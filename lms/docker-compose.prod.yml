@@ -1,0 +1,36 @@
+# Production stack. Run from lms/:  docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+# - No ports are published for the database (the host already runs Postgres on 5432).
+# - The API listens on 127.0.0.1:8000 only; nginx on the host proxies /api to it.
+name: lws
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lws
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: lws
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lws"]
+      interval: 10s
+      retries: 10
+    mem_limit: 512m
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://lws:${POSTGRES_PASSWORD}@db:5432/lws
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    mem_limit: 512m
+
+volumes:
+  pgdata:
