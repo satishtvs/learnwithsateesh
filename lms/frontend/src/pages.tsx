@@ -11,12 +11,21 @@ function useReturnTo(): string {
   return from && from.startsWith('/') && !from.startsWith('//') ? from : '/'
 }
 
+/** The logo has a white background, so it sits on a white tile that also works in dark mode. */
+function BrandLogo({ height }: { height: number }) {
+  return (
+    <Link to="/" className="logo-link" aria-label="Learn With Sateesh, home">
+      <img src="/logo.png" alt="Learn With Sateesh" height={height} />
+    </Link>
+  )
+}
+
 export function Home() {
   const { user, signOut } = useAuth()
   return (
     <main className="wide">
       <header className="topbar">
-        <strong className="brand">LearnWithSateesh</strong>
+        <BrandLogo height={48} />
         {user ? (
           <span>
             {user.full_name || user.email} · <a href="#" onClick={(e) => { e.preventDefault(); signOut() }}>Sign out</a>
@@ -112,6 +121,7 @@ export function Login() {
 
   return (
     <main className="card">
+      <BrandLogo height={40} />
       <h1>Sign in</h1>
       <GoogleButton />
       <form onSubmit={onSubmit}>
@@ -151,6 +161,7 @@ export function Register() {
 
   return (
     <main className="card">
+      <BrandLogo height={40} />
       <h1>Create account</h1>
       <GoogleButton />
       <form onSubmit={onSubmit}>

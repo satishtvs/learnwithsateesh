@@ -64,7 +64,9 @@ a { color: #b85f00; }
 .error { color: #d93025; margin: 0; }
 .muted { text-align: center; opacity: 0.7; margin: 12px 0 0; }
 .muted-left { opacity: 0.65; margin: 0 0 4px; }
-.brand { font-size: 1.1rem; }
+.logo-link { display: inline-block; background: #fff; border-radius: 10px; padding: 4px 8px; line-height: 0; }
+.logo-link img { display: block; height: auto; max-width: 100%; }
+.card .logo-link { margin-bottom: 8px; }
 .hero { padding: 28px 0 8px; }
 .hero h1 { font-size: 2rem; line-height: 1.2; }
 .hero h1::after { content: ''; display: block; width: 56px; height: 4px; background: var(--orange); margin-top: 10px; border-radius: 2px; }
