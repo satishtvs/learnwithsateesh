@@ -51,6 +51,7 @@ class LessonOut(BaseModel):
     notes_md: str
     slides_url: str | None
     is_preview: bool
+    completed: bool = False  # for the signed-in user; always False for anonymous visitors
     chapter_code: str | None
     chapter_title: str | None
     prev: LessonSummary | None
@@ -142,7 +143,15 @@ async def get_lesson(
     if not lesson.is_preview and user is None:
         raise HTTPException(401, "login_required")
     chapter = next((c for c in course.chapters if c.id == lesson.chapter_id), None)
+
+    completed = False
+    if user is not None:  # lazy import: progress.py imports this module
+        from app.progress import completed_lesson_ids, record_visit
+
+        await record_visit(session, user, lesson)
+        completed = lesson.id in await completed_lesson_ids(session, user, [lesson])
     return LessonOut(
+        completed=completed,
         slug=lesson.slug,
         title=lesson.title,
         youtube_id=lesson.youtube_id,

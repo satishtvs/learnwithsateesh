@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { getProviders, login, register, startGoogleLogin } from './api'
 import { useAuth } from './auth'
-import { Catalogue, FreePreviews } from './courses'
+import { Catalogue, ContinueLearning, FreePreviews } from './courses'
 
 /** Where to go after signing in: the page that sent us here, if it was an in-app path. */
 function useReturnTo(): string {
@@ -56,6 +56,8 @@ export function Home() {
           <li>Live doubt-clearing sessions with the instructor <span className="badge">Planned</span></li>
         </ul>
       </section>
+
+      {user && <ContinueLearning />}
 
       <section id="try-free">
         <h2>Try it free, no account needed</h2>

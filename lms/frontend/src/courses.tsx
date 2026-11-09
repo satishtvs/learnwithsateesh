@@ -1,11 +1,30 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Markdown from 'react-markdown'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { ApiError, getCourse, getLesson, listCourses, type LessonSummary } from './api'
+import {
+  ApiError,
+  getAllProgress,
+  getCourse,
+  getCourseProgress,
+  getLesson,
+  listCourses,
+  setLessonCompleted,
+  type CourseProgress,
+  type LessonSummary,
+} from './api'
 import { useAuth } from './auth'
 
 function useCourses() {
   return useQuery({ queryKey: ['courses'], queryFn: listCourses })
+}
+
+function ProgressBar({ p }: { p: Pick<CourseProgress, 'completed' | 'total' | 'percent'> }) {
+  return (
+    <div className="progress" role="progressbar" aria-valuenow={p.percent} aria-valuemin={0} aria-valuemax={100}>
+      <div className="bar"><div style={{ width: `${p.percent}%` }} /></div>
+      <span>{p.completed} of {p.total} lessons · {p.percent}%</span>
+    </div>
+  )
 }
 
 export function Catalogue() {
@@ -27,6 +46,31 @@ export function Catalogue() {
   )
 }
 
+/** Signed-in home: courses the learner has started, with a resume link. */
+export function ContinueLearning() {
+  const { data } = useQuery({ queryKey: ['progress'], queryFn: getAllProgress })
+  const started = (data ?? []).filter((p) => p.started)
+  if (!started.length) return null
+  return (
+    <section>
+      <h2>Continue learning</h2>
+      <div className="grid">
+        {started.map((p) => (
+          <div key={p.course_slug} className="course-card static">
+            <h3>{p.course_title}</h3>
+            <ProgressBar p={p} />
+            {p.resume ? (
+              <Link className="btn" to={`/courses/${p.course_slug}/lessons/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
+            ) : (
+              <p className="meta">All lessons completed. Well done!</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 /** Lessons anyone can watch without an account, across all courses. */
 export function FreePreviews() {
   const { data, isLoading } = useCourses()
@@ -45,12 +89,22 @@ export function FreePreviews() {
   )
 }
 
-function LessonLink({ course, lesson, signedIn }: { course: string; lesson: LessonSummary; signedIn: boolean }) {
+function LessonLink({
+  course,
+  lesson,
+  signedIn,
+  done,
+}: {
+  course: string
+  lesson: LessonSummary
+  signedIn: boolean
+  done: boolean
+}) {
   const locked = !lesson.is_preview && !signedIn
   return (
-    <li>
+    <li className={done ? 'done' : ''}>
       <Link to={`/courses/${course}/lessons/${lesson.slug}`}>
-        {locked ? '🔒 ' : ''}
+        {done ? '✓ ' : locked ? '🔒 ' : ''}
         {lesson.title}
       </Link>
       {lesson.is_preview && !signedIn && <span className="badge">Free preview</span>}
@@ -62,9 +116,16 @@ export function CoursePage() {
   const { slug = '' } = useParams()
   const { user } = useAuth()
   const { data, error, isLoading } = useQuery({ queryKey: ['course', slug], queryFn: () => getCourse(slug), retry: false })
+  const progress = useQuery({
+    queryKey: ['progress', slug],
+    queryFn: () => getCourseProgress(slug),
+    enabled: !!user,
+    retry: false,
+  })
   if (isLoading) return <main className="wide">Loading…</main>
   if (error || !data) return <main className="wide"><p>Course not found.</p><Link to="/">Back</Link></main>
   const signedIn = !!user
+  const done = new Set(progress.data?.completed_slugs ?? [])
   const allLessons = [...data.overview_lessons, ...data.chapters.flatMap((c) => c.lessons)]
   const anyLocked = allLessons.some((l) => !l.is_preview)
 
@@ -73,6 +134,16 @@ export function CoursePage() {
       <p><Link to="/">← All courses</Link></p>
       <h1>{data.title}</h1>
       <p>{data.description}</p>
+      {progress.data && (
+        <div className="progress-panel">
+          <ProgressBar p={progress.data} />
+          {progress.data.resume && (
+            <Link className="btn" to={`/courses/${slug}/lessons/${progress.data.resume.slug}`}>
+              {progress.data.started ? 'Resume' : 'Start'}: {progress.data.resume.title}
+            </Link>
+          )}
+        </div>
+      )}
       {!signedIn && (
         <p className="unlock">
           {anyLocked
@@ -86,7 +157,9 @@ export function CoursePage() {
         <section>
           <h2>Start here</h2>
           <ul className="lessons">
-            {data.overview_lessons.map((l) => <LessonLink key={l.slug} course={slug} lesson={l} signedIn={signedIn} />)}
+            {data.overview_lessons.map((l) => (
+              <LessonLink key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />
+            ))}
           </ul>
         </section>
       )}
@@ -101,7 +174,9 @@ export function CoursePage() {
             <p className="muted-left">Coming soon</p>
           ) : (
             <ul className="lessons">
-              {ch.lessons.map((l) => <LessonLink key={l.slug} course={slug} lesson={l} signedIn={signedIn} />)}
+              {ch.lessons.map((l) => (
+                <LessonLink key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />
+              ))}
             </ul>
           )}
         </section>
@@ -127,12 +202,20 @@ export function LessonPage() {
   const { slug = '', lessonSlug = '' } = useParams()
   const { user, loading } = useAuth()
   const loc = useLocation()
+  const qc = useQueryClient()
   const { data, error, isLoading } = useQuery({
     // user id in the key: re-fetch after signing in or out
     queryKey: ['lesson', slug, lessonSlug, user?.id ?? 'anon'],
     queryFn: () => getLesson(slug, lessonSlug),
     enabled: !loading,
     retry: false,
+  })
+  const toggle = useMutation({
+    mutationFn: (completed: boolean) => setLessonCompleted(slug, lessonSlug, completed),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['progress'] })
+      qc.invalidateQueries({ queryKey: ['lesson', slug, lessonSlug] })
+    },
   })
 
   if (loading || isLoading) return <main className="wide">Loading…</main>
@@ -163,7 +246,19 @@ export function LessonPage() {
           allowFullScreen
         />
       </div>
-      {!user && (
+      {user ? (
+        <div className="complete-row">
+          <button
+            type="button"
+            className={data.completed ? 'done-btn' : ''}
+            disabled={toggle.isPending}
+            onClick={() => toggle.mutate(!data.completed)}
+          >
+            {data.completed ? '✓ Completed (click to undo)' : 'Mark as complete'}
+          </button>
+          {toggle.isError && <span role="alert" className="error">Could not save. Try again.</span>}
+        </div>
+      ) : (
         <p className="unlock">
           Enjoying this? <Link to="/register" state={{ from: loc.pathname }}>Create a free account</Link>{' '}
           to track your progress and get quizzes and certificates as they launch.

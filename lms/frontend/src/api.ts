@@ -58,6 +58,7 @@ export interface Lesson {
   notes_md: string
   slides_url: string | null
   is_preview: boolean
+  completed: boolean
   chapter_code: string | null
   chapter_title: string | null
   prev: LessonSummary | null
@@ -72,6 +73,33 @@ export async function getCourse(slug: string): Promise<CourseOutline> {
 }
 export async function getLesson(course: string, lesson: string): Promise<Lesson> {
   return (await request(`/courses/${encodeURIComponent(course)}/lessons/${encodeURIComponent(lesson)}`)).json()
+}
+
+export interface CourseProgress {
+  course_slug: string
+  course_title: string
+  total: number
+  completed: number
+  percent: number
+  started: boolean
+  completed_slugs: string[]
+  resume: LessonSummary | null
+}
+
+export async function getCourseProgress(course: string): Promise<CourseProgress> {
+  return (await request(`/courses/${encodeURIComponent(course)}/progress`)).json()
+}
+export async function getAllProgress(): Promise<CourseProgress[]> {
+  return (await request('/progress')).json()
+}
+export async function setLessonCompleted(course: string, lesson: string, completed: boolean): Promise<CourseProgress> {
+  return (
+    await request(`/courses/${encodeURIComponent(course)}/lessons/${encodeURIComponent(lesson)}/progress`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed }),
+    })
+  ).json()
 }
 
 export async function getMe(): Promise<User | null> {

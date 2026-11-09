@@ -84,6 +84,17 @@ a { color: #b85f00; }
 .gate .cta { justify-content: center; }
 .meta { margin-top: 8px !important; font-size: 0.8rem !important; opacity: 0.65 !important; }
 ul.previews { list-style: none; padding: 0; }
+.progress { margin: 8px 0; }
+.progress .bar { height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--text) 15%, transparent); overflow: hidden; }
+.progress .bar > div { height: 100%; background: var(--orange); border-radius: 999px; transition: width 0.3s; }
+.progress span { display: block; margin-top: 4px; font-size: 0.8rem; opacity: 0.75; }
+.progress-panel { display: grid; gap: 10px; margin: 16px 0; padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; }
+.course-card.static:hover { border-color: var(--border); }
+.course-card .btn { margin-top: 8px; font-size: 0.9rem; }
+ul.lessons li.done a { opacity: 0.7; }
+.complete-row { margin: 14px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.complete-row button { width: auto; }
+.complete-row button.done-btn { background: #2e7d32; }
 .perks ul { padding-left: 20px; }
 .perks li { padding: 4px 0; }
 .topbar { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }

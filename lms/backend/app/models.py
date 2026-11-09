@@ -1,5 +1,8 @@
+import uuid
+from datetime import datetime, timezone
+
 from fastapi_users.db import SQLAlchemyBaseOAuthAccountTableUUID, SQLAlchemyBaseUserTableUUID
-from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -78,3 +81,18 @@ class Lesson(Base):
 
     course: Mapped[Course] = relationship(back_populates="lessons")
     chapter: Mapped[Chapter | None] = relationship(back_populates="lessons")
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+class LessonProgress(Base):
+    """One row per (user, lesson) the user has opened. completed_at is set once they mark it complete."""
+
+    __tablename__ = "lesson_progress"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
+    lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id", ondelete="CASCADE"), primary_key=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
