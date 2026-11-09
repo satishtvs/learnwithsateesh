@@ -54,7 +54,7 @@ export function Shell() {
         <nav className="side-nav">
           {NAV.map((n) => {
             // Quiz pages live under /courses/... but belong to the Quizzes item.
-            const inQuiz = pathname === '/quizzes' || pathname.includes('/quizzes/')
+            const inQuiz = !pathname.startsWith('/admin') && (pathname === '/quizzes' || pathname.includes('/quizzes/'))
             const active = inQuiz
               ? n.to === '/quizzes'
               : n.end
@@ -67,6 +67,15 @@ export function Shell() {
               </Link>
             )
           })}
+          {(user?.role === 'instructor' || user?.role === 'admin') && (
+            <>
+              <p className="nav-label">Instructor</p>
+              <Link to="/admin" className={`nav-item${pathname.startsWith('/admin') ? ' active' : ''}`} aria-current={pathname.startsWith('/admin') ? 'page' : undefined}>
+                <Icon name="settings" />
+                <span>Manage content</span>
+              </Link>
+            </>
+          )}
           <p className="nav-label">Coming soon</p>
           {SOON.map((n) => (
             <span key={n.label} className="nav-item disabled" aria-disabled="true">
@@ -130,15 +139,6 @@ export function Shell() {
           <span>AI &amp; ML for B.Tech students</span>
         </footer>
       </div>
-    </div>
-  )
-}
-
-/** Bare centred layout for sign-in and registration. */
-export function AuthLayout() {
-  return (
-    <div className="auth-wrap">
-      <Outlet />
     </div>
   )
 }

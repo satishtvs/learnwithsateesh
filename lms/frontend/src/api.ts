@@ -14,13 +14,31 @@ export class ApiError extends Error {
   }
 }
 
+/** Machine codes the auth API returns, in words a learner understands. */
+const FRIENDLY: Record<string, string> = {
+  REGISTER_USER_ALREADY_EXISTS: 'An account with this email already exists. Try signing in instead.',
+  LOGIN_BAD_CREDENTIALS: 'Incorrect email or password.',
+  LOGIN_USER_NOT_VERIFIED: 'Please verify your email address first. Check your inbox for the link.',
+  RESET_PASSWORD_BAD_TOKEN: 'This reset link is invalid or has expired. Please request a new one.',
+  VERIFY_USER_BAD_TOKEN: 'This verification link is invalid or has expired.',
+  VERIFY_USER_ALREADY_VERIFIED: 'Your email address is already verified. You can sign in.',
+}
+
 async function request(path: string, init: RequestInit = {}): Promise<Response> {
   const res = await fetch(`/api${path}`, { credentials: 'same-origin', ...init })
   if (!res.ok) {
     let detail = res.statusText
     try {
       const body = await res.json()
-      detail = typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail)
+      if (typeof body.detail === 'string') detail = FRIENDLY[body.detail] ?? body.detail
+      else if (body.detail && typeof body.detail.reason === 'string') detail = body.detail.reason // e.g. weak password
+      else if (Array.isArray(body.detail)) {
+        // FastAPI validation errors: show the human message(s), not raw JSON
+        detail = body.detail
+          .map((d: { msg?: string }) => String(d.msg ?? '').replace(/^Value error, /, ''))
+          .filter(Boolean)
+          .join('. ')
+      } else detail = JSON.stringify(body.detail)
     } catch {
       /* non-JSON error body */
     }
@@ -169,6 +187,125 @@ export async function submitAttempt(
   ).json()
 }
 
+// ---------------------------------------------------------------- instructor admin
+export interface AdminCourse {
+  id: number
+  slug: string
+  title: string
+  description: string
+  published: boolean
+  position: number
+  chapter_count: number
+  lesson_count: number
+  quiz_count: number
+}
+export interface AdminChapter {
+  id: number
+  code: string
+  title: string
+  unit: string | null
+  textbook_ref: string | null
+  position: number
+}
+export interface AdminLesson {
+  id: number
+  chapter_id: number | null
+  slug: string
+  title: string
+  youtube_id: string
+  notes_md: string
+  slides_url: string | null
+  position: number
+  published: boolean
+  is_preview: boolean
+}
+export interface AdminQuiz {
+  id: number
+  course_id: number
+  slug: string
+  title: string
+  chapter_id: number | null
+  pass_percent: number
+  published: boolean
+  position: number
+  question_count: number
+}
+export interface AdminQuestion {
+  id: number
+  position: number
+  prompt: string
+  options: string[]
+  correct_index: number
+  explanation: string
+}
+export interface AdminCourseDetail {
+  course: AdminCourse
+  chapters: AdminChapter[]
+  lessons: AdminLesson[]
+  quizzes: AdminQuiz[]
+}
+export interface AdminQuizDetail {
+  quiz: AdminQuiz
+  questions: AdminQuestion[]
+}
+
+async function adminCall<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const res = await request(`/admin${path}`, {
+    method,
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+  return (res.status === 204 ? undefined : await res.json()) as T
+}
+
+export const admin = {
+  courses: () => adminCall<AdminCourse[]>('GET', '/courses'),
+  course: (id: number) => adminCall<AdminCourseDetail>('GET', `/courses/${id}`),
+  createCourse: (b: { title: string; description?: string; slug?: string }) => adminCall<AdminCourse>('POST', '/courses', b),
+  updateCourse: (id: number, b: Partial<Pick<AdminCourse, 'title' | 'slug' | 'description' | 'published'>>) =>
+    adminCall<AdminCourse>('PATCH', `/courses/${id}`, b),
+
+  createChapter: (course: number, b: { code: string; title: string; unit?: string | null; textbook_ref?: string | null }) =>
+    adminCall<AdminChapter>('POST', `/courses/${course}/chapters`, b),
+  updateChapter: (id: number, b: Partial<Omit<AdminChapter, 'id' | 'position'>>) => adminCall<AdminChapter>('PATCH', `/chapters/${id}`, b),
+  deleteChapter: (id: number) => adminCall<void>('DELETE', `/chapters/${id}`),
+  moveChapter: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/chapters/${id}/move`, { direction }),
+
+  createLesson: (course: number, b: LessonForm) => adminCall<AdminLesson>('POST', `/courses/${course}/lessons`, b),
+  updateLesson: (id: number, b: Partial<LessonForm>) => adminCall<AdminLesson>('PATCH', `/lessons/${id}`, b),
+  deleteLesson: (id: number) => adminCall<void>('DELETE', `/lessons/${id}`),
+  moveLesson: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/lessons/${id}/move`, { direction }),
+
+  createQuiz: (course: number, b: { title: string; chapter_id?: number | null; pass_percent?: number }) =>
+    adminCall<AdminQuiz>('POST', `/courses/${course}/quizzes`, b),
+  quiz: (id: number) => adminCall<AdminQuizDetail>('GET', `/quizzes/${id}`),
+  updateQuiz: (id: number, b: Partial<Pick<AdminQuiz, 'title' | 'chapter_id' | 'pass_percent' | 'published'>>) =>
+    adminCall<AdminQuiz>('PATCH', `/quizzes/${id}`, b),
+  deleteQuiz: (id: number) => adminCall<void>('DELETE', `/quizzes/${id}`),
+  moveQuiz: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/quizzes/${id}/move`, { direction }),
+
+  createQuestion: (quiz: number, b: QuestionForm) => adminCall<AdminQuestion>('POST', `/quizzes/${quiz}/questions`, b),
+  updateQuestion: (id: number, b: Partial<QuestionForm>) => adminCall<AdminQuestion>('PATCH', `/questions/${id}`, b),
+  deleteQuestion: (id: number) => adminCall<void>('DELETE', `/questions/${id}`),
+  moveQuestion: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/questions/${id}/move`, { direction }),
+}
+
+export interface LessonForm {
+  title: string
+  youtube: string
+  chapter_id: number | null
+  notes_md: string
+  slides_url: string | null
+  published: boolean
+  is_preview: boolean
+}
+export interface QuestionForm {
+  prompt: string
+  options: string[]
+  correct_index: number
+  explanation: string
+}
+
 export async function getMe(): Promise<User | null> {
   try {
     return await (await request('/me')).json()
@@ -198,8 +335,23 @@ export async function logout(): Promise<void> {
   await request('/auth/logout', { method: 'POST' })
 }
 
-export async function getProviders(): Promise<{ google: boolean }> {
+export async function getProviders(): Promise<{ google: boolean; email: boolean }> {
   return (await request('/auth/providers')).json()
+}
+
+const jsonPost = (body: unknown): RequestInit => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+})
+export async function forgotPassword(email: string): Promise<void> {
+  await request('/auth/forgot-password', jsonPost({ email }))
+}
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await request('/auth/reset-password', jsonPost({ token, password }))
+}
+export async function verifyEmail(token: string): Promise<void> {
+  await request('/auth/verify', jsonPost({ token }))
 }
 
 /** Starts the Google flow: ask the API for the consent URL, then navigate to it. */

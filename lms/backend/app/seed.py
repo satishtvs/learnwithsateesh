@@ -44,7 +44,7 @@ LESSONS = [
 ]
 
 
-async def seed() -> None:
+async def seed(force_quizzes: bool = False) -> None:
     async with async_session_maker() as s:
         course = (await s.execute(select(Course).where(Course.slug == COURSE["slug"]))).scalar_one_or_none()
         if course is None:
@@ -55,9 +55,10 @@ async def seed() -> None:
         chapters: dict[str, Chapter] = {}
         existing = {c.code: c for c in (await s.execute(select(Chapter).where(Chapter.course_id == course.id))).scalars()}
         for pos, (code, title, unit, ref) in enumerate(CHAPTERS):
-            ch = existing.get(code) or Chapter(course_id=course.id, code=code)
-            ch.title, ch.unit, ch.textbook_ref, ch.position = title, unit, ref, pos
-            s.add(ch)
+            ch = existing.get(code)
+            if ch is None:  # create-only: existing chapters belong to the instructor admin now
+                ch = Chapter(course_id=course.id, code=code, title=title, unit=unit, textbook_ref=ref, position=pos)
+                s.add(ch)
             chapters[code] = ch
         await s.flush()
 
@@ -65,18 +66,26 @@ async def seed() -> None:
         for pos, (code, slug, title, yt, preview) in enumerate(LESSONS):
             if not YOUTUBE_ID.match(yt):
                 raise ValueError(f"bad YouTube id for {slug}: {yt!r}")
-            le = have.get(slug) or Lesson(course_id=course.id, slug=slug)
-            le.title, le.youtube_id, le.position, le.is_preview = title, yt, pos, preview
-            le.chapter_id = chapters[code].id if code else None
-            s.add(le)
+            if slug in have:
+                continue  # create-only: edit existing lessons in the instructor admin
+            s.add(
+                Lesson(
+                    course_id=course.id, slug=slug, title=title, youtube_id=yt, position=pos, is_preview=preview,
+                    chapter_id=chapters[code].id if code else None,
+                )
+            )
         await s.commit()
-    print(f"seeded {COURSE['slug']}: {len(CHAPTERS)} chapters, {len(LESSONS)} lessons")
+    print(f"seeded {COURSE['slug']}: {len(CHAPTERS)} chapters, {len(LESSONS)} lessons (existing ones are left as they are)")
 
     async with async_session_maker() as s:
-        nq, nn = await import_all(s)
+        nq, nn = await import_all(s, force=force_quizzes)
         await s.commit()
-    print(f"imported quizzes: {nq} quizzes, {nn} questions (only 'approved' ones are visible)")
+    print(f"imported quizzes: {nq} quizzes, {nn} questions created (only 'approved' ones are visible)")
 
 
 if __name__ == "__main__":
-    asyncio.run(seed())
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Create any missing seed content. Never overwrites existing content by default.")
+    ap.add_argument("--reimport-quizzes", action="store_true", help="overwrite quizzes in the database from content/quizzes/*.yaml")
+    asyncio.run(seed(force_quizzes=ap.parse_args().reimport_quizzes))

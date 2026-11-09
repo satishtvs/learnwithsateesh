@@ -19,5 +19,13 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
 
+    # Outgoing email (password reset, verification). Leave SMTP_HOST empty in development: emails are logged.
+    smtp_host: str = ""
+    smtp_port: int = 587  # 587 = STARTTLS, 465 = implicit TLS
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""  # e.g. "Learn With Sateesh <no-reply@learnwithsateesh.in>"
+    smtp_starttls: bool = True
+
 
 settings = Settings()

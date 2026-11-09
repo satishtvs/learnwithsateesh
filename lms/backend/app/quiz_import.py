@@ -48,8 +48,12 @@ def parse_quiz_file(data: dict, source: str = "") -> dict:
     return data
 
 
-async def import_quiz_data(session: AsyncSession, data: dict) -> tuple[int, int]:
-    """Create/update the course, chapter, quizzes and questions. Returns (quizzes, questions)."""
+async def import_quiz_data(session: AsyncSession, data: dict, force: bool = False) -> tuple[int, int]:
+    """Create the course, chapter, quizzes and questions that do not exist yet. Returns (quizzes, questions) created.
+
+    Existing content is never touched unless `force` is set: once something lives in the database the instructor
+    admin owns it, and a deploy must not overwrite edits made there.
+    """
     cdata, chdata = data["course"], data["chapter"]
     course = (await session.execute(select(Course).where(Course.slug == cdata["slug"]))).scalar_one_or_none()
     if course is None:
@@ -62,13 +66,14 @@ async def import_quiz_data(session: AsyncSession, data: dict) -> tuple[int, int]
     chapter = (
         await session.execute(select(Chapter).where(Chapter.course_id == course.id, Chapter.code == chdata["code"]))
     ).scalar_one_or_none()
-    if chapter is None:
-        pos = (await session.execute(select(func.count(Chapter.id)).where(Chapter.course_id == course.id))).scalar_one()
-        chapter = Chapter(course_id=course.id, code=chdata["code"], position=pos)
-        session.add(chapter)
-    chapter.title = chdata["title"]
-    chapter.unit = chdata.get("unit")
-    chapter.textbook_ref = chdata.get("textbook_ref")
+    if chapter is None or force:
+        if chapter is None:
+            pos = (await session.execute(select(func.count(Chapter.id)).where(Chapter.course_id == course.id))).scalar_one()
+            chapter = Chapter(course_id=course.id, code=chdata["code"], position=pos)
+            session.add(chapter)
+        chapter.title = chdata["title"]
+        chapter.unit = chdata.get("unit")
+        chapter.textbook_ref = chdata.get("textbook_ref")
     await session.flush()
 
     n_quizzes = n_questions = 0
@@ -80,6 +85,8 @@ async def import_quiz_data(session: AsyncSession, data: dict) -> tuple[int, int]
                 .options(selectinload(Quiz.questions))  # async: the old questions must be loaded to be replaced
             )
         ).scalar_one_or_none()
+        if quiz is not None and not force:
+            continue  # already in the database: the admin owns it now
         if quiz is None:
             quiz = Quiz(course_id=course.id, slug=qd["slug"])
             session.add(quiz)
@@ -104,10 +111,10 @@ async def import_quiz_data(session: AsyncSession, data: dict) -> tuple[int, int]
     return n_quizzes, n_questions
 
 
-async def import_all(session: AsyncSession, directory: Path = CONTENT_DIR) -> tuple[int, int]:
+async def import_all(session: AsyncSession, directory: Path = CONTENT_DIR, force: bool = False) -> tuple[int, int]:
     total_q = total_n = 0
     for path in sorted(directory.glob("*.yaml")):
         data = parse_quiz_file(yaml.safe_load(path.read_text(encoding="utf-8")), path.name)
-        nq, nn = await import_quiz_data(session, data)
+        nq, nn = await import_quiz_data(session, data, force=force)
         total_q, total_n = total_q + nq, total_n + nn
     return total_q, total_n

@@ -37,9 +37,9 @@ DATA = {
 }
 
 
-async def load(data=DATA):
+async def load(data=DATA, force=False):
     async with async_session_maker() as s:
-        await import_quiz_data(s, parse_quiz_file(copy.deepcopy(data)))
+        await import_quiz_data(s, parse_quiz_file(copy.deepcopy(data)), force=force)
         await s.commit()
 
 
@@ -111,10 +111,20 @@ async def test_import_is_idempotent_and_draft_content_stays_hidden(client):
     assert "machine-learning-r22" not in [c["slug"] for c in (await client.get("/api/courses")).json()]
 
 
-async def test_reimport_replaces_questions_instead_of_duplicating(client):
+async def test_plain_reimport_never_overwrites_existing_quizzes(client):
+    """Once a quiz is in the database the admin owns it: a deploy-time seed must leave it alone."""
     d = copy.deepcopy(DATA)
     d["quizzes"][0]["questions"] = d["quizzes"][0]["questions"][:2]
+    d["quizzes"][0]["title"] = "Changed in the file"
     await load(d)
+    quiz = (await client.get(C)).json()[0]
+    assert quiz["question_count"] == 3 and quiz["title"] == "Intro quiz"
+
+
+async def test_forced_reimport_replaces_questions_instead_of_duplicating(client):
+    d = copy.deepcopy(DATA)
+    d["quizzes"][0]["questions"] = d["quizzes"][0]["questions"][:2]
+    await load(d, force=True)
     quizzes = (await client.get(C)).json()
     assert quizzes[0]["question_count"] == 2
 

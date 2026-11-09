@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 
 from fastapi import Depends, Request
 from fastapi.responses import RedirectResponse
-from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
+from fastapi_users import BaseUserManager, FastAPIUsers, InvalidPasswordException, UUIDIDMixin
 from fastapi_users.authentication import AuthenticationBackend, CookieTransport, JWTStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 from httpx_oauth.clients.google import GoogleOAuth2
@@ -18,9 +18,22 @@ COOKIE_NAME = "lws_auth"
 LIFETIME = 60 * 60 * 24 * 7  # 7 days
 
 
+MIN_PASSWORD_LENGTH = 8
+
+
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.secret
     verification_token_secret = settings.secret
+
+    async def validate_password(self, password: str, user) -> None:
+        """Enforced on registration, password reset and profile updates (the form's minLength is only a hint)."""
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise InvalidPasswordException(reason=f"Password must be at least {MIN_PASSWORD_LENGTH} characters.")
+        if len(password) > 128:
+            raise InvalidPasswordException(reason="Password must be at most 128 characters.")
+        email = getattr(user, "email", "") or ""
+        if email and password.lower() == email.lower():
+            raise InvalidPasswordException(reason="Password must not be the same as your email address.")
 
     async def on_after_register(self, user: User, request: Request | None = None):
         if not user.is_verified:

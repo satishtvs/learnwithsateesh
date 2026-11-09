@@ -15,6 +15,26 @@ async def test_me_requires_login(client):
     assert r.status_code == 401
 
 
+@pytest.mark.parametrize("password", ["abc", "1234567", "", "x" * 129])
+async def test_weak_passwords_are_rejected_by_the_server(client, password):
+    """The form's minLength is only a browser hint; direct API calls must be refused too."""
+    r = await client.post("/api/auth/register", json={"email": "weak@example.com", "password": password})
+    assert r.status_code in (400, 422)
+    # and no account was created, so logging in with that password fails (422 for an empty form field)
+    assert (await client.post("/api/auth/login", data={"username": "weak@example.com", "password": password})).status_code in (400, 422)
+
+
+async def test_password_may_not_equal_the_email(client):
+    r = await client.post("/api/auth/register", json={"email": "same-as-pw@example.com", "password": "same-as-pw@example.com"})
+    assert r.status_code == 400
+    assert "email" in r.json()["detail"]["reason"].lower()
+
+
+async def test_eight_character_password_is_accepted(client):
+    r = await client.post("/api/auth/register", json={"email": "ok8@example.com", "password": "12345678"})
+    assert r.status_code == 201
+
+
 async def test_register_login_me(client):
     r = await client.post("/api/auth/register", json={**CREDS, "full_name": "Asha"})
     assert r.status_code == 201

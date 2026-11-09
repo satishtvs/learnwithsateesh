@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.admin import router as admin_router
 from app.courses import router as courses_router
+from app.emailer import email_enabled
 from app.progress import router as progress_router
 from app.quizzes import all_router as all_quizzes_router
 from app.quizzes import router as quizzes_router
@@ -52,6 +54,7 @@ api.include_router(courses_router)
 api.include_router(progress_router)
 api.include_router(quizzes_router)
 api.include_router(all_quizzes_router)
+api.include_router(admin_router)
 
 
 @api.get("/me", response_model=UserRead)
@@ -61,7 +64,8 @@ async def me(user: User = Depends(current_active_user)):
 
 @api.get("/auth/providers")
 async def providers():
-    return {"google": bool(settings.google_client_id)}
+    # "email": real email can be sent, so password reset / verification links will actually arrive.
+    return {"google": bool(settings.google_client_id), "email": email_enabled()}
 
 
 app.include_router(api)
