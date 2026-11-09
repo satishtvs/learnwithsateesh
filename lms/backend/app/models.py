@@ -147,3 +147,18 @@ class QuizAttempt(Base):
     passed: Mapped[bool] = mapped_column(Boolean)
     answers: Mapped[dict] = mapped_column(JSON)  # {question_id: chosen_index | null}
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class Certificate(Base):
+    """Issued once per (user, course) when every lesson is complete. The name is a snapshot at issue time."""
+
+    __tablename__ = "certificate"
+    __table_args__ = (UniqueConstraint("user_id", "course_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(24), unique=True, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), index=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), index=True)
+    learner_name: Mapped[str] = mapped_column(String(200))
+    lesson_count: Mapped[int] = mapped_column(Integer)
+    issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

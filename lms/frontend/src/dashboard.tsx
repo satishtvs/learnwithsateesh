@@ -26,6 +26,7 @@ const TABS = [
   { to: '/dashboard', label: 'Dashboard', end: true },
   { to: '/dashboard/courses', label: 'Enrolled courses' },
   { to: '/dashboard/quizzes', label: 'Quiz attempts' },
+  { to: '/dashboard/certificates', label: 'Certificates' },
   { to: '/dashboard/profile', label: 'My profile' },
 ]
 

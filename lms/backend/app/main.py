@@ -5,6 +5,7 @@ from app.config import settings
 from app.admin import router as admin_router
 from app.courses import router as courses_router
 from app.emailer import email_enabled
+from app.certificates import router as certificates_router
 from app.progress import router as progress_router
 from app.quizzes import all_router as all_quizzes_router
 from app.quizzes import me_router as my_attempts_router
@@ -53,6 +54,7 @@ if settings.google_client_id:
 
 api.include_router(courses_router)
 api.include_router(progress_router)
+api.include_router(certificates_router)
 api.include_router(quizzes_router)
 api.include_router(all_quizzes_router)
 api.include_router(my_attempts_router)

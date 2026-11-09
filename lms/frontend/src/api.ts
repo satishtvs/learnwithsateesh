@@ -394,3 +394,21 @@ export async function startGoogleLogin(): Promise<void> {
   const { authorization_url } = await (await request('/auth/google/authorize')).json()
   window.location.href = authorization_url
 }
+
+export interface Certificate {
+  code: string
+  learner_name: string
+  course_slug: string
+  course_title: string
+  lesson_count: number
+  issued_at: string
+}
+export async function claimCertificate(course: string): Promise<Certificate> {
+  return (await request(`/courses/${encodeURIComponent(course)}/certificate`, { method: 'POST' })).json()
+}
+export async function getMyCertificates(): Promise<Certificate[]> {
+  return (await request('/me/certificates')).json()
+}
+export async function getCertificate(code: string): Promise<Certificate> {
+  return (await request(`/certificates/${encodeURIComponent(code)}`)).json()
+}

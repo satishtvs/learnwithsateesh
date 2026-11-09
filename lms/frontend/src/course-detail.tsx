@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { getCourse, getCourseProgress, listCourseQuizzes } from './api'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes } from './api'
 import { useAuth } from './auth'
 import { LessonRow, QuizRow } from './courses'
 import { groupRefs, lessonsWord } from './format'
@@ -18,6 +18,9 @@ export function CoursePage() {
   const { slug = '' } = useParams()
   const { user } = useAuth()
   const [copied, setCopied] = useState(false)
+  const [claiming, setClaiming] = useState(false)
+  const [claimError, setClaimError] = useState('')
+  const navigate = useNavigate()
   const { data, error, isLoading } = useQuery({ queryKey: ['course', slug], queryFn: () => getCourse(slug), retry: false })
   const progress = useQuery({
     queryKey: ['progress', slug],
@@ -43,6 +46,18 @@ export function CoursePage() {
   const textbooks = groupRefs([...new Set(data.chapters.map((c) => c.textbook_ref).filter(Boolean))] as string[])
   const firstFree = freeLessons[0]
   const resume = progress.data?.resume
+
+  async function claim() {
+    setClaiming(true)
+    setClaimError('')
+    try {
+      const cert = await claimCertificate(slug)
+      navigate(`/certificates/${cert.code}`)
+    } catch {
+      setClaimError('Could not issue the certificate. Please try again.')
+      setClaiming(false)
+    }
+  }
 
   async function share() {
     const url = window.location.href
@@ -175,7 +190,13 @@ export function CoursePage() {
                   {progress.data?.started ? 'Resume' : 'Start learning'}
                 </Link>
               ) : progress.data && progress.data.total > 0 ? (
-                <p className="note small">You have completed every lesson. Well done!</p>
+                <>
+                  <p className="note small">You have completed every lesson. Well done!</p>
+                  <button type="button" className="btn block" onClick={claim} disabled={claiming}>
+                    <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
+                  </button>
+                  {claimError && <p className="error small" role="alert">{claimError}</p>}
+                </>
               ) : (
                 <p className="muted small">Lessons are on the way.</p>
               )
@@ -197,7 +218,7 @@ export function CoursePage() {
               {allQuizzes.length > 0 && <li><Icon name="quiz" size={16} /> {allQuizzes.length} practice {allQuizzes.length === 1 ? 'quiz' : 'quizzes'} with instant feedback</li>}
               <li><Icon name="learning" size={16} /> Progress tracking and resume</li>
               {freeLessons.length > 0 && <li><Icon name="sparkle" size={16} /> {freeLessons.length} free preview {lessonsWord(freeLessons.length)}</li>}
-              <li className="soon"><Icon name="award" size={16} /> Certificate of completion <span className="chip">Coming soon</span></li>
+              <li><Icon name="award" size={16} /> Certificate when you finish every lesson</li>
             </ul>
 
             <h3>Course features</h3>

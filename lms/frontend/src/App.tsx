@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { CertificatePage, MyCertificates } from './certificate'
 import { AdminHome, CourseEditor, QuizEditor } from './admin'
 import { AuthProvider } from './auth'
 import { CoursePage } from './course-detail'
@@ -26,6 +27,7 @@ export default function App() {
                 <Route index element={<DashboardHome />} />
                 <Route path="courses" element={<EnrolledCourses />} />
                 <Route path="quizzes" element={<QuizAttempts />} />
+                <Route path="certificates" element={<MyCertificates />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
               <Route path="/quizzes" element={<QuizzesPage />} />
@@ -36,6 +38,7 @@ export default function App() {
               <Route path="/admin/courses/:id" element={<CourseEditor />} />
               <Route path="/admin/quizzes/:id" element={<QuizEditor />} />
             </Route>
+            <Route path="/certificates/:code" element={<CertificatePage />} />
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
