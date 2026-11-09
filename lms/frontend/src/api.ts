@@ -282,7 +282,18 @@ async function adminCall<T>(method: string, path: string, body?: unknown): Promi
   return (res.status === 204 ? undefined : await res.json()) as T
 }
 
+export interface AdminOverview {
+  learners: number
+  active_7d: number
+  lessons_completed: number
+  attempts: number
+  pass_rate: number | null
+  courses: { id: number; title: string; published: boolean; learners: number; completions: number; lesson_count: number }[]
+  recent_attempts: { learner: string; quiz_title: string; course_title: string; score: number; total: number; passed: boolean; created_at: string }[]
+}
+
 export const admin = {
+  overview: () => adminCall<AdminOverview>('GET', '/overview'),
   courses: () => adminCall<AdminCourse[]>('GET', '/courses'),
   course: (id: number) => adminCall<AdminCourseDetail>('GET', `/courses/${id}`),
   createCourse: (b: { title: string; description?: string; slug?: string }) => adminCall<AdminCourse>('POST', '/courses', b),

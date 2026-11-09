@@ -272,3 +272,15 @@ async def test_reseed_keeps_admin_edits(admin):
     edited = next(le for le in again["lessons"] if le["slug"] == "syllabus")
     assert edited["title"] == "Edited title" and edited["is_preview"] is False
     assert len(again["lessons"]) == len(detail["lessons"])  # and nothing got duplicated
+
+
+async def test_overview_is_staff_only_and_counts(client):
+    await signin(client, STUDENT)
+    assert (await client.get("/api/admin/overview")).status_code == 403
+    await signin(client, TEACHER, "admin")
+    r = await client.get("/api/admin/overview")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["learners"] == 1
+    assert body["attempts"] == 0 and body["pass_rate"] is None
+    assert len(body["courses"]) >= 1 and body["recent_attempts"] == []

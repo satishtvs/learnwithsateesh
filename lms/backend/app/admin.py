@@ -5,15 +5,16 @@ server-side (see app/promote.py); the public API deliberately has no way to self
 """
 import re
 import unicodedata
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_async_session
-from app.models import Chapter, Course, Lesson, Question, Quiz, User
+from app.models import Chapter, Course, Lesson, LessonProgress, Question, Quiz, QuizAttempt, User
 from app.users import current_active_user
 
 
@@ -333,6 +334,107 @@ async def _quiz_out(session: AsyncSession, quiz: Quiz) -> QuizOut:
     out = QuizOut.model_validate(quiz)
     out.question_count = n
     return out
+
+
+# ---------------------------------------------------------------- overview
+class CourseStat(BaseModel):
+    id: int
+    title: str
+    published: bool
+    learners: int
+    completions: int
+    lesson_count: int
+
+
+class RecentAttempt(BaseModel):
+    learner: str
+    quiz_title: str
+    course_title: str
+    score: int
+    total: int
+    passed: bool
+    created_at: datetime
+
+
+class Overview(BaseModel):
+    learners: int
+    active_7d: int
+    lessons_completed: int
+    attempts: int
+    pass_rate: int | None
+    courses: list[CourseStat]
+    recent_attempts: list[RecentAttempt]
+
+
+@router.get("/overview", response_model=Overview)
+async def overview(session: AsyncSession = Depends(get_async_session)):
+    """Numbers for the instructor home page. Learners are accounts with the student role."""
+    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    learners = (await session.execute(select(func.count()).select_from(User).where(User.role == "student"))).scalar_one()
+    active_7d = (
+        await session.execute(
+            select(func.count(func.distinct(LessonProgress.user_id))).where(LessonProgress.last_seen_at >= week_ago)
+        )
+    ).scalar_one()
+    completed = (
+        await session.execute(select(func.count()).select_from(LessonProgress).where(LessonProgress.completed_at.is_not(None)))
+    ).scalar_one()
+    attempts, passed = (
+        await session.execute(
+            select(func.count(), func.coalesce(func.sum(case((QuizAttempt.passed, 1), else_=0)), 0)).select_from(QuizAttempt)
+        )
+    ).one()
+
+    started = dict(
+        (
+            await session.execute(
+                select(Lesson.course_id, func.count(func.distinct(LessonProgress.user_id)))
+                .select_from(LessonProgress).join(Lesson, Lesson.id == LessonProgress.lesson_id)
+                .group_by(Lesson.course_id)
+            )
+        ).all()
+    )
+    done_by_course = dict(
+        (
+            await session.execute(
+                select(Lesson.course_id, func.count())
+                .select_from(LessonProgress).join(Lesson, Lesson.id == LessonProgress.lesson_id)
+                .where(LessonProgress.completed_at.is_not(None))
+                .group_by(Lesson.course_id)
+            )
+        ).all()
+    )
+    counts = await _counts(session)
+    courses = (await session.execute(select(Course).order_by(Course.position, Course.title))).scalars().all()
+    stats = [
+        CourseStat(
+            id=c.id, title=c.title, published=c.published, learners=started.get(c.id, 0),
+            completions=done_by_course.get(c.id, 0), lesson_count=counts[1].get(c.id, 0),
+        )
+        for c in courses
+    ]
+
+    rows = (
+        await session.execute(
+            select(QuizAttempt, User, Quiz, Course).select_from(QuizAttempt)
+            .join(User, User.id == QuizAttempt.user_id)
+            .join(Quiz, Quiz.id == QuizAttempt.quiz_id)
+            .join(Course, Course.id == Quiz.course_id)
+            .order_by(QuizAttempt.created_at.desc())
+            .limit(8)
+        )
+    ).unique().all()
+    recent = [
+        RecentAttempt(
+            learner=u.full_name or u.email.split("@")[0], quiz_title=q.title, course_title=c.title,
+            score=a.score, total=a.total, passed=a.passed, created_at=a.created_at,
+        )
+        for a, u, q, c in rows
+    ]
+    return Overview(
+        learners=learners, active_7d=active_7d, lessons_completed=completed, attempts=attempts,
+        pass_rate=round(100 * passed / attempts) if attempts else None, courses=stats, recent_attempts=recent,
+    )
 
 
 # ---------------------------------------------------------------- courses

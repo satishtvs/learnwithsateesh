@@ -5,6 +5,7 @@ import {
   admin,
   ApiError,
   type AdminChapter,
+  type AdminOverview,
   type AdminLesson,
   type AdminQuestion,
   type AdminQuiz,
@@ -14,6 +15,8 @@ import {
 import { useAuth } from './auth'
 import { LoginGate } from './courses'
 import { Icon, PageHeader } from './ui'
+
+const fmtWhen = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
 // ---------------------------------------------------------------- shared bits
 function Gate({ children }: { children: ReactNode }) {
@@ -82,10 +85,63 @@ function MoveButtons({ onMove, disabled }: { onMove: (d: 'up' | 'down') => void;
 
 const ask = (msg: string) => window.confirm(msg)
 
+// ---------------------------------------------------------------- overview
+function OverviewPanel({ o }: { o: AdminOverview }) {
+  const tiles = [
+    { icon: 'learning' as const, label: 'Learners', value: o.learners, tone: 'orange' },
+    { icon: 'sparkle' as const, label: 'Active this week', value: o.active_7d, tone: 'navy' },
+    { icon: 'check' as const, label: 'Lessons completed', value: o.lessons_completed, tone: 'green' },
+    { icon: 'quiz' as const, label: o.pass_rate === null ? 'Quiz attempts' : `Quiz attempts · ${o.pass_rate}% passed`, value: o.attempts, tone: 'violet' },
+  ]
+  return (
+    <>
+      <section className="stats" aria-label="Overview">
+        {tiles.map((t) => (
+          <div className="stat" key={t.label}>
+            <span className={`stat-ico ${t.tone}`}><Icon name={t.icon} size={20} /></span>
+            <div><strong>{t.value}</strong><span>{t.label}</span></div>
+          </div>
+        ))}
+      </section>
+      <div className="two-col block">
+        <section className="panel">
+          <h2>Courses</h2>
+          <table className="tbl">
+            <thead><tr><th>Course</th><th>Learners</th><th>Lessons done</th></tr></thead>
+            <tbody>
+              {o.courses.map((c) => (
+                <tr key={c.id}>
+                  <td><Link to={`/admin/courses/${c.id}`}>{c.title}</Link> {!c.published && <span className="chip warn">Draft</span>}</td>
+                  <td>{c.learners}</td>
+                  <td>{c.completions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+        <section className="panel">
+          <h2>Recent quiz attempts</h2>
+          {o.recent_attempts.length === 0 ? <p className="muted">No attempts yet.</p> : (
+            <ul className="rows">
+              {o.recent_attempts.map((r, i) => (
+                <li key={i} className="row">
+                  <span><strong>{r.learner}</strong><br /><small className="muted">{r.quiz_title} · {fmtWhen(r.created_at)}</small></span>
+                  <span className={`chip ${r.passed ? 'ok' : 'warn'}`}>{r.score}/{r.total}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </>
+  )
+}
+
 // ---------------------------------------------------------------- course list
 export function AdminHome() {
   const nav = useNavigate()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'courses'], queryFn: admin.courses })
+  const overview = useQuery({ queryKey: ['admin', 'overview'], queryFn: admin.overview })
   const [open, setOpen] = useState(false)
   const create = useAdminMutation(admin.createCourse, [['admin', 'courses']], (c) => nav(`/admin/courses/${c.id}`))
 
@@ -111,6 +167,8 @@ export function AdminHome() {
           <p className="muted small">New courses start unpublished, so students cannot see them until you publish.</p>
         </form>
       )}
+
+      {overview.data && <OverviewPanel o={overview.data} />}
 
       {isLoading ? <p className="muted">Loading…</p> : (
         <div className="grid">

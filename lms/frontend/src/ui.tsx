@@ -84,8 +84,8 @@ const COVERS = [
   ['#f97316', '#fbbf24'],
   ['#1e2a44', '#3f5378'],
   ['#0f766e', '#34d399'],
-  ['#7c3aed', '#c084fc'],
-  ['#be123c', '#fb7185'],
+  ['#c2410c', '#fb923c'],
+  ['#2b3b5e', '#f97316'],
 ]
 
 /** A deterministic gradient cover per course so cards are easy to tell apart. */
