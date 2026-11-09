@@ -64,6 +64,28 @@ a { color: #b85f00; }
 .error { color: #d93025; margin: 0; }
 .muted { text-align: center; opacity: 0.7; margin: 12px 0 0; }
 .muted-left { opacity: 0.65; margin: 0 0 4px; }
+.brand { font-size: 1.1rem; }
+.hero { padding: 28px 0 8px; }
+.hero h1 { font-size: 2rem; line-height: 1.2; }
+.hero h1::after { content: ''; display: block; width: 56px; height: 4px; background: var(--orange); margin-top: 10px; border-radius: 2px; }
+.hero p { font-size: 1.05rem; max-width: 60ch; opacity: 0.9; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.btn { display: inline-block; padding: 10px 18px; border-radius: 8px; background: var(--navy); color: #fff !important; text-decoration: none; font-weight: 600; }
+.btn:hover { background: #3f5378; }
+.btn.ghost { background: transparent; color: var(--text) !important; border: 1px solid var(--border); }
+.btn.ghost:hover { border-color: var(--orange); }
+.features { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 24px; }
+.features > div { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.features h3 { font-size: 1rem; }
+.features p { margin: 0; opacity: 0.8; font-size: 0.9rem; }
+.badge { margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--orange) 25%, transparent); font-size: 0.75rem; font-weight: 600; }
+.unlock { margin-top: 16px; padding: 12px 14px; border-left: 4px solid var(--orange); background: color-mix(in srgb, var(--orange) 10%, transparent); border-radius: 6px; }
+.gate { text-align: center; padding: 32px 16px; border: 1px dashed var(--border); border-radius: 12px; }
+.gate .cta { justify-content: center; }
+.meta { margin-top: 8px !important; font-size: 0.8rem !important; opacity: 0.65 !important; }
+ul.previews { list-style: none; padding: 0; }
+.perks ul { padding-left: 20px; }
+.perks li { padding: 4px 0; }
 .topbar { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
 .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .course-card { display: block; padding: 16px; border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: inherit; }

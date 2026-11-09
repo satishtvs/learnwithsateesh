@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { getProviders, login, register, startGoogleLogin } from './api'
 import { useAuth } from './auth'
-import { Catalogue } from './courses'
+import { Catalogue, FreePreviews } from './courses'
 
 /** Where to go after signing in: the page that sent us here, if it was an in-app path. */
 function useReturnTo(): string {
@@ -16,19 +16,62 @@ export function Home() {
   return (
     <main className="wide">
       <header className="topbar">
-        <h1>LearnWithSateesh</h1>
+        <strong className="brand">LearnWithSateesh</strong>
         {user ? (
           <span>
             {user.full_name || user.email} · <a href="#" onClick={(e) => { e.preventDefault(); signOut() }}>Sign out</a>
           </span>
         ) : (
           <span>
-            <Link to="/login">Sign in</Link> · <Link to="/register">Create account</Link>
+            <Link to="/login">Sign in</Link> · <Link to="/register">Create free account</Link>
           </span>
         )}
       </header>
-      <h2>Courses</h2>
-      <Catalogue />
+
+      <section className="hero">
+        <h1>Learn AI &amp; ML the exam-ready way</h1>
+        <p>
+          Clear, focused video lessons for B.Tech AI &amp; ML students, organised unit by unit and aligned to the
+          JNTUH syllabus. Taught by Sateesh Kumar Talupuri.
+        </p>
+        {!user && (
+          <div className="cta">
+            <Link className="btn" to="/register">Create a free account</Link>
+            <a className="btn ghost" href="#try-free">Watch a free lesson</a>
+          </div>
+        )}
+      </section>
+
+      <section className="features">
+        <div><h3>Syllabus-aligned</h3><p>Every video follows the units and topics of your university syllabus.</p></div>
+        <div><h3>Short, focused videos</h3><p>Each topic is split into parts of about 10 to 20 minutes.</p></div>
+        <div><h3>Revision-ready</h3><p>Worked examples and an important-questions slide at the end of each unit.</p></div>
+      </section>
+      <section className="perks">
+        <h2>With a free account</h2>
+        <ul>
+          <li>Track your progress through each course and resume where you left off <span className="badge">Coming soon</span></li>
+          <li>Practice quizzes on every unit, with instant feedback <span className="badge">Coming soon</span></li>
+          <li>Certificates when you complete a course <span className="badge">Coming soon</span></li>
+          <li>Live doubt-clearing sessions with the instructor <span className="badge">Planned</span></li>
+        </ul>
+      </section>
+
+      <section id="try-free">
+        <h2>Try it free, no account needed</h2>
+        <FreePreviews />
+      </section>
+
+      <section>
+        <h2>Courses</h2>
+        <Catalogue />
+        {!user && (
+          <p className="unlock">
+            <strong>Join free.</strong> Create an account to track your progress and get quizzes and certificates as they launch.
+            {' '}<Link to="/register">Sign up free</Link>
+          </p>
+        )}
+      </section>
     </main>
   )
 }

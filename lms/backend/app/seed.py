@@ -35,10 +35,11 @@ CHAPTERS = [
     ("C10", "Philosophical Foundations", "Unit - V", "AIMA ch. 26-27"),
 ]
 
-# (chapter code or None, slug, title, youtube id)
+# (chapter code or None, slug, title, youtube id, free preview?)
+# Free previews can be watched without an account; everything else needs a (free) sign-in.
 LESSONS = [
-    (None, "syllabus", "AI-Y3S1 Syllabus: B.Tech. Artificial Intelligence Course Syllabus", "zN6yG0iReXY"),
-    ("C01", "c01-introduction-part-1", "AI Y3S1C01 Introduction: Part 1", "f3LHSSHeHdU"),
+    (None, "syllabus", "AI-Y3S1 Syllabus: B.Tech. Artificial Intelligence Course Syllabus", "zN6yG0iReXY", True),
+    ("C01", "c01-introduction-part-1", "AI Y3S1C01 Introduction: Part 1", "f3LHSSHeHdU", True),
 ]
 
 
@@ -60,11 +61,11 @@ async def seed() -> None:
         await s.flush()
 
         have = {le.slug: le for le in (await s.execute(select(Lesson).where(Lesson.course_id == course.id))).scalars()}
-        for pos, (code, slug, title, yt) in enumerate(LESSONS):
+        for pos, (code, slug, title, yt, preview) in enumerate(LESSONS):
             if not YOUTUBE_ID.match(yt):
                 raise ValueError(f"bad YouTube id for {slug}: {yt!r}")
             le = have.get(slug) or Lesson(course_id=course.id, slug=slug)
-            le.title, le.youtube_id, le.position = title, yt, pos
+            le.title, le.youtube_id, le.position, le.is_preview = title, yt, pos, preview
             le.chapter_id = chapters[code].id if code else None
             s.add(le)
         await s.commit()

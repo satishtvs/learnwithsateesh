@@ -32,11 +32,14 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
 export interface LessonSummary {
   slug: string
   title: string
+  is_preview: boolean
 }
 export interface CourseSummary {
   slug: string
   title: string
   description: string
+  lesson_count: number
+  previews: LessonSummary[]
 }
 export interface CourseOutline extends CourseSummary {
   overview_lessons: LessonSummary[]
@@ -54,6 +57,7 @@ export interface Lesson {
   youtube_id: string
   notes_md: string
   slides_url: string | null
+  is_preview: boolean
   chapter_code: string | null
   chapter_title: string | null
   prev: LessonSummary | null

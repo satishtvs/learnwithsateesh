@@ -73,6 +73,8 @@ class Lesson(Base):
     slides_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     position: Mapped[int] = mapped_column(Integer, default=0)
     published: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    # Free preview: viewable without signing in (the rest needs a free account).
+    is_preview: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
     course: Mapped[Course] = relationship(back_populates="lessons")
     chapter: Mapped[Chapter | None] = relationship(back_populates="lessons")

@@ -79,3 +79,5 @@ google_client = GoogleOAuth2(settings.google_client_id, settings.google_client_s
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend, google_backend])
 
 current_active_user = fastapi_users.current_user(active=True, verified=settings.require_verified_email)
+# None when nobody is signed in (used for free-preview content).
+optional_user = fastapi_users.current_user(optional=True, active=True, verified=settings.require_verified_email)
