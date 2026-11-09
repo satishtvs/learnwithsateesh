@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from app.db import async_session_maker
 from app.models import Chapter, Course, Lesson
+from app.quiz_import import import_all
 
 YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
 
@@ -70,6 +71,11 @@ async def seed() -> None:
             s.add(le)
         await s.commit()
     print(f"seeded {COURSE['slug']}: {len(CHAPTERS)} chapters, {len(LESSONS)} lessons")
+
+    async with async_session_maker() as s:
+        nq, nn = await import_all(s)
+        await s.commit()
+    print(f"imported quizzes: {nq} quizzes, {nn} questions (only 'approved' ones are visible)")
 
 
 if __name__ == "__main__":

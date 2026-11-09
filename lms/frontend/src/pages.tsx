@@ -4,6 +4,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { getProviders, login, register, startGoogleLogin } from './api'
 import { useAuth } from './auth'
 import { Catalogue, ContinueLearning, FreePreviews } from './courses'
+import { Icon, Logo, type IconName } from './ui'
 
 /** Where to go after signing in: the page that sent us here, if it was an in-app path. */
 function useReturnTo(): string {
@@ -11,79 +12,92 @@ function useReturnTo(): string {
   return from && from.startsWith('/') && !from.startsWith('//') ? from : '/'
 }
 
-/** The logo has a white background, so it sits on a white tile that also works in dark mode. */
-function BrandLogo({ height }: { height: number }) {
-  return (
-    <Link to="/" className="logo-link" aria-label="Learn With Sateesh, home">
-      <img src="/logo.png" alt="Learn With Sateesh" height={height} />
-    </Link>
-  )
-}
+const FEATURES: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'courses', title: 'Syllabus-aligned', text: 'Every video follows the units and topics of your university syllabus.' },
+  { icon: 'clock', title: 'Short, focused videos', text: 'Each topic is split into parts of about 10 to 20 minutes.' },
+  { icon: 'sparkle', title: 'Revision-ready', text: 'Worked examples and an important-questions slide at the end of each unit.' },
+]
+
+const PERKS: { icon: IconName; text: string; status?: string }[] = [
+  { icon: 'learning', text: 'Track your progress and resume where you left off' },
+  { icon: 'quiz', text: 'Practice quizzes on every unit, with instant feedback', status: 'Coming soon' },
+  { icon: 'award', text: 'Certificates when you complete a course', status: 'Planned' },
+  { icon: 'live', text: 'Live doubt-clearing sessions with the instructor', status: 'Planned' },
+]
 
 export function Home() {
-  const { user, signOut } = useAuth()
-  return (
-    <main className="wide">
-      <header className="topbar">
-        <BrandLogo height={48} />
-        {user ? (
-          <span>
-            {user.full_name || user.email} · <a href="#" onClick={(e) => { e.preventDefault(); signOut() }}>Sign out</a>
-          </span>
-        ) : (
-          <span>
-            <Link to="/login">Sign in</Link> · <Link to="/register">Create free account</Link>
-          </span>
-        )}
-      </header>
+  const { user } = useAuth()
+  const first = (user?.full_name || '').trim().split(/\s+/)[0]
 
-      <section className="hero">
+  if (user) {
+    return (
+      <>
+        <div className="page-head">
+          <div>
+            <h1>Welcome back{first ? `, ${first}` : ''}</h1>
+            <p className="sub">Continue a course or explore something new.</p>
+          </div>
+        </div>
+        <section className="block">
+          <h2 className="section-title">Continue learning</h2>
+          <ContinueLearning empty />
+        </section>
+        <section className="block">
+          <h2 className="section-title">All courses</h2>
+          <Catalogue />
+        </section>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <section className="hero-banner">
         <h1>Learn AI &amp; ML the exam-ready way</h1>
         <p>
-          Clear, focused video lessons for B.Tech AI &amp; ML students, organised unit by unit and aligned to the
-          JNTUH syllabus. Taught by Sateesh Kumar Talupuri.
+          Clear, focused video lessons for B.Tech AI &amp; ML students, organised unit by unit and aligned to the JNTUH
+          syllabus. Taught by Sateesh Kumar Talupuri.
         </p>
-        {!user && (
-          <div className="cta">
-            <Link className="btn" to="/register">Create a free account</Link>
-            <a className="btn ghost" href="#try-free">Watch a free lesson</a>
-          </div>
-        )}
+        <div className="cta">
+          <Link className="btn accent" to="/register">Create a free account</Link>
+          <a className="btn ghost-light" href="#try-free">Watch a free lesson</a>
+        </div>
       </section>
 
       <section className="features">
-        <div><h3>Syllabus-aligned</h3><p>Every video follows the units and topics of your university syllabus.</p></div>
-        <div><h3>Short, focused videos</h3><p>Each topic is split into parts of about 10 to 20 minutes.</p></div>
-        <div><h3>Revision-ready</h3><p>Worked examples and an important-questions slide at the end of each unit.</p></div>
-      </section>
-      <section className="perks">
-        <h2>With a free account</h2>
-        <ul>
-          <li>Track your progress through each course and resume where you left off <span className="badge">Coming soon</span></li>
-          <li>Practice quizzes on every unit, with instant feedback <span className="badge">Coming soon</span></li>
-          <li>Certificates when you complete a course <span className="badge">Coming soon</span></li>
-          <li>Live doubt-clearing sessions with the instructor <span className="badge">Planned</span></li>
-        </ul>
+        {FEATURES.map((f) => (
+          <div key={f.title} className="card feature">
+            <span className="feat-ico"><Icon name={f.icon} size={20} /></span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
       </section>
 
-      {user && <ContinueLearning />}
-
-      <section id="try-free">
-        <h2>Try it free, no account needed</h2>
+      <section className="block" id="try-free">
+        <h2 className="section-title">Try it free, no account needed</h2>
         <FreePreviews />
       </section>
 
-      <section>
-        <h2>Courses</h2>
+      <section className="block">
+        <h2 className="section-title">Courses</h2>
         <Catalogue />
-        {!user && (
-          <p className="unlock">
-            <strong>Join free.</strong> Create an account to track your progress and get quizzes and certificates as they launch.
-            {' '}<Link to="/register">Sign up free</Link>
-          </p>
-        )}
       </section>
-    </main>
+
+      <section className="panel">
+        <h2>With a free account</h2>
+        <ul className="rows">
+          {PERKS.map((p) => (
+            <li key={p.text} className="row static">
+              <span className="ico"><Icon name={p.icon} size={15} /></span>
+              <span className="t">{p.text}</span>
+              {p.status && <span className="chip">{p.status}</span>}
+            </li>
+          ))}
+        </ul>
+        <div className="cta"><Link className="btn" to="/register">Sign up free</Link></div>
+      </section>
+    </>
   )
 }
 
@@ -92,11 +106,21 @@ function GoogleButton() {
   if (!data?.google) return null
   return (
     <>
-      <button type="button" onClick={startGoogleLogin}>
+      <button type="button" className="btn ghost block" onClick={startGoogleLogin}>
         Continue with Google
       </button>
-      <p className="muted">or use email</p>
+      <p className="divider"><span>or use email</span></p>
     </>
+  )
+}
+
+function AuthCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <main className="auth-card">
+      <Link to="/" className="auth-logo" aria-label="Learn With Sateesh, home"><Logo height={44} /></Link>
+      <h1>{title}</h1>
+      {children}
+    </main>
   )
 }
 
@@ -120,20 +144,16 @@ export function Login() {
   }
 
   return (
-    <main className="card">
-      <BrandLogo height={40} />
-      <h1>Sign in</h1>
+    <AuthCard title="Sign in">
       <GoogleButton />
       <form onSubmit={onSubmit}>
-        <input name="email" type="email" placeholder="Email" required autoComplete="email" />
-        <input name="password" type="password" placeholder="Password" required autoComplete="current-password" />
+        <label>Email<input name="email" type="email" required autoComplete="email" /></label>
+        <label>Password<input name="password" type="password" required autoComplete="current-password" /></label>
         {error && <p role="alert" className="error">{error}</p>}
-        <button type="submit">Sign in</button>
+        <button type="submit" className="btn block">Sign in</button>
       </form>
-      <p>
-        New here? <Link to="/register">Create an account</Link>
-      </p>
-    </main>
+      <p className="auth-alt">New here? <Link to="/register" state={{ from: returnTo }}>Create an account</Link></p>
+    </AuthCard>
   )
 }
 
@@ -160,27 +180,19 @@ export function Register() {
   }
 
   return (
-    <main className="card">
-      <BrandLogo height={40} />
-      <h1>Create account</h1>
+    <AuthCard title="Create your free account">
       <GoogleButton />
       <form onSubmit={onSubmit}>
-        <input name="name" placeholder="Full name" required autoComplete="name" />
-        <input name="email" type="email" placeholder="Email" required autoComplete="email" />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password (min 8 characters)"
-          required
-          minLength={8}
-          autoComplete="new-password"
-        />
+        <label>Full name<input name="name" required autoComplete="name" /></label>
+        <label>Email<input name="email" type="email" required autoComplete="email" /></label>
+        <label>
+          Password
+          <input name="password" type="password" placeholder="At least 8 characters" required minLength={8} autoComplete="new-password" />
+        </label>
         {error && <p role="alert" className="error">{error}</p>}
-        <button type="submit">Create account</button>
+        <button type="submit" className="btn block">Create account</button>
       </form>
-      <p>
-        Already registered? <Link to="/login">Sign in</Link>
-      </p>
-    </main>
+      <p className="auth-alt">Already registered? <Link to="/login" state={{ from: returnTo }}>Sign in</Link></p>
+    </AuthCard>
   )
 }

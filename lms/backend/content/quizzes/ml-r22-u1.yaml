@@ -1,0 +1,459 @@
+# Machine Learning (JNTUH R22 CSE-AIML, III-I), Unit I quizzes.
+# DRAFT for Sateesh's review. Nothing is shown to students until a quiz has `status: approved`.
+#
+# How to review: read each question; fix wording, options, the answer letter or the explanation;
+# then change that quiz's `status` from draft to approved. `answer` is the letter of the correct option.
+# Questions are original; they follow the Unit I slides (6 parts), not the textbook wording.
+
+course:
+  slug: machine-learning-r22
+  title: "Machine Learning: JNTUH R22 B.Tech CSE (AI&ML), III-I"
+  description: "Unit-wise video lessons and quizzes for Machine Learning (AM502PC), following S. Marsland, Machine Learning: An Algorithmic Perspective, 2nd ed."
+  published: false          # flip to true when the first videos are uploaded
+chapter:
+  code: U1
+  title: "Learning and Linear Models"
+  unit: "Unit - I"
+  textbook_ref: "Marsland ch. 1-3; Mitchell ch. 1-2"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u1-p1
+    title: "Part 1: What is learning? Supervised learning and the neuron"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In the spam-filter example of a learning problem, what is the experience E?"
+        options:
+          - "The percentage of emails classified correctly"
+          - "The task of deciding whether an email is spam"
+          - "Emails that users have already labelled as spam or not spam"
+          - "The weights inside the classifier"
+        answer: C
+        explain: "E is the data the program learns from: here, emails labelled by users. The percentage correct is the performance measure P, and classifying emails is the task T."
+
+      - q: "Which type of learning gets no correct answers with its data and tries to find structure such as groups (clusters)?"
+        options:
+          - "Unsupervised learning"
+          - "Supervised learning"
+          - "Reinforcement learning"
+          - "Evolutionary learning"
+        answer: A
+        explain: "Unsupervised learning has no targets; it looks for structure in the inputs themselves, for example clusters."
+
+      - q: "A program improves by trial and error, receiving rewards and penalties for what it does. This is:"
+        options:
+          - "Supervised learning"
+          - "Unsupervised learning"
+          - "Concept learning"
+          - "Reinforcement learning"
+        answer: D
+        explain: "Reinforcement learning uses reward and penalty signals instead of the correct answer for every example."
+
+      - q: "Which of these tasks is a regression problem?"
+        options:
+          - "Deciding whether an email is spam"
+          - "Predicting tomorrow's maximum temperature"
+          - "Recognising a handwritten digit from 0 to 9"
+          - "Labelling a photo as cat or dog"
+        answer: B
+        explain: "Regression predicts a continuous value such as a temperature. The other three choose one of a few classes, which is classification."
+
+      - q: "Why do we keep a test set aside and never train on it?"
+        options:
+          - "So that training runs faster"
+          - "To increase the number of training examples"
+          - "To choose the number of neurons"
+          - "To measure how well the model generalises to data it has not seen"
+        answer: D
+        explain: "Doing well on the training data can just be memorising. The test set shows performance on new data, which is what generalisation means."
+
+      - q: "In the McCulloch and Pitts model of a neuron, which part plays the role of the strength of the synapses?"
+        options:
+          - "The weights"
+          - "The threshold"
+          - "The output"
+          - "The number of inputs"
+        answer: A
+        explain: "Each input is multiplied by a weight; large weights mean strong connections. Learning means changing these weights."
+
+      - q: "According to Hebb's idea, which connections between neurons get stronger?"
+        options:
+          - "Connections between neurons that never fire"
+          - "Connections between neurons that fire together"
+          - "Only the connections to the output layer"
+          - "All connections equally"
+        answer: B
+        explain: "Hebb's rule: neurons that fire together strengthen their connection. It is the idea behind learning by weight changes."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u1-p2
+    title: "Part 2: Designing a learning system"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Which is the correct order of the design steps for a learning system?"
+        options:
+          - "Choose the algorithm, choose the training experience, choose the target function, choose the representation"
+          - "Choose the representation, choose the target function, choose the algorithm, choose the training experience"
+          - "Choose the training experience, choose the target function, choose its representation, choose the learning algorithm"
+          - "Choose the target function, choose the algorithm, choose the training experience, choose the representation"
+        answer: C
+        explain: "First decide what to learn from (experience), then what to learn (target function), how to write it down (representation), and finally how to learn it (algorithm)."
+
+      - q: "In the checkers example, the learner only learns at the end of a game whether it won or lost. What problem does this indirect feedback create?"
+        options:
+          - "The credit assignment problem: which of the moves caused the result?"
+          - "Overfitting"
+          - "Linear inseparability"
+          - "A learning rate that is too large"
+        answer: A
+        explain: "A single win or loss at the end does not say which of the many moves were good or bad. Sorting this out is the credit assignment problem."
+
+      - q: "In the checkers example, what does the target function V(b) give?"
+        options:
+          - "The number of moves in the game"
+          - "The learning rate for the board b"
+          - "The correct move for the board b"
+          - "A score for the board b, where a higher score means a better board for us"
+        answer: D
+        explain: "V(b) assigns a score to every board. The program then picks the move that leads to the board with the highest score."
+
+      - q: "The LMS rule is w_i ← w_i + η (V_train(b) − V(b)) x_i. If w_i = 0.5, η = 0.1, V_train(b) = 10, V(b) = 8 and x_i = 3, what is the new w_i?"
+        options:
+          - "0.6"
+          - "0.8"
+          - "1.1"
+          - "1.7"
+        answer: C
+        explain: "Error = 10 − 8 = 2. Change = 0.1 × 2 × 3 = 0.6. New weight = 0.5 + 0.6 = 1.1. (0.6 alone is only the change, not the new weight.)"
+
+      - q: "A model scores very well on its training data but badly on new data because it has fitted the noise. This is called:"
+        options:
+          - "Generalisation"
+          - "Overfitting"
+          - "Regularisation"
+          - "Credit assignment"
+        answer: B
+        explain: "Overfitting means fitting the noise and quirks of the training data, so the model generalises poorly."
+
+      - q: "Seen as a search problem, what does a learner search through?"
+        options:
+          - "The list of all test examples"
+          - "The set of all programmers' source code"
+          - "The space of possible hypotheses, for one that fits the training data"
+          - "The training set, to delete wrong examples"
+        answer: C
+        explain: "Learning is searching the hypothesis space for the hypotheses that best fit the data."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u1-p3
+    title: "Part 3: Concept learning and Find-S"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In the EnjoySport concept, what does the hypothesis <Sunny, Warm, ?, Strong, ?, ?> say?"
+        options:
+          - "A day is positive if it is sunny AND warm AND has strong wind; the other attributes do not matter"
+          - "Every day is a positive example"
+          - "A day is positive if it is sunny OR warm OR has strong wind"
+          - "No day is a positive example"
+        answer: A
+        explain: "A hypothesis is a conjunction of constraints. A '?' means any value is accepted for that attribute."
+
+      - q: "What does the hypothesis <∅, ∅, ∅, ∅, ∅, ∅> say?"
+        options:
+          - "Every day is positive"
+          - "Only sunny days are positive"
+          - "The hypothesis is not valid"
+          - "No day is positive"
+        answer: D
+        explain: "∅ means no value is acceptable, so no day can satisfy it. This is the most specific hypothesis."
+
+      - q: "Sky has 3 possible values and each of the other five attributes has 2. How many different days (instances) are possible?"
+        options:
+          - "30"
+          - "96"
+          - "973"
+          - "5120"
+        answer: B
+        explain: "3 × 2 × 2 × 2 × 2 × 2 = 96 instances. 5120 counts syntactically distinct hypotheses and 973 the semantically distinct ones."
+
+      - q: "Which hypothesis is more general?"
+        options:
+          - "<Sunny, Warm, ?, Strong, ?, ?>"
+          - "Both are equally general"
+          - "They cannot be compared"
+          - "<Sunny, ?, ?, ?, ?, ?>"
+        answer: D
+        explain: "<Sunny, ?, ?, ?, ?, ?> accepts every day that the first one accepts, and more. A more general hypothesis covers more examples."
+
+      - q: "Find-S starts with which hypothesis?"
+        options:
+          - "The most specific one, <∅, ∅, ∅, ∅, ∅, ∅>"
+          - "The most general one, <?, ?, ?, ?, ?, ?>"
+          - "A random hypothesis"
+          - "The first negative example"
+        answer: A
+        explain: "Find-S begins as specific as possible and generalises just enough to cover each positive example."
+
+      - q: "Find-S sees these positive examples in order: (Sunny, Warm, Normal, Strong, Warm, Same) and (Sunny, Warm, High, Strong, Warm, Same). What is its hypothesis after the second?"
+        options:
+          - "<Sunny, Warm, Normal, Strong, Warm, Same>"
+          - "<Sunny, Warm, ?, Strong, Warm, Same>"
+          - "<?, ?, ?, ?, ?, ?>"
+          - "<Sunny, Warm, High, Strong, Warm, Same>"
+        answer: B
+        explain: "Only Humidity differs (Normal vs High), so only that attribute is generalised to '?'. The others still match."
+
+      - q: "How does Find-S treat negative examples?"
+        options:
+          - "It specialises its hypothesis to exclude them"
+          - "It deletes them from the data"
+          - "It ignores them completely"
+          - "It stops with an error"
+        answer: C
+        explain: "Find-S only looks at positive examples. This is one of its weaknesses, which candidate elimination fixes."
+
+      - q: "Which is a limitation of Find-S?"
+        options:
+          - "It cannot tell whether it has found the only hypothesis consistent with the data"
+          - "It needs a very large amount of memory"
+          - "It can only learn from negative examples"
+          - "It always outputs the most general hypothesis"
+        answer: A
+        explain: "Find-S returns one maximally specific hypothesis but cannot say whether others also fit. It also ignores negatives and cannot detect noisy data."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u1-p4
+    title: "Part 4: Version spaces and candidate elimination"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What is the version space?"
+        options:
+          - "The set of all hypotheses, consistent or not"
+          - "The set of training examples"
+          - "The set of attributes"
+          - "The set of all hypotheses consistent with the training examples"
+        answer: D
+        explain: "A hypothesis is consistent if it classifies every training example correctly. The version space is the set of all such hypotheses."
+
+      - q: "In candidate elimination, what does the boundary G hold?"
+        options:
+          - "The maximally specific hypotheses consistent with the examples"
+          - "All the positive examples"
+          - "The maximally general hypotheses consistent with the examples"
+          - "All the negative examples"
+        answer: C
+        explain: "G is the general boundary; S is the specific boundary. Every consistent hypothesis lies between S and G."
+
+      - q: "For six attributes, what are the starting S and G in candidate elimination?"
+        options:
+          - "S = {<?, ?, ?, ?, ?, ?>}, G = {<∅, ∅, ∅, ∅, ∅, ∅>}"
+          - "S = {<∅, ∅, ∅, ∅, ∅, ∅>}, G = {<?, ?, ?, ?, ?, ?>}"
+          - "S and G both start as {<?, ?, ?, ?, ?, ?>}"
+          - "S and G both start empty"
+        answer: B
+        explain: "S starts as specific as possible and G as general as possible, so the version space starts as everything."
+
+      - q: "A positive example arrives. What happens to the boundary S?"
+        options:
+          - "S members that cover the example are deleted"
+          - "S is reset to the example's negative"
+          - "S members that do not cover the example are minimally generalised"
+          - "S is unchanged"
+        answer: C
+        explain: "A positive example pushes S upwards (more general) just enough to cover it. Members of G that reject it are removed."
+
+      - q: "A negative example arrives. What happens to the boundary G?"
+        options:
+          - "G members that cover the example are minimally specialised"
+          - "G members that reject the example are deleted"
+          - "G is unchanged"
+          - "G becomes equal to S"
+        answer: A
+        explain: "A negative example pushes G downwards (more specific) so that it no longer covers the example. Members of S that cover it are removed."
+
+      - q: "In the EnjoySport trace, example 3 (Rainy, Cold, High, Strong, Warm, Change → No) arrives after two positives. How many hypotheses does G3 contain?"
+        options:
+          - "1"
+          - "2"
+          - "6"
+          - "3"
+        answer: D
+        explain: "G3 = {<Sunny, ?, ?, ?, ?, ?>, <?, Warm, ?, ?, ?, ?>, <?, ?, ?, ?, ?, Same>}: three minimal specialisations that exclude the negative example."
+
+      - q: "After all four EnjoySport examples, how many hypotheses are in the final version space?"
+        options:
+          - "2"
+          - "6"
+          - "4"
+          - "973"
+        answer: B
+        explain: "S4, G4 (two members) and three hypotheses between them make six."
+
+      - q: "What is inductive bias?"
+        options:
+          - "A mistake in the training data"
+          - "The difference between S and G"
+          - "The learning rate"
+          - "The assumptions a learner makes (for example that the target is a conjunction of attribute constraints), without which it cannot generalise beyond its examples"
+        answer: D
+        explain: "A learner with no bias can only repeat the examples it has seen. Bias is what lets it classify new, unseen examples."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u1-p5
+    title: "Part 5: The perceptron and linear separability"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "A perceptron has a bias input of −1 with weight w0 = 2, and inputs x1 = 1 and x2 = 0 with weights w1 = 2 and w2 = 1. It outputs 1 if a > 0, otherwise 0. What does it output?"
+        options:
+          - "0, because a = 0 which is not greater than 0"
+          - "1, because a = 2"
+          - "0, because a = −2"
+          - "1, because a = 1"
+        answer: A
+        explain: "a = w0(−1) + w1x1 + w2x2 = −2 + 2 + 0 = 0. The rule needs a > 0 to fire, so the output is 0."
+
+      - q: "What is the role of the bias weight w0?"
+        options:
+          - "It sets the learning rate"
+          - "It lets the decision boundary be moved away from the origin (it controls how easily the neuron fires)"
+          - "It removes noisy examples"
+          - "It counts the number of inputs"
+        answer: B
+        explain: "Without a bias, the boundary w · x = 0 must pass through the origin. The bias is a weight that is learned like the others."
+
+      - q: "Perceptron rule: w_i ← w_i + η (t − y) x_i. With w_i = 0.3, η = 0.5, target t = 1, output y = 0 and input x_i = 1, what is the new w_i?"
+        options:
+          - "0.3"
+          - "−0.2"
+          - "0.8"
+          - "1.3"
+        answer: C
+        explain: "t − y = 1, so the change is 0.5 × 1 × 1 = 0.5 and the new weight is 0.3 + 0.5 = 0.8."
+
+      - q: "When the perceptron's output is correct (y = t), what does the learning rule do to the weights?"
+        options:
+          - "Leaves them unchanged"
+          - "Increases them"
+          - "Decreases them"
+          - "Resets them to zero"
+        answer: A
+        explain: "t − y = 0, so the update term is zero. Weights change only when there is an error."
+
+      - q: "If the perceptron outputs 1 but the target is 0, what happens to the weights on the inputs that are active (non-zero)?"
+        options:
+          - "They go up"
+          - "They stay the same"
+          - "They become 1"
+          - "They go down"
+        answer: D
+        explain: "t − y = −1 so η(t − y)x_i is negative for active inputs: the weights go down, making the neuron less likely to fire."
+
+      - q: "Which function can a single perceptron NOT learn?"
+        options:
+          - "AND"
+          - "OR"
+          - "XOR"
+          - "NOT"
+        answer: C
+        explain: "XOR is not linearly separable: no single straight line separates its two classes. AND, OR and NOT are linearly separable."
+
+      - q: "What does the perceptron convergence theorem say?"
+        options:
+          - "The perceptron always converges, for any data"
+          - "If the data is linearly separable, the learning rule finds a separating boundary in a finite number of steps"
+          - "The perceptron converges only for XOR"
+          - "The learning rate must be exactly 1"
+        answer: B
+        explain: "Convergence is guaranteed only for linearly separable data. For other data the weights never settle."
+
+      - q: "How is the XOR problem solved?"
+        options:
+          - "By using a very small learning rate"
+          - "By removing the bias"
+          - "By using several layers of neurons: the multi-layer perceptron"
+          - "By training for more passes"
+        answer: C
+        explain: "A single layer can only draw a straight line. Layers of neurons can combine lines into more complicated boundaries (Unit II)."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u1-p6
+    title: "Part 6: Linear regression"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What is the sum-of-squares error for targets t_i and predictions y_i?"
+        options:
+          - "Σ (t_i − y_i)²"
+          - "Σ (t_i − y_i)"
+          - "Σ |t_i| + |y_i|"
+          - "(Σ t_i) − (Σ y_i)"
+        answer: A
+        explain: "E = Σ (t_i − y_i)². Each error is squared, then added up."
+
+      - q: "Why are the errors squared in least squares?"
+        options:
+          - "To make the calculation slower"
+          - "Because the targets are always squares"
+          - "To remove the bias"
+          - "To make every error positive and to punish large errors more"
+        answer: D
+        explain: "Squaring stops positive and negative errors cancelling and makes big mistakes count more than small ones."
+
+      - q: "For data x = 1, 2, 3, 4, 5 and t = 2, 4, 5, 4, 5, we have Σ(x − x̄)(t − t̄) = 6 and Σ(x − x̄)² = 10. What is the slope β1?"
+        options:
+          - "1.6"
+          - "0.6"
+          - "2.2"
+          - "6"
+        answer: B
+        explain: "β1 = Σ(x − x̄)(t − t̄) / Σ(x − x̄)² = 6 / 10 = 0.6."
+
+      - q: "For the same data x̄ = 3, t̄ = 4 and β1 = 0.6. What is the intercept β0?"
+        options:
+          - "1.8"
+          - "3.4"
+          - "4"
+          - "2.2"
+        answer: D
+        explain: "β0 = t̄ − β1 x̄ = 4 − 0.6 × 3 = 2.2."
+
+      - q: "Using the fitted line y = 2.2 + 0.6x, what is the prediction for x = 6?"
+        options:
+          - "5.8"
+          - "3.6"
+          - "6.8"
+          - "2.8"
+        answer: A
+        explain: "y = 2.2 + 0.6 × 6 = 2.2 + 3.6 = 5.8."
+
+      - q: "Fit a line to x = 1, 2, 3 and t = 2, 4, 6 by least squares. Which line do you get?"
+        options:
+          - "y = 1 + x"
+          - "y = 2x"
+          - "y = 0.5x"
+          - "y = 2 + 2x"
+        answer: B
+        explain: "x̄ = 2, t̄ = 4. Σ(x − x̄)(t − t̄) = (−1)(−2) + 0 + (1)(2) = 4 and Σ(x − x̄)² = 2, so β1 = 2 and β0 = 4 − 2 × 2 = 0. The points lie exactly on y = 2x."
+
+      - q: "How does training linear regression differ from training a perceptron?"
+        options:
+          - "Linear regression needs repeated updates and the perceptron has a closed-form solution"
+          - "Neither one uses the training data"
+          - "Linear regression has a closed-form solution (the normal equations), while the perceptron learns by repeated weight updates"
+          - "They are identical"
+        answer: C
+        explain: "Least squares can be solved directly: β = (XᵀX)⁻¹ Xᵀ t. The perceptron adjusts its weights example by example over many passes."
+
+      - q: "How can linear regression be used for classification?"
+        options:
+          - "Code the classes as 0 and 1, fit by regression, then threshold the output"
+          - "It cannot be used for classification at all"
+          - "Square all the targets first"
+          - "Use only the negative examples"
+        answer: A
+        explain: "Fit targets coded as 0 and 1, then give the class whose value is closer (threshold). This works only when a straight line or plane suits the data."

@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.courses import router as courses_router
 from app.progress import router as progress_router
+from app.quizzes import all_router as all_quizzes_router
+from app.quizzes import router as quizzes_router
 from app.models import User
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users, google_backend, google_client
@@ -48,6 +50,8 @@ if settings.google_client_id:
 
 api.include_router(courses_router)
 api.include_router(progress_router)
+api.include_router(quizzes_router)
+api.include_router(all_quizzes_router)
 
 
 @api.get("/me", response_model=UserRead)

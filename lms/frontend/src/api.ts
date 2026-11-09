@@ -102,6 +102,73 @@ export async function setLessonCompleted(course: string, lesson: string, complet
   ).json()
 }
 
+export interface QuizSummary {
+  slug: string
+  title: string
+  chapter_code: string | null
+  question_count: number
+  pass_percent: number
+  best_percent: number | null
+  passed: boolean
+}
+export interface CourseQuiz extends QuizSummary {
+  course_slug: string
+  course_title: string
+}
+export interface QuizQuestion {
+  id: number
+  prompt: string
+  options: string[]
+}
+export interface QuizDetail {
+  slug: string
+  title: string
+  chapter_code: string | null
+  chapter_title: string | null
+  pass_percent: number
+  questions: QuizQuestion[]
+  best_percent: number | null
+  passed: boolean
+}
+export interface QuestionResult {
+  question_id: number
+  chosen: number | null
+  correct_index: number
+  correct: boolean
+  explanation: string
+}
+export interface AttemptResult {
+  score: number
+  total: number
+  percent: number
+  passed: boolean
+  pass_percent: number
+  results: QuestionResult[]
+}
+
+export async function listAllQuizzes(): Promise<CourseQuiz[]> {
+  return (await request('/quizzes')).json()
+}
+export async function listCourseQuizzes(course: string): Promise<QuizSummary[]> {
+  return (await request(`/courses/${encodeURIComponent(course)}/quizzes`)).json()
+}
+export async function getQuiz(course: string, quiz: string): Promise<QuizDetail> {
+  return (await request(`/courses/${encodeURIComponent(course)}/quizzes/${encodeURIComponent(quiz)}`)).json()
+}
+export async function submitAttempt(
+  course: string,
+  quiz: string,
+  answers: Record<number, number | null>,
+): Promise<AttemptResult> {
+  return (
+    await request(`/courses/${encodeURIComponent(course)}/quizzes/${encodeURIComponent(quiz)}/attempts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers }),
+    })
+  ).json()
+}
+
 export async function getMe(): Promise<User | null> {
   try {
     return await (await request('/me')).json()

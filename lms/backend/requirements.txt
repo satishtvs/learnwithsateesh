@@ -6,6 +6,7 @@ alembic>=1.13
 fastapi-users[sqlalchemy,oauth]>=13.0,<15
 pydantic-settings>=2.3
 email-validator>=2.1
+pyyaml>=6
 # tests
 pytest>=8
 pytest-asyncio>=0.23
