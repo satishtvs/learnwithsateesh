@@ -1,6 +1,6 @@
 #!/bin/bash
 # Nightly Postgres dump, keeps 14 days.  Cron (as ubuntu):
-#   17 2 * * * /home/ubuntu/learnwithsateesh/lms/deploy/backup.sh >> /var/backups/lws/backup.log 2>&1
+#   17 2 * * * /home/ubuntu/projects/learnwithsateesh/lms/deploy/backup.sh >> /var/backups/lws/backup.log 2>&1
 set -euo pipefail
 DIR=/var/backups/lws
 mkdir -p "$DIR"

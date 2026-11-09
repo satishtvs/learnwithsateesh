@@ -17,15 +17,15 @@ native Postgres on 127.0.0.1:5432). The LMS is kept separate from it:
 2. Security group: 80 and 443 open to the world; SSH only from your IP.
 3. On the server:
 
-       git clone https://github.com/satishtvs/learnwithsateesh.git ~/learnwithsateesh
-       cd ~/learnwithsateesh/lms
+       git clone https://github.com/satishtvs/learnwithsateesh.git ~/projects/learnwithsateesh
+       cd ~/projects/learnwithsateesh/lms
        cp .env.example .env && nano .env     # see "Production .env" below
        sudo cp deploy/nginx-learnwithsateesh.conf /etc/nginx/sites-available/learnwithsateesh
        sudo ln -s /etc/nginx/sites-available/learnwithsateesh /etc/nginx/sites-enabled/
        sudo nginx -t && sudo systemctl reload nginx      # never reload if -t fails
        bash deploy/deploy.sh
        sudo certbot --nginx -d learnwithsateesh.in -d www.learnwithsateesh.in --redirect
-       (crontab -l; echo '17 2 * * * /home/ubuntu/learnwithsateesh/lms/deploy/backup.sh >> /var/backups/lws/backup.log 2>&1') | crontab -
+       (crontab -l; echo '17 2 * * * /home/ubuntu/projects/learnwithsateesh/lms/deploy/backup.sh >> /var/backups/lws/backup.log 2>&1') | crontab -
 
 ## Production .env
 
@@ -40,7 +40,7 @@ native Postgres on 127.0.0.1:5432). The LMS is kept separate from it:
 
 ## Updating
 
-    ssh ubuntu@<host> 'bash ~/learnwithsateesh/lms/deploy/deploy.sh'
+    ssh ubuntu@<host> 'bash ~/projects/learnwithsateesh/lms/deploy/deploy.sh'
 
 ## Rollback / removal
 
