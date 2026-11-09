@@ -1,13 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Markdown from 'react-markdown'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import {
   ApiError,
   getAllProgress,
   getCourse,
   getCourseProgress,
   getLesson,
-  listCourseQuizzes,
   listCourses,
   setLessonCompleted,
   type CourseProgress,
@@ -60,23 +59,47 @@ function CourseCard({ c, progress }: { c: CourseSummary; progress?: CourseProgre
   )
 }
 
-export function Catalogue() {
+/** The course grid. `query` filters by title or description; `limit` shows only the first few. */
+export function Catalogue({ query = '', limit }: { query?: string; limit?: number }) {
   const { data, isLoading } = useCourses()
   const progress = useProgressBySlug()
   if (isLoading) return <p className="muted">Loading courses…</p>
   if (!data?.length) return <p className="muted">No courses yet.</p>
+  const needle = query.trim().toLowerCase()
+  const matches = needle ? data.filter((c) => `${c.title} ${c.description}`.toLowerCase().includes(needle)) : data
+  if (!matches.length) {
+    return (
+      <div className="empty plain">
+        <Icon name="search" size={28} />
+        <h3>No courses match “{query.trim()}”</h3>
+        <p>Try a shorter word, such as “machine” or “AI”.</p>
+      </div>
+    )
+  }
   return (
     <div className="grid">
-      {data.map((c) => <CourseCard key={c.slug} c={c} progress={progress.get(c.slug)} />)}
+      {(limit ? matches.slice(0, limit) : matches).map((c) => <CourseCard key={c.slug} c={c} progress={progress.get(c.slug)} />)}
     </div>
   )
 }
 
 export function CoursesPage() {
+  const [params, setParams] = useSearchParams()
+  const q = params.get('q') ?? ''
   return (
     <>
       <PageHeader title="Courses" subtitle="Syllabus-aligned video lessons, organised unit by unit." />
-      <Catalogue />
+      <form className="search-bar" role="search" onSubmit={(e) => e.preventDefault()}>
+        <Icon name="search" size={18} />
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
+          placeholder="Search courses"
+          aria-label="Search courses"
+        />
+      </form>
+      <Catalogue query={q} />
     </>
   )
 }
@@ -140,7 +163,7 @@ export function FreePreviews() {
   )
 }
 
-function LessonRow({
+export function LessonRow({
   course,
   lesson,
   signedIn,
@@ -171,7 +194,7 @@ function LessonRow({
   )
 }
 
-function QuizRow({ course, q }: { course: string; q: QuizSummary }) {
+export function QuizRow({ course, q }: { course: string; q: QuizSummary }) {
   return (
     <li>
       <Link to={`/courses/${course}/quizzes/${q.slug}`} className="row quiz">
@@ -183,114 +206,6 @@ function QuizRow({ course, q }: { course: string; q: QuizSummary }) {
         <QuizStatus q={q} />
       </Link>
     </li>
-  )
-}
-
-export function CoursePage() {
-  const { slug = '' } = useParams()
-  const { user } = useAuth()
-  const { data, error, isLoading } = useQuery({ queryKey: ['course', slug], queryFn: () => getCourse(slug), retry: false })
-  const progress = useQuery({
-    queryKey: ['progress', slug],
-    queryFn: () => getCourseProgress(slug),
-    enabled: !!user,
-    retry: false,
-  })
-  const quizzes = useQuery({
-    queryKey: ['quizzes', slug, user?.id ?? 'anon'],
-    queryFn: () => listCourseQuizzes(slug),
-    retry: false,
-  })
-  if (isLoading) return <p className="muted">Loading…</p>
-  if (error || !data) return <div className="empty"><h3>Course not found</h3><Link className="btn" to="/courses">All courses</Link></div>
-
-  const signedIn = !!user
-  const done = new Set(progress.data?.completed_slugs ?? [])
-  const allLessons = [...data.overview_lessons, ...data.chapters.flatMap((c) => c.lessons)]
-  const anyLocked = allLessons.some((l) => !l.is_preview)
-  const allQuizzes = quizzes.data ?? []
-  const chapterCodes = new Set(data.chapters.map((c) => c.code))
-  const looseQuizzes = allQuizzes.filter((q) => !q.chapter_code || !chapterCodes.has(q.chapter_code))
-
-  return (
-    <>
-      <nav className="crumbs" aria-label="Breadcrumb"><Link to="/courses">Courses</Link><Icon name="chevron" size={14} /><span>{data.title}</span></nav>
-
-      <section className="hero-card">
-        <Cover seed={data.slug} />
-        <div className="hero-body">
-          <h1>{data.title}</h1>
-          <p>{data.description}</p>
-          <div className="chips">
-            <span className="chip"><Icon name="play" size={12} /> {allLessons.length} {allLessons.length === 1 ? 'lesson' : 'lessons'}</span>
-            {allQuizzes.length > 0 && (
-              <span className="chip"><Icon name="quiz" size={12} /> {allQuizzes.length} {allQuizzes.length === 1 ? 'quiz' : 'quizzes'}</span>
-            )}
-            <span className="chip free">{allLessons.filter((l) => l.is_preview).length} free to watch</span>
-          </div>
-          {progress.data ? (
-            <div className="hero-progress">
-              <ProgressBar percent={progress.data.percent} label="Course progress" />
-              <span>{progress.data.completed} of {progress.data.total} {lessonsWord(progress.data.total)} · {progress.data.percent}%</span>
-              {progress.data.resume && (
-                <Link className="btn" to={`/courses/${slug}/lessons/${progress.data.resume.slug}`}>
-                  {progress.data.started ? 'Resume' : 'Start'}: {progress.data.resume.title}
-                </Link>
-              )}
-            </div>
-          ) : (
-            !signedIn && (
-              <p className="note">
-                {anyLocked
-                  ? 'Some lessons are free to watch. Create a free account to unlock all of them.'
-                  : 'Every lesson is free to watch. Create a free account to track progress and take quizzes.'}{' '}
-                <Link to="/register" state={{ from: `/courses/${slug}` }}>Sign up free</Link>
-              </p>
-            )
-          )}
-        </div>
-      </section>
-
-      {data.overview_lessons.length > 0 && (
-        <section className="panel">
-          <h2>Start here</h2>
-          <ul className="rows">
-            {data.overview_lessons.map((l) => (
-              <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {data.chapters.map((ch) => {
-        const chapterQuizzes = allQuizzes.filter((q) => q.chapter_code === ch.code)
-        return (
-          <section key={ch.code} className="panel">
-            <h2>
-              <span className="code">{ch.code}</span> {ch.title}
-              <small>{[ch.unit, ch.textbook_ref].filter(Boolean).join(' · ')}</small>
-            </h2>
-            {ch.lessons.length === 0 && chapterQuizzes.length === 0 ? (
-              <p className="muted small">Coming soon</p>
-            ) : (
-              <ul className="rows">
-                {ch.lessons.map((l) => (
-                  <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />
-                ))}
-                {chapterQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}
-              </ul>
-            )}
-          </section>
-        )
-      })}
-
-      {looseQuizzes.length > 0 && (
-        <section className="panel">
-          <h2>Quizzes</h2>
-          <ul className="rows">{looseQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}</ul>
-        </section>
-      )}
-    </>
   )
 }
 

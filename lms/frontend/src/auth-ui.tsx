@@ -3,7 +3,7 @@ import { Link, Outlet } from 'react-router-dom'
 import { Icon, Logo, type IconName } from './ui'
 
 /** Original illustration for the sign-in panel: our book badge, a lesson card, a quiz result and a progress ring. */
-function AuthArt() {
+export function BrandArt() {
   return (
     <svg className="auth-art" viewBox="0 0 420 360" role="img" aria-label="A lesson, a passed quiz and course progress">
       <defs>
@@ -54,7 +54,7 @@ export function AuthLayout() {
   return (
     <div className="auth-split">
       <aside className="auth-aside" aria-hidden="false">
-        <AuthArt />
+        <BrandArt />
         <div className="auth-welcome">
           <h2>Welcome to<br />Learn With <span>Sateesh</span></h2>
           <p>Syllabus-aligned AI &amp; ML video lessons, practice quizzes and progress tracking for B.Tech students.</p>
