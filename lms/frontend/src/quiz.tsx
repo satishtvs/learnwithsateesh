@@ -139,6 +139,7 @@ export function QuizPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       qc.invalidateQueries({ queryKey: ['quizzes'] })
       qc.invalidateQueries({ queryKey: ['quiz', slug, quizSlug] })
+      qc.invalidateQueries({ queryKey: ['my-attempts'] })
     },
   })
 

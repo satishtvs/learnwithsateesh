@@ -1,5 +1,7 @@
 """Quizzes: listing is public; taking a quiz needs a free account. Answers are only revealed after submitting."""
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -138,6 +140,45 @@ async def list_quizzes(
     if course is None:
         raise HTTPException(404, "Course not found")
     return await _course_summaries(session, course, user)
+
+
+me_router = APIRouter(prefix="/me/quiz-attempts", tags=["quizzes"])
+
+
+class MyAttempt(BaseModel):
+    quiz_slug: str
+    quiz_title: str
+    course_slug: str
+    course_title: str
+    score: int
+    total: int
+    percent: int
+    passed: bool
+    created_at: datetime
+
+
+@me_router.get("", response_model=list[MyAttempt])
+async def my_attempts(
+    limit: int = Query(50, ge=1, le=200),
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
+):
+    """The signed-in learner's own attempts, newest first. Attempts on quizzes that are no longer visible are left out."""
+    q = (
+        select(QuizAttempt, Quiz, Course)
+        .join(Quiz, Quiz.id == QuizAttempt.quiz_id)
+        .join(Course, Course.id == Quiz.course_id)
+        .where(QuizAttempt.user_id == user.id, Quiz.published.is_(True), Course.published.is_(True))
+        .order_by(QuizAttempt.created_at.desc(), QuizAttempt.id.desc())
+        .limit(limit)
+    )
+    return [
+        MyAttempt(
+            quiz_slug=quiz.slug, quiz_title=quiz.title, course_slug=course.slug, course_title=course.title,
+            score=a.score, total=a.total, percent=_percent(a.score, a.total), passed=a.passed, created_at=a.created_at,
+        )
+        for a, quiz, course in (await session.execute(q)).all()
+    ]
 
 
 all_router = APIRouter(prefix="/quizzes", tags=["quizzes"])

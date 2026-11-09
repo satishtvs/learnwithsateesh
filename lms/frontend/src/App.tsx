@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AdminHome, CourseEditor, QuizEditor } from './admin'
 import { AuthProvider } from './auth'
-import { CoursePage, CoursesPage, LearningPage, LessonPage } from './courses'
+import { CoursePage, CoursesPage, LessonPage } from './courses'
+import { DashboardHome, DashboardLayout, EnrolledCourses, ProfilePage, QuizAttempts } from './dashboard'
 import { AuthLayout } from './auth-ui'
 import { Shell } from './layout'
 import { ForgotPassword, Home, Login, Register, ResetPassword, VerifyEmail } from './pages'
@@ -19,7 +20,13 @@ export default function App() {
             <Route element={<Shell />}>
               <Route path="/" element={<Home />} />
               <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/learning" element={<LearningPage />} />
+              <Route path="/learning" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="courses" element={<EnrolledCourses />} />
+                <Route path="quizzes" element={<QuizAttempts />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
               <Route path="/quizzes" element={<QuizzesPage />} />
               <Route path="/courses/:slug" element={<CoursePage />} />
               <Route path="/courses/:slug/lessons/:lessonSlug" element={<LessonPage />} />

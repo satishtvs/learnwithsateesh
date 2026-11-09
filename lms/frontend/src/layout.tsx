@@ -6,7 +6,7 @@ import { Icon, Logo, type IconName } from './ui'
 const NAV: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/', label: 'Home', icon: 'home', end: true },
   { to: '/courses', label: 'Courses', icon: 'courses' },
-  { to: '/learning', label: 'My learning', icon: 'learning' },
+  { to: '/dashboard', label: 'Dashboard', icon: 'grid' },
   { to: '/quizzes', label: 'Quizzes', icon: 'quiz' },
 ]
 const SOON: { label: string; icon: IconName }[] = [
@@ -43,8 +43,7 @@ export function Shell() {
       <aside className="sidebar" id="sidebar" aria-label="Main navigation">
         <div className="side-top">
           <Link to="/" className="brand" aria-label="Learn With Sateesh, home">
-            <img src="/favicon.svg" alt="" width={34} height={34} />
-            <span>Learn With<br /><strong>Sateesh</strong></span>
+            <Logo height={46} />
           </Link>
           <button type="button" className="icon-btn side-close" onClick={() => setOpen(false)} aria-label="Close menu">
             <Icon name="x" />

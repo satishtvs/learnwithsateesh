@@ -210,6 +210,43 @@ async def test_attempts_are_per_user(client):
     assert (await client.get(C)).json()[0]["best_percent"] is None
 
 
+async def _attempt(client, answers_ok: bool):
+    qs = (await client.get(f"{C}/intro")).json()["questions"]
+    answers = {str(qs[0]["id"]): 1, str(qs[1]["id"]): 0, str(qs[2]["id"]): 0} if answers_ok else {}
+    return (await client.post(f"{C}/intro/attempts", json={"answers": answers})).json()
+
+
+async def test_my_attempts_requires_login(client):
+    assert (await client.get("/api/me/quiz-attempts")).status_code == 401
+
+
+async def test_my_attempts_are_private_newest_first_and_limited(client):
+    await signin(client, A)
+    await _attempt(client, False)  # 0%
+    await _attempt(client, True)  # 100%, newest
+    mine = (await client.get("/api/me/quiz-attempts")).json()
+    assert [(a["percent"], a["passed"]) for a in mine] == [(100, True), (0, False)]
+    assert mine[0]["quiz_title"] == "Intro quiz" and mine[0]["course_slug"] == "ai-y3s1" and mine[0]["total"] == 3
+    assert len((await client.get("/api/me/quiz-attempts?limit=1")).json()) == 1
+    assert (await client.get("/api/me/quiz-attempts?limit=0")).status_code == 422
+    await signin(client, B)  # someone else sees none of it
+    assert (await client.get("/api/me/quiz-attempts")).json() == []
+
+
+async def test_my_attempts_hide_quizzes_that_are_no_longer_published(client):
+    from sqlalchemy import update
+
+    from app.models import Quiz
+
+    await signin(client, A)
+    await _attempt(client, True)
+    assert len((await client.get("/api/me/quiz-attempts")).json()) == 1
+    async with async_session_maker() as s:
+        await s.execute(update(Quiz).where(Quiz.slug == "intro").values(published=False))
+        await s.commit()
+    assert (await client.get("/api/me/quiz-attempts")).json() == []
+
+
 async def test_invalid_answers_are_rejected(client):
     await signin(client, A)
     qs = (await client.get(f"{C}/intro")).json()["questions"]

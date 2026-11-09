@@ -164,6 +164,30 @@ export interface AttemptResult {
   results: QuestionResult[]
 }
 
+export interface MyAttempt {
+  quiz_slug: string
+  quiz_title: string
+  course_slug: string
+  course_title: string
+  score: number
+  total: number
+  percent: number
+  passed: boolean
+  created_at: string
+}
+export async function getMyAttempts(limit = 200): Promise<MyAttempt[]> {
+  return (await request(`/me/quiz-attempts?limit=${limit}`)).json()
+}
+export async function updateMe(fields: { full_name: string }): Promise<User> {
+  return (
+    await request('/users/me', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    })
+  ).json()
+}
+
 export async function listAllQuizzes(): Promise<CourseQuiz[]> {
   return (await request('/quizzes')).json()
 }

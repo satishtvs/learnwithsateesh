@@ -7,6 +7,7 @@ from app.courses import router as courses_router
 from app.emailer import email_enabled
 from app.progress import router as progress_router
 from app.quizzes import all_router as all_quizzes_router
+from app.quizzes import me_router as my_attempts_router
 from app.quizzes import router as quizzes_router
 from app.models import User
 from app.schemas import UserCreate, UserRead, UserUpdate
@@ -54,6 +55,7 @@ api.include_router(courses_router)
 api.include_router(progress_router)
 api.include_router(quizzes_router)
 api.include_router(all_quizzes_router)
+api.include_router(my_attempts_router)
 api.include_router(admin_router)
 
 

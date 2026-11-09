@@ -16,6 +16,7 @@ import {
   type QuizSummary,
 } from './api'
 import { useAuth } from './auth'
+import { lessonsWord } from './format'
 import { Cover, Icon, PageHeader, ProgressBar } from './ui'
 
 function useCourses() {
@@ -104,7 +105,7 @@ export function ContinueLearning({ empty }: { empty?: boolean }) {
             <h3>{p.course_title}</h3>
             <div className="card-progress">
               <ProgressBar percent={p.percent} label={`${p.course_title} progress`} />
-              <span>{p.completed} of {p.total} lessons · {p.percent}%</span>
+              <span>{p.completed} of {p.total} {lessonsWord(p.total)} · {p.percent}%</span>
             </div>
             {p.resume ? (
               <Link className="btn small" to={`/courses/${p.course_slug}/lessons/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
@@ -115,29 +116,6 @@ export function ContinueLearning({ empty }: { empty?: boolean }) {
         </div>
       ))}
     </div>
-  )
-}
-
-export function LearningPage() {
-  const { user, loading } = useAuth()
-  if (loading) return <p className="muted">Loading…</p>
-  return (
-    <>
-      <PageHeader title="My learning" subtitle="Pick up where you left off." />
-      {user ? (
-        <ContinueLearning empty />
-      ) : (
-        <div className="empty">
-          <Icon name="lock" size={28} />
-          <h3>Sign in to track your progress</h3>
-          <p>A free account remembers the lessons you have finished and takes you straight back to where you stopped.</p>
-          <div className="cta">
-            <Link className="btn" to="/register" state={{ from: '/learning' }}>Create a free account</Link>
-            <Link className="btn ghost" to="/login" state={{ from: '/learning' }}>Sign in</Link>
-          </div>
-        </div>
-      )}
-    </>
   )
 }
 
@@ -253,7 +231,7 @@ export function CoursePage() {
           {progress.data ? (
             <div className="hero-progress">
               <ProgressBar percent={progress.data.percent} label="Course progress" />
-              <span>{progress.data.completed} of {progress.data.total} lessons · {progress.data.percent}%</span>
+              <span>{progress.data.completed} of {progress.data.total} {lessonsWord(progress.data.total)} · {progress.data.percent}%</span>
               {progress.data.resume && (
                 <Link className="btn" to={`/courses/${slug}/lessons/${progress.data.resume.slug}`}>
                   {progress.data.started ? 'Resume' : 'Start'}: {progress.data.resume.title}
