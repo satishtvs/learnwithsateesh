@@ -1,25 +1,34 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { getProviders, login, register, startGoogleLogin } from './api'
 import { useAuth } from './auth'
+import { Catalogue } from './courses'
+
+/** Where to go after signing in: the page that sent us here, if it was an in-app path. */
+function useReturnTo(): string {
+  const from = (useLocation().state as { from?: string } | null)?.from
+  return from && from.startsWith('/') && !from.startsWith('//') ? from : '/'
+}
 
 export function Home() {
   const { user, signOut } = useAuth()
   return (
-    <main className="card">
-      <h1>LearnWithSateesh</h1>
-      {user ? (
-        <>
-          <p>Welcome, {user.full_name || user.email}.</p>
-          <p>Courses will appear here (next build step).</p>
-          <button onClick={signOut}>Sign out</button>
-        </>
-      ) : (
-        <p>
-          <Link to="/login">Sign in</Link> or <Link to="/register">create an account</Link> to start learning.
-        </p>
-      )}
+    <main className="wide">
+      <header className="topbar">
+        <h1>LearnWithSateesh</h1>
+        {user ? (
+          <span>
+            {user.full_name || user.email} · <a href="#" onClick={(e) => { e.preventDefault(); signOut() }}>Sign out</a>
+          </span>
+        ) : (
+          <span>
+            <Link to="/login">Sign in</Link> · <Link to="/register">Create account</Link>
+          </span>
+        )}
+      </header>
+      <h2>Courses</h2>
+      <Catalogue />
     </main>
   )
 }
@@ -40,8 +49,9 @@ function GoogleButton() {
 export function Login() {
   const { user, refresh } = useAuth()
   const nav = useNavigate()
+  const returnTo = useReturnTo()
   const [error, setError] = useState('')
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to={returnTo} replace />
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -49,7 +59,7 @@ export function Login() {
     try {
       await login(String(f.get('email')), String(f.get('password')))
       await refresh()
-      nav('/')
+      nav(returnTo)
     } catch {
       setError('Incorrect email or password.')
     }
@@ -75,8 +85,9 @@ export function Login() {
 export function Register() {
   const { user, refresh } = useAuth()
   const nav = useNavigate()
+  const returnTo = useReturnTo()
   const [error, setError] = useState('')
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to={returnTo} replace />
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -87,7 +98,7 @@ export function Register() {
       await register(email, password, String(f.get('name')))
       await login(email, password)
       await refresh()
-      nav('/')
+      nav(returnTo)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not register.')
     }

@@ -29,6 +29,47 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   return res
 }
 
+export interface LessonSummary {
+  slug: string
+  title: string
+}
+export interface CourseSummary {
+  slug: string
+  title: string
+  description: string
+}
+export interface CourseOutline extends CourseSummary {
+  overview_lessons: LessonSummary[]
+  chapters: {
+    code: string
+    title: string
+    unit: string | null
+    textbook_ref: string | null
+    lessons: LessonSummary[]
+  }[]
+}
+export interface Lesson {
+  slug: string
+  title: string
+  youtube_id: string
+  notes_md: string
+  slides_url: string | null
+  chapter_code: string | null
+  chapter_title: string | null
+  prev: LessonSummary | null
+  next: LessonSummary | null
+}
+
+export async function listCourses(): Promise<CourseSummary[]> {
+  return (await request('/courses')).json()
+}
+export async function getCourse(slug: string): Promise<CourseOutline> {
+  return (await request(`/courses/${encodeURIComponent(slug)}`)).json()
+}
+export async function getLesson(course: string, lesson: string): Promise<Lesson> {
+  return (await request(`/courses/${encodeURIComponent(course)}/lessons/${encodeURIComponent(lesson)}`)).json()
+}
+
 export async function getMe(): Promise<User | null> {
   try {
     return await (await request('/me')).json()

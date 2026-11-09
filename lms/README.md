@@ -13,6 +13,7 @@ This layout is the standard template for FastAPI + React projects.
     docker compose up -d db
     cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
     .venv/bin/alembic upgrade head
+    .venv/bin/python -m app.seed                   # AI Y3S1 course: 10 chapters + the uploaded videos
     .venv/bin/uvicorn app.main:app --reload        # http://localhost:8000/docs
     cd ../frontend && npm install && npm run dev   # http://localhost:5173
 
@@ -36,5 +37,5 @@ The "Continue with Google" button only appears when these are set.
 ## Build order
 
 1. ~~Scaffold, Compose, DB, migrations~~  2. ~~Auth (email + Google)~~
-3. Course / chapter / lesson API + pages  4. Progress  5. Quizzes
+3. ~~Course / chapter / lesson API + pages~~  4. Progress  5. Quizzes
 6. Instructor admin + content importer  7. EC2 deployment  8. v2 features

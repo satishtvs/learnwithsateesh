@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.courses import router as courses_router
 from app.models import User
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users, google_backend, google_client
@@ -42,6 +43,9 @@ if settings.google_client_id:
         prefix="/auth/google",
         tags=["auth"],
     )
+
+
+api.include_router(courses_router)
 
 
 @api.get("/me", response_model=UserRead)
