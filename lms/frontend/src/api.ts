@@ -293,6 +293,10 @@ export interface AdminOverview {
 }
 
 export const admin = {
+  liveSessions: () => adminCall<AdminLiveSession[]>('GET', '/live-sessions'),
+  saveLive: (id: number | undefined, b: LiveForm) =>
+    id === undefined ? adminCall<AdminLiveSession>('POST', '/live-sessions', b) : adminCall<AdminLiveSession>('PUT', `/live-sessions/${id}`, b),
+  deleteLive: (id: number) => adminCall<void>('DELETE', `/live-sessions/${id}`),
   overview: () => adminCall<AdminOverview>('GET', '/overview'),
   courses: () => adminCall<AdminCourse[]>('GET', '/courses'),
   course: (id: number) => adminCall<AdminCourseDetail>('GET', `/courses/${id}`),
@@ -411,4 +415,35 @@ export async function getMyCertificates(): Promise<Certificate[]> {
 }
 export async function getCertificate(code: string): Promise<Certificate> {
   return (await request(`/certificates/${encodeURIComponent(code)}`)).json()
+}
+
+export interface LiveSession {
+  id: number
+  title: string
+  description: string
+  starts_at: string
+  duration_minutes: number
+  status: 'upcoming' | 'live' | 'past'
+  course_slug: string | null
+  course_title: string | null
+  join_url: string | null
+  recording_youtube_id: string | null
+}
+export interface AdminLiveSession extends LiveSession {
+  published: boolean
+  course_id: number | null
+  join_url_raw: string
+}
+export interface LiveForm {
+  title: string
+  description: string
+  starts_at: string
+  duration_minutes: number
+  join_url: string
+  recording: string
+  course_id: number | null
+  published: boolean
+}
+export async function listLiveSessions(): Promise<LiveSession[]> {
+  return (await request('/live-sessions')).json()
 }

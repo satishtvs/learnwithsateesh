@@ -6,6 +6,8 @@ from app.admin import router as admin_router
 from app.courses import router as courses_router
 from app.emailer import email_enabled
 from app.certificates import router as certificates_router
+from app.live import admin_router as live_admin_router
+from app.live import router as live_router
 from app.progress import router as progress_router
 from app.quizzes import all_router as all_quizzes_router
 from app.quizzes import me_router as my_attempts_router
@@ -59,6 +61,8 @@ api.include_router(quizzes_router)
 api.include_router(all_quizzes_router)
 api.include_router(my_attempts_router)
 api.include_router(admin_router)
+api.include_router(live_router)
+api.include_router(live_admin_router)
 
 
 @api.get("/me", response_model=UserRead)

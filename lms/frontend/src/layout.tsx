@@ -8,9 +8,7 @@ const NAV: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/courses', label: 'Courses', icon: 'courses' },
   { to: '/dashboard', label: 'Dashboard', icon: 'grid' },
   { to: '/quizzes', label: 'Quizzes', icon: 'quiz' },
-]
-const SOON: { label: string; icon: IconName }[] = [
-  { label: 'Live sessions', icon: 'live' },
+  { to: '/live', label: 'Live sessions', icon: 'live' },
 ]
 
 const YEAR = new Date().getFullYear()
@@ -74,13 +72,6 @@ export function Shell() {
               </Link>
             </>
           )}
-          <p className="nav-label">Coming soon</p>
-          {SOON.map((n) => (
-            <span key={n.label} className="nav-item disabled" aria-disabled="true">
-              <Icon name={n.icon} />
-              <span>{n.label}</span>
-            </span>
-          ))}
         </nav>
 
         <div className="side-foot">

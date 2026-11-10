@@ -162,3 +162,19 @@ class Certificate(Base):
     learner_name: Mapped[str] = mapped_column(String(200))
     lesson_count: Mapped[int] = mapped_column(Integer)
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class LiveSession(Base):
+    """A scheduled live class. join_url is only handed to signed-in users; the recording is added afterwards."""
+
+    __tablename__ = "live_session"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text, default="")
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    duration_minutes: Mapped[int] = mapped_column(Integer, default=60, server_default="60")
+    join_url: Mapped[str] = mapped_column(String(500), default="", server_default="")
+    recording_youtube_id: Mapped[str | None] = mapped_column(String(11), nullable=True)
+    course_id: Mapped[int | None] = mapped_column(ForeignKey("course.id", ondelete="SET NULL"), nullable=True)
+    published: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")

@@ -19,7 +19,7 @@ import { Icon, PageHeader } from './ui'
 const fmtWhen = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
 // ---------------------------------------------------------------- shared bits
-function Gate({ children }: { children: ReactNode }) {
+export function Gate({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth()
   const loc = useLocation()
   if (loading) return <p className="muted">Loading…</p>
@@ -37,14 +37,14 @@ function Gate({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
 
-function ErrorNote({ error }: { error: unknown }) {
+export function ErrorNote({ error }: { error: unknown }) {
   if (!error) return null
   const msg = error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
   return <p role="alert" className="error form-error">{msg}</p>
 }
 
 /** A mutation that refreshes the listed queries on success. */
-function useAdminMutation<A, R>(fn: (a: A) => Promise<R>, invalidate: unknown[][], onDone?: (r: R) => void) {
+export function useAdminMutation<A, R>(fn: (a: A) => Promise<R>, invalidate: unknown[][], onDone?: (r: R) => void) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: fn,
@@ -55,7 +55,7 @@ function useAdminMutation<A, R>(fn: (a: A) => Promise<R>, invalidate: unknown[][
   })
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
+export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="field">
       <span>{label}</span>
@@ -65,7 +65,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   )
 }
 
-function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+export function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="check">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
@@ -154,6 +154,7 @@ export function AdminHome() {
   return (
     <Gate>
       <PageHeader title="Instructor area" subtitle="Create courses, add lessons by pasting a YouTube link, and manage quizzes.">
+        <Link className="btn ghost" to="/admin/live">Live sessions</Link>
         <button type="button" className="btn" onClick={() => setOpen((v) => !v)}>New course</button>
       </PageHeader>
 
