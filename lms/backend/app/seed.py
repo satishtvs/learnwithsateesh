@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from app.db import async_session_maker
 from app.models import Chapter, Course, Lesson
+from app.lesson_import import import_all_lessons
 from app.quiz_import import import_all
 
 YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
@@ -81,6 +82,11 @@ async def seed(force_quizzes: bool = False) -> None:
         nq, nn = await import_all(s, force=force_quizzes)
         await s.commit()
     print(f"imported quizzes: {nq} quizzes, {nn} questions created (only 'approved' ones are visible)")
+
+    async with async_session_maker() as s:
+        nl = await import_all_lessons(s)
+        await s.commit()
+    print(f"imported lessons: {nl} created (lessons without a youtube_id are skipped)")
 
 
 if __name__ == "__main__":
