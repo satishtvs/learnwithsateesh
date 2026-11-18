@@ -1,5 +1,7 @@
-import pytest_asyncio
+﻿import pytest_asyncio
 
+from app.db import async_session_maker
+from app.quiz_import import import_quiz_data, parse_quiz_file
 from app.seed import seed
 
 A = {"email": "asha@example.com", "password": "S3cure-passw0rd!"}
@@ -61,3 +63,37 @@ async def test_certificates_are_per_user(client):
     await signin(client, B)
     assert (await client.get("/api/me/certificates")).json() == []
     assert (await client.post(f"{C}/certificate")).status_code == 409
+
+
+QUIZ_DATA = {
+    "course": {"slug": "ai-y3s1", "title": "x"},
+    "chapter": {"code": "C01", "title": "Introduction", "unit": "Unit - I", "textbook_ref": "AIMA ch. 1"},
+    "quizzes": [
+        {"slug": "q1", "title": "Quiz one", "status": "approved", "pass_percent": 100,
+         "questions": [{"q": "Two plus two?", "options": ["3", "4"], "answer": "B", "explain": "4"}]},
+        {"slug": "q2", "title": "Draft", "status": "draft",
+         "questions": [{"q": "Hidden?", "options": ["a", "b"], "answer": "A"}]},
+    ],
+}
+
+
+async def attempt(client, choice):
+    qs = (await client.get(f"{C}/quizzes/q1")).json()["questions"]
+    r = await client.post(f"{C}/quizzes/q1/attempts", json={"answers": {str(qs[0]["id"]): choice}})
+    assert r.status_code == 200
+
+
+async def test_visible_quizzes_must_be_passed_before_claiming(client):
+    async with async_session_maker() as s:
+        await import_quiz_data(s, parse_quiz_file(QUIZ_DATA))
+        await s.commit()
+    await signin(client, A)
+    await finish_course(client)
+    prog = (await client.get(f"{C}/progress")).json()
+    assert (prog["quizzes_total"], prog["quizzes_passed"]) == (1, 0)  # the draft quiz does not count
+    assert (await client.post(f"{C}/certificate")).status_code == 409
+    await attempt(client, 0)  # wrong answer: fails
+    assert (await client.post(f"{C}/certificate")).status_code == 409
+    await attempt(client, 1)  # passes
+    assert (await client.get(f"{C}/progress")).json()["quizzes_passed"] == 1
+    assert (await client.post(f"{C}/certificate")).status_code == 200

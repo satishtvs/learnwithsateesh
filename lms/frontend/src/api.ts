@@ -102,6 +102,8 @@ export interface CourseProgress {
   started: boolean
   completed_slugs: string[]
   resume: LessonSummary | null
+  quizzes_total: number
+  quizzes_passed: number
 }
 
 export async function getCourseProgress(course: string): Promise<CourseProgress> {

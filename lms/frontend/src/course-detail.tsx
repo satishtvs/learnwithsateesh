@@ -46,6 +46,8 @@ export function CoursePage() {
   const textbooks = groupRefs([...new Set(data.chapters.map((c) => c.textbook_ref).filter(Boolean))] as string[])
   const firstFree = freeLessons[0]
   const resume = progress.data?.resume
+  const quizzesLeft = progress.data ? progress.data.quizzes_total - progress.data.quizzes_passed : 0
+  const nextQuiz = allQuizzes.find((q) => !q.passed)
 
   async function claim() {
     setClaiming(true)
@@ -191,10 +193,28 @@ export function CoursePage() {
                 </Link>
               ) : progress.data && progress.data.total > 0 ? (
                 <>
-                  <p className="note small">You have completed every lesson. Well done!</p>
-                  <button type="button" className="btn block" onClick={claim} disabled={claiming}>
-                    <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
-                  </button>
+                  {quizzesLeft > 0 ? (
+                    <>
+                      <p className="note small">
+                        You have completed every lesson. Pass {quizzesLeft === 1 ? 'the remaining quiz' : `the ${quizzesLeft} remaining quizzes`} to
+                        earn your certificate ({progress.data.quizzes_passed} of {progress.data.quizzes_total} passed).
+                      </p>
+                      {nextQuiz && (
+                        <Link className="btn block" to={`/courses/${slug}/quizzes/${nextQuiz.slug}`}>
+                          <Icon name="quiz" size={16} /> Take the next quiz
+                        </Link>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="note small">
+                        {progress.data.quizzes_total > 0 ? 'You have finished every lesson and passed every quiz. Well done!' : 'You have completed every lesson. Well done!'}
+                      </p>
+                      <button type="button" className="btn block" onClick={claim} disabled={claiming}>
+                        <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
+                      </button>
+                    </>
+                  )}
                   {claimError && <p className="error small" role="alert">{claimError}</p>}
                 </>
               ) : (
@@ -218,7 +238,7 @@ export function CoursePage() {
               {allQuizzes.length > 0 && <li><Icon name="quiz" size={16} /> {allQuizzes.length} practice {allQuizzes.length === 1 ? 'quiz' : 'quizzes'} with instant feedback</li>}
               <li><Icon name="learning" size={16} /> Progress tracking and resume</li>
               {freeLessons.length > 0 && <li><Icon name="sparkle" size={16} /> {freeLessons.length} free preview {lessonsWord(freeLessons.length)}</li>}
-              <li><Icon name="award" size={16} /> Certificate when you finish every lesson</li>
+              <li><Icon name="award" size={16} /> Certificate when you finish every lesson{allQuizzes.length > 0 && ' and pass every quiz'}</li>
             </ul>
 
             <h3>Course features</h3>

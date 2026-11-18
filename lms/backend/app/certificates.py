@@ -1,4 +1,4 @@
-"""Certificates of completion: claimed by a learner once every lesson in a course is complete."""
+"""Certificates of completion: claimed once every lesson is complete and every visible quiz is passed."""
 import secrets
 from datetime import datetime
 
@@ -53,6 +53,8 @@ async def claim_certificate(
     progress = await build_progress(session, user, course)
     if progress.total == 0 or progress.completed < progress.total:
         raise HTTPException(409, "Complete every lesson in this course to earn the certificate")
+    if progress.quizzes_passed < progress.quizzes_total:
+        raise HTTPException(409, "Pass every quiz in this course to earn the certificate")
     cert = Certificate(
         code=new_code(), user_id=user.id, course_id=course.id, lesson_count=progress.total,
         learner_name=(user.full_name or "").strip() or user.email.split("@")[0],

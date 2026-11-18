@@ -3,12 +3,12 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.courses import LessonSummary, _course_query, _ordered_lessons
 from app.db import get_async_session
-from app.models import Course, Lesson, LessonProgress, User
+from app.models import Course, Lesson, LessonProgress, Quiz, QuizAttempt, User
 from app.users import current_active_user
 
 router = APIRouter(tags=["progress"])
@@ -23,6 +23,8 @@ class CourseProgress(BaseModel):
     started: bool  # the user has opened at least one lesson
     completed_slugs: list[str]
     resume: LessonSummary | None  # where to continue; None when nothing is left
+    quizzes_total: int = 0  # visible quizzes in the course
+    quizzes_passed: int = 0  # of those, how many this user has passed at least once
 
 
 class CompletedBody(BaseModel):
@@ -52,6 +54,21 @@ async def completed_lesson_ids(session: AsyncSession, user: User, lessons: list[
     return set((await session.execute(q)).scalars().all())
 
 
+async def quiz_counts(session: AsyncSession, user: User, course: Course) -> tuple[int, int]:
+    """(visible quizzes in the course, how many of them the user has passed)."""
+    ids = list((await session.execute(select(Quiz.id).where(Quiz.course_id == course.id, Quiz.published.is_(True)))).scalars())
+    if not ids:
+        return 0, 0
+    passed = (
+        await session.execute(
+            select(func.count(func.distinct(QuizAttempt.quiz_id))).where(
+                QuizAttempt.user_id == user.id, QuizAttempt.quiz_id.in_(ids), QuizAttempt.passed.is_(True)
+            )
+        )
+    ).scalar_one()
+    return len(ids), passed
+
+
 async def build_progress(session: AsyncSession, user: User, course: Course) -> CourseProgress:
     ordered = _ordered_lessons(course)
     rows = []
@@ -74,6 +91,7 @@ async def build_progress(session: AsyncSession, user: User, course: Course) -> C
                 le for le in ordered if le.id not in done
             )
     total = len(ordered)
+    quizzes_total, quizzes_passed = await quiz_counts(session, user, course)
     return CourseProgress(
         course_slug=course.slug,
         course_title=course.title,
@@ -83,6 +101,8 @@ async def build_progress(session: AsyncSession, user: User, course: Course) -> C
         started=bool(rows),
         completed_slugs=[le.slug for le in ordered if le.id in done],
         resume=LessonSummary.model_validate(resume) if resume else None,
+        quizzes_total=quizzes_total,
+        quizzes_passed=quizzes_passed,
     )
 
 
