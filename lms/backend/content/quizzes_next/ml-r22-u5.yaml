@@ -1,0 +1,324 @@
+# Machine Learning (JNTUH R22 CSE-AIML, III-I), Unit V quizzes.
+# DRAFT for Sateesh's review. Nothing is shown to students until a quiz has `status: approved`.
+#
+# How to review: read each question; fix wording, options, the answer letter or the explanation;
+# then change that quiz's `status` from draft to approved. `answer` is the letter of the correct option.
+# Questions are original; they follow the Unit V slides (6 parts), not the textbook wording.
+
+course:
+  slug: machine-learning-r22
+  title: "Machine Learning: JNTUH R22 B.Tech CSE (AI&ML), III-I"
+  description: "Unit-wise video parts and quizzes for Machine Learning (AM502PC), following S. Marsland, Machine Learning: An Algorithmic Perspective, 2nd ed."
+  published: false          # flip to true when the first videos are uploaded
+unit:
+  code: U5
+  title: "Reinforcement Learning, Sampling and Graphical Models"
+  label: "Unit - V"
+  textbook_ref: "Marsland ch. 11, 15-16"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u5-p1
+    title: "Part 1: Reinforcement learning and the Getting Lost example"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In reinforcement learning, what feedback does the agent receive after an action?"
+        options:
+          - "The correct action for that state"
+          - "A reward, a number saying how good the outcome was"
+          - "A cluster label for the new state"
+          - "A full list of all possible actions and their values"
+        answer: B
+        explain: "The agent is never told the best action; it only gets a reward and a new state and must work out good behaviour by trying."
+
+      - q: "What is a policy?"
+        options:
+          - "The immediate reward after one action"
+          - "The set of all states in the environment"
+          - "A rule that chooses the action to take in each state"
+          - "The factor that reduces the weight of later rewards"
+        answer: C
+        explain: "A policy maps states to actions (deterministic) or to action probabilities (stochastic). Finding a good policy is the aim of RL."
+
+      - q: "In the Getting Lost grid with gamma = 0.9, the goal reward of +20 arrives after seven steps of -1. What is its discounted value, 20 x 0.9^7?"
+        options:
+          - "20.00"
+          - "13.00"
+          - "9.57"
+          - "4.35"
+        answer: C
+        explain: "0.9^7 is about 0.4783, so 20 x 0.4783 is about 9.566. Adding the discounted penalties of -5.217 gives the return 4.349."
+
+      - q: "What does a discount factor gamma close to 0 make the agent?"
+        options:
+          - "Short-sighted: it cares mostly about immediate rewards"
+          - "Far-sighted: distant rewards count almost fully"
+          - "Unable to receive any reward"
+          - "Fully random in its choices"
+        answer: A
+        explain: "The weight of a reward k steps ahead is gamma^k, which dies out fast for small gamma. Gamma near 1 gives a far-sighted agent."
+
+      - q: "A purely greedy player (epsilon = 0) on a three-lever slot machine ends with a low average reward. Why?"
+        options:
+          - "It explores too much and wastes pulls"
+          - "It sticks with the first lever that looked better than its starting estimate and never tries the others"
+          - "Its discount factor is too large"
+          - "It is told the wrong action by a teacher"
+        answer: B
+        explain: "Without exploration the player never discovers the better lever. Epsilon-greedy with a small epsilon finds it and earns far more."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u5-p2
+    title: "Part 2: MDP, Bellman equation, Q-learning and Sarsa"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What does the Markov property say?"
+        options:
+          - "The next state and reward depend only on the current state and action"
+          - "The next state depends on the whole history of states"
+          - "Every action has the same reward"
+          - "The discount factor must equal 1"
+        answer: A
+        explain: "That is why the state must contain everything useful: the past adds no extra information about what happens next."
+
+      - q: "The cell next to the gate has value 20. Taking one step (reward -1) into it gives what value, using Bellman with gamma = 0.9?"
+        options:
+          - "19.0"
+          - "17.0"
+          - "18.0"
+          - "14.3"
+        answer: B
+        explain: "Value = reward now + gamma x next value = -1 + 0.9 x 20 = 17."
+
+      - q: "Which method needs a complete model of the world (the step function for every action in every cell)?"
+        options:
+          - "Q-learning"
+          - "Sarsa"
+          - "Value iteration"
+          - "Epsilon-greedy exploration"
+        answer: C
+        explain: "Value iteration sweeps all cells using the model. Q-learning and Sarsa learn from experienced (state, action, reward, next state) steps only."
+
+      - q: "With alpha = 0.5, gamma = 0.9, old Q = 0 and the best Q of the next state = 10, reward -1, what is the new Q-learning value?"
+        options:
+          - "8.00"
+          - "-1.00"
+          - "10.00"
+          - "4.00"
+        answer: D
+        explain: "Target = -1 + 0.9 x 10 = 8. New Q = 0 + 0.5 x (8 - 0) = 4."
+
+      - q: "How does the Sarsa target differ from the Q-learning target?"
+        options:
+          - "Sarsa ignores the reward"
+          - "Sarsa uses the Q of the action actually taken next, not the best Q"
+          - "Sarsa needs the transition probabilities"
+          - "Sarsa has no learning rate"
+        answer: B
+        explain: "Sarsa is on-policy: it learns the value of the behaviour it really follows, including exploratory moves. Q-learning is off-policy and uses the maximum."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u5-p3
+    title: "Part 3: Sampling methods and Markov chain Monte Carlo"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In inverse transform sampling for an exponential distribution with rate 2, x = -ln(1 - u) / 2. For u = 0.5488, what is x (approximately)?"
+        options:
+          - "0.3979"
+          - "0.5488"
+          - "0.7957"
+          - "1.1000"
+        answer: A
+        explain: "1 - u = 0.4512 and ln(0.4512) is about -0.7957, so x = 0.7957 / 2 = 0.3979."
+
+      - q: "In rejection sampling with the envelope M = 1.5 and a uniform proposal, what is the expected acceptance rate?"
+        options:
+          - "1.5"
+          - "0.5"
+          - "0.3333"
+          - "0.6667"
+        answer: D
+        explain: "The acceptance rate is 1/M = 1/1.5 = 0.6667. The video observed 6675 accepted out of 10000."
+
+      - q: "How does importance sampling differ from rejection sampling?"
+        options:
+          - "It weights every sample by p(x)/q(x) instead of throwing samples away"
+          - "It needs a Markov chain"
+          - "It only works for discrete variables"
+          - "It requires the inverse CDF"
+        answer: A
+        explain: "Importance sampling keeps all samples and corrects for the wrong distribution using weights. A poor q makes a few weights huge."
+
+      - q: "What does the stationary distribution pi of a Markov chain satisfy?"
+        options:
+          - "pi P = 0"
+          - "pi P = pi"
+          - "pi + P = 1"
+          - "pi is the first row of P"
+        answer: B
+        explain: "One more step of the chain leaves pi unchanged. MCMC builds a chain whose stationary distribution is the target."
+
+      - q: "In the Metropolis algorithm, the ratio p(x')/p(x) is 0.4757. What happens?"
+        options:
+          - "The move is always accepted"
+          - "The move is always rejected"
+          - "The chain restarts from zero"
+          - "The move is accepted with probability 0.4757, otherwise the chain stays"
+        answer: D
+        explain: "Accept with probability min(1, ratio). Only ratios matter, so p need be known only up to a constant. A rejected step still records the old point."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u5-p4
+    title: "Part 4: Graphical models: Bayesian networks and Markov random fields"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "How many numbers are needed for the full joint distribution of 10 yes/no variables?"
+        options:
+          - "20"
+          - "100"
+          - "1023"
+          - "10240"
+        answer: C
+        explain: "2^10 - 1 = 1023. A graphical model needs far fewer numbers because each variable depends on only a few others."
+
+      - q: "In the rain, sprinkler, wet grass network, P(rain) = 0.2, P(no sprinkler | rain) = 0.99 and P(wet | rain, no sprinkler) = 0.8. What is P(rain, no sprinkler, wet)?"
+        options:
+          - "0.1584"
+          - "0.2000"
+          - "0.9900"
+          - "0.0160"
+        answer: A
+        explain: "The joint is a product of P(node | parents): 0.2 x 0.99 x 0.8 = 0.1584."
+
+      - q: "P(wet) = 0.44838 and P(rain, wet) = 0.16038. What is P(rain | wet)?"
+        options:
+          - "0.2000"
+          - "0.1604"
+          - "0.5000"
+          - "0.3577"
+        answer: D
+        explain: "P(rain | wet) = 0.16038 / 0.44838 = 0.3577, higher than the prior 0.2 because wet grass is evidence for rain."
+
+      - q: "What is explaining away?"
+        options:
+          - "Removing a node from the graph"
+          - "Seeing one cause (sprinkler on) lowers belief in another cause (rain) of the same effect"
+          - "Ignoring all observed variables"
+          - "Dividing by the constant Z"
+        answer: B
+        explain: "Once the sprinkler explains the wet grass, rain is no longer needed, so P(rain) drops from 0.3577 to 0.0068."
+
+      - q: "What do Markov random fields need that Bayesian networks do not?"
+        options:
+          - "Arrows between nodes"
+          - "A directed acyclic graph"
+          - "The normalising constant Z"
+          - "Conditional probability tables"
+        answer: C
+        explain: "MRF potentials are not probabilities, so the product of potentials must be divided by Z. Bayesian network tables are already normalised."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u5-p5
+    title: "Part 5: Hidden Markov models"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In a hidden Markov model, what do we actually observe?"
+        options:
+          - "The hidden states directly"
+          - "The transition matrix"
+          - "The observations emitted by the hidden states"
+          - "The stationary distribution"
+        answer: C
+        explain: "The states are hidden; we see only the emissions (such as walk, shop, clean) and reason about the states from them."
+
+      - q: "Which algorithm finds the most likely hidden state sequence?"
+        options:
+          - "Forward algorithm"
+          - "Baum-Welch"
+          - "Gibbs sampling"
+          - "Viterbi algorithm"
+        answer: D
+        explain: "Viterbi takes the maximum instead of the sum and traces back through backpointers. The forward algorithm gives the likelihood."
+
+      - q: "Day 1: alpha(Sunny) = 0.36, alpha(Rainy) = 0.04. Sunny to sunny is 0.7, rainy to sunny is 0.4, and sunny emits the day-2 observation with probability 0.3. What is alpha(day 2, Sunny)?"
+        options:
+          - "0.0804"
+          - "0.2680"
+          - "0.1080"
+          - "0.4000"
+        answer: A
+        explain: "(0.36 x 0.7 + 0.04 x 0.4) x 0.3 = 0.268 x 0.3 = 0.0804."
+
+      - q: "What is the main difference between the forward algorithm and Viterbi?"
+        options:
+          - "Forward uses the maximum, Viterbi uses the sum"
+          - "Forward sums over previous states, Viterbi takes the maximum and remembers the best previous state"
+          - "Forward learns parameters, Viterbi does not"
+          - "They are identical"
+        answer: B
+        explain: "Both use the same trellis. Summing gives the total likelihood of the observations; maximising gives the single best path."
+
+      - q: "What is guaranteed by Baum-Welch training?"
+        options:
+          - "The true parameters are recovered exactly"
+          - "The log-likelihood never decreases, but it may reach only a local optimum"
+          - "It always finishes in one iteration"
+          - "It needs the hidden states to be known"
+        answer: B
+        explain: "Baum-Welch is an EM method: the likelihood rises or stays level each iteration, but a bad start can end in a local optimum."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u5-p6
+    title: "Part 6: Tracking: Kalman filter and particle filter"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What are the two steps of each Kalman filter cycle?"
+        options:
+          - "Sample and reject"
+          - "Predict and update"
+          - "Explore and exploit"
+          - "Forward and backward"
+        answer: B
+        explain: "Predict moves the belief forward and uncertainty grows; update blends in the measurement and uncertainty shrinks."
+
+      - q: "After the predict step the variance is P = 10.5 and the sensor noise variance is R = 4. What is the Kalman gain K = P / (P + R)?"
+        options:
+          - "0.2759"
+          - "0.4000"
+          - "0.7241"
+          - "0.5000"
+        answer: C
+        explain: "K = 10.5 / 14.5 = 0.7241, so the update trusts the measurement a lot at the start."
+
+      - q: "What happens to the Kalman gain over the first few steps in the example (0.7241, 0.4592, 0.3688, 0.3306)?"
+        options:
+          - "It rises, because measurements get better"
+          - "It stays constant"
+          - "It becomes negative"
+          - "It falls, as the filter becomes more certain and trusts measurements less"
+        answer: D
+        explain: "As the variance of the belief shrinks, the filter relies more on its own estimate, so the gain falls and settles near 0.2965."
+
+      - q: "In the particle filter, what is the purpose of resampling?"
+        options:
+          - "To make all particles more varied"
+          - "To increase the sensor noise"
+          - "To remove the need for a model"
+          - "To drop low-weight particles and copy high-weight ones near the measurement"
+        answer: D
+        explain: "Resampling concentrates the particle cloud where the measurement says the state probably is."
+
+      - q: "When would you prefer a particle filter over a Kalman filter?"
+        options:
+          - "When the model is non-linear or non-Gaussian"
+          - "When speed is the only concern and the model is linear Gaussian"
+          - "When there are no measurements"
+          - "When you want an exact closed-form answer"
+        answer: A
+        explain: "The Kalman filter is fast and exact for linear Gaussian models. Particle filters work for any model but cost more computation."

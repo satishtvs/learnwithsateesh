@@ -1,0 +1,324 @@
+# Machine Learning (JNTUH R22 CSE-AIML, III-I), Unit IV quizzes.
+# DRAFT for Sateesh's review. Nothing is shown to students until a quiz has `status: approved`.
+#
+# How to review: read each question; fix wording, options, the answer letter or the explanation;
+# then change that quiz's `status` from draft to approved. `answer` is the letter of the correct option.
+# Questions are original; they follow the Unit IV slides (6 parts), not the textbook wording.
+
+course:
+  slug: machine-learning-r22
+  title: "Machine Learning: JNTUH R22 B.Tech CSE (AI&ML), III-I"
+  description: "Unit-wise video parts and quizzes for Machine Learning (AM502PC), following S. Marsland, Machine Learning: An Algorithmic Perspective, 2nd ed."
+  published: false          # flip to true when the first videos are uploaded
+unit:
+  code: U4
+  title: "Dimensionality Reduction and Evolutionary Learning"
+  label: "Unit - IV"
+  textbook_ref: "Marsland ch. 6, 10"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u4-p1
+    title: "Part 1: Dimensionality reduction and linear discriminant analysis"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What happens to distances between random points as the number of dimensions becomes very large?"
+        options:
+          - "The nearest and farthest points become almost equally far, so 'nearest' loses meaning"
+          - "The nearest point becomes much closer than the farthest point"
+          - "All distances shrink to exactly zero"
+          - "Distances stay the same as in two dimensions"
+        answer: A
+        explain: "In the video the nearest to farthest ratio rose from 0.016 in 2-D to 0.915 in 1000-D. This is why distance-based methods such as nearest neighbours work badly in high dimensions."
+
+      - q: "Which statement correctly separates feature selection from feature extraction?"
+        options:
+          - "Selection builds new features; extraction keeps a subset of the old ones"
+          - "Selection keeps a subset of the original features; extraction builds new features from all of them"
+          - "Selection needs labels; extraction never uses labels"
+          - "Both always create weighted sums of all the original features"
+        answer: B
+        explain: "Selection keeps original columns, which keep their meaning. Extraction creates new features, in the linear case as weighted sums of the old ones."
+
+      - q: "What does linear discriminant analysis try to do with the direction w?"
+        options:
+          - "Maximise the variance of the projected data, ignoring the labels"
+          - "Make the within-class scatter as large as possible"
+          - "Make projected class means far apart while keeping each class tightly packed"
+          - "Remove the class with the smallest mean"
+        answer: C
+        explain: "LDA is supervised. The Fisher criterion is the ratio of between-class scatter to within-class scatter, and we want it large."
+
+      - q: "In the worked example, the projected class means differ by 3.58 and the total projected spread inside the classes is 6.06. What is the Fisher ratio J (to two decimals)?"
+        options:
+          - "0.59"
+          - "3.58"
+          - "2.11"
+          - "6.06"
+        answer: C
+        explain: "J = (3.58 squared) / 6.06 = 12.81 / 6.06, which is about 2.11."
+
+      - q: "A data set has 4 classes. At most how many useful LDA directions can we get?"
+        options:
+          - "4"
+          - "3"
+          - "2"
+          - "As many as there are features"
+        answer: B
+        explain: "The between-class scatter has rank at most C - 1, so LDA gives at most C - 1 useful directions. For 4 classes that is 3."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u4-p2
+    title: "Part 2: Principal component analysis"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Why is PCA called an unsupervised method?"
+        options:
+          - "It never uses the covariance matrix"
+          - "It only works on data without any features"
+          - "It chooses directions from the spread of the data and never uses class labels"
+          - "It needs at least two classes"
+        answer: C
+        explain: "PCA looks only at how the data is spread (variance). The labels are never used, unlike in LDA."
+
+      - q: "For centred data X with n examples, how is the covariance matrix computed?"
+        options:
+          - "X X^T multiplied by n"
+          - "X^T X divided by (n - 1)"
+          - "The inverse of X divided by n"
+          - "The sum of all the rows of X"
+        answer: B
+        explain: "C = X^T X / (n - 1) for centred X. Its diagonal entries are the feature variances and the off-diagonal entries are covariances."
+
+      - q: "An eigenvector v of the covariance matrix has length one and eigenvalue lambda. What is the variance of the data projected on v?"
+        options:
+          - "lambda"
+          - "1 / lambda"
+          - "lambda squared"
+          - "The length of v"
+        answer: A
+        explain: "The variance along a unit vector v is v^T C v, and for an eigenvector this equals lambda. So the largest eigenvalue marks the first principal component."
+
+      - q: "In the worked example the eigenvalues are 10.9522 and 0.5478. What share of the total variance does PC1 hold?"
+        options:
+          - "About 0.05"
+          - "About 0.50"
+          - "About 0.70"
+          - "About 0.95"
+        answer: D
+        explain: "The total variance is 10.9522 + 0.5478 = 11.5, and 10.9522 / 11.5 is about 0.9524."
+
+      - q: "Why should we standardise the features before PCA when they have different units?"
+        options:
+          - "PCA follows variance, so a feature with large numbers can dominate the first component"
+          - "Standardising makes the eigenvalues negative"
+          - "PCA only works if every feature has the value 1"
+          - "It converts the method into a supervised one"
+        answer: A
+        explain: "On the raw wine data the proline column (values in the hundreds) made PC1 hold 0.9981 of the variance. After standardising it was 0.362, a more honest picture."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u4-p3
+    title: "Part 3: Factor analysis and independent component analysis"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "In the factor analysis model x = mean + L f + noise, what are the entries of L called?"
+        options:
+          - "Eigenvalues"
+          - "Loadings"
+          - "Residuals"
+          - "Centroids"
+        answer: B
+        explain: "L is the loading matrix. Each loading tells how strongly one hidden factor drives one observed feature."
+
+      - q: "What is the covariance of x in the factor analysis model?"
+        options:
+          - "L L^T plus a diagonal matrix of noise variances"
+          - "L plus f"
+          - "The inverse of L multiplied by the noise"
+          - "Only the diagonal matrix of noise variances"
+        answer: A
+        explain: "The shared part L L^T explains the covariance between features; the diagonal part holds the variance that belongs to single features only."
+
+      - q: "In the cocktail party problem, what do we know and what do we want to find?"
+        options:
+          - "We know the voices and want the microphone weights"
+          - "We know the mixing matrix and the voices and want the noise"
+          - "We know only the recordings and want the original voices and mixing weights"
+          - "We know the class labels and want the best direction"
+        answer: C
+        explain: "This is blind source separation: only the mixtures x are given, and ICA finds W (the inverse of A) so that s = W x."
+
+      - q: "Why can ICA not separate sources that are all Gaussian?"
+        options:
+          - "Gaussian sources always have zero variance"
+          - "After whitening, a Gaussian cloud is a round ball, so every rotation looks the same"
+          - "Gaussian sources are correlated, which ICA forbids"
+          - "FastICA cannot compute a hyperbolic tangent"
+        answer: B
+        explain: "Whitening fixes the covariance but not the final rotation. For Gaussian data no rotation is better than another, so at most one source may be Gaussian."
+
+      - q: "In the code example the FastICA outputs matched the sources with correlations about 0.995 and 0.998, while PCA gave 0.744 and 0.771. What is the lesson?"
+        options:
+          - "PCA is always better than ICA"
+          - "ICA and PCA give identical outputs"
+          - "Correlation cannot be used to compare methods"
+          - "Uncorrelated does not mean independent, and ICA uses the shape of the distribution as well"
+        answer: D
+        explain: "PCA removes only second-order (correlation) relations, so its outputs were still mixtures. ICA uses non-Gaussianity and recovered the sources almost perfectly."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u4-p4
+    title: "Part 4: Isomap, locally linear embedding and least squares optimisation"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What does Isomap use instead of the ordinary straight-line distance?"
+        options:
+          - "The Manhattan distance"
+          - "The geodesic distance along the surface, approximated by hops between neighbours"
+          - "The distance to the overall mean"
+          - "The cosine of the angle between points"
+        answer: B
+        explain: "Two points on a swiss roll can be close in space but far apart along the sheet. Isomap approximates the path along the surface using a neighbour graph."
+
+      - q: "What is the correct order of the Isomap steps?"
+        options:
+          - "MDS, neighbour graph, shortest paths"
+          - "Shortest paths, MDS, neighbour graph"
+          - "Neighbour graph, shortest paths between all pairs, then MDS"
+          - "Eigenvectors of (I - W), then weights, then neighbours"
+        answer: C
+        explain: "Build a k-nearest-neighbour graph, find shortest paths (for example with Dijkstra) to approximate geodesic distances, then run multidimensional scaling."
+
+      - q: "What goes wrong in Isomap if k (the number of neighbours) is too large?"
+        options:
+          - "The graph breaks into many separate pieces"
+          - "The data become one-dimensional"
+          - "The algorithm becomes supervised"
+          - "Edges can jump across layers of the roll (short circuits), making geodesic distances wrong"
+        answer: D
+        explain: "A very small k breaks the graph, while a very large k adds wrong edges between layers. In the video, k = 20 on 300 points gave 636 such jumps."
+
+      - q: "In LLE, a point is rebuilt from two neighbours with weights 0.75 and 0.25, and the neighbours are (1, 3) and (4, 0). Where is the rebuilt point?"
+        options:
+          - "(1.75, 2.25)"
+          - "(2.5, 1.5)"
+          - "(2, 2.5)"
+          - "(0.75, 0.25)"
+        answer: A
+        explain: "0.75 x (1, 3) + 0.25 x (4, 0) = (0.75 + 1, 2.25 + 0) = (1.75, 2.25). Weights must add up to one."
+
+      - q: "For the linear model y = X beta, which equation gives the least squares solution?"
+        options:
+          - "X beta = y squared"
+          - "X^T X beta = X^T y"
+          - "beta = X y"
+          - "(I - W)^T (I - W) beta = 0"
+        answer: B
+        explain: "Setting the gradient of the sum of squared errors to zero gives the normal equation X^T X beta = X^T y. For the video's five points this gave intercept 0.05 and slope 1.99."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u4-p5
+    title: "Part 5: Evolutionary learning and genetic algorithms"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What does a genetic algorithm need from the problem in order to work?"
+        options:
+          - "The derivative of the error function"
+          - "A smooth, bowl-shaped error surface"
+          - "A score (fitness) for each candidate solution"
+          - "A labelled training set"
+        answer: C
+        explain: "A genetic algorithm uses no gradient. It only needs a fitness value for each candidate, so it works for rough and discrete problems."
+
+      - q: "In a genetic algorithm, what is a gene?"
+        options:
+          - "A whole candidate solution written as a string"
+          - "One position in the chromosome, for example a single bit"
+          - "The total fitness of the population"
+          - "The probability of mutation"
+        answer: B
+        explain: "A chromosome is the string that encodes one candidate solution, and each position in it is a gene."
+
+      - q: "Six strings have fitness (number of ones) with a total of 26. String 6 has 7 ones. What is its chance of selection in roulette wheel selection?"
+        options:
+          - "About 7.7 percent"
+          - "About 14.3 percent"
+          - "About 26.9 percent"
+          - "About 50 percent"
+        answer: C
+        explain: "Probability = fitness / total fitness = 7 / 26, which is about 26.9 percent."
+
+      - q: "What does a larger tournament size t do in tournament selection?"
+        options:
+          - "It makes selection pressure weaker"
+          - "It makes weak strings win more often"
+          - "It removes the need for a fitness function"
+          - "It makes selection pressure stronger, because weak strings almost never win"
+        answer: D
+        explain: "The fittest of t random strings wins, so with a larger t the weak strings rarely win. t = 3 is a common choice."
+
+      - q: "In the worked example the total fitness rose from 26 to 41 in one generation with 6 strings. What is the new mean fitness?"
+        options:
+          - "About 6.83"
+          - "About 4.33"
+          - "About 8.00"
+          - "About 41"
+        answer: A
+        explain: "Mean = total / number of strings = 41 / 6, which is about 6.83. The old mean was 26 / 6, about 4.33."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u4-p6
+    title: "Part 6: Genetic operators and using genetic algorithms"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Parent A is ten ones and parent B is ten zeros. With one-point crossover after bit 4, taking the first part from A, which child is produced?"
+        options:
+          - "0000111111"
+          - "1111000000"
+          - "1110000111"
+          - "1010101010"
+        answer: B
+        explain: "The child takes the first four bits from A (1111) and the remaining six from B (000000), giving 1111000000."
+
+      - q: "Why is mutation needed even though crossover already mixes parents?"
+        options:
+          - "Crossover can only recombine genes already in the population; mutation can create new ones"
+          - "Mutation makes all strings identical, which is the goal"
+          - "Crossover cannot be used with bit strings"
+          - "Mutation removes the need for a fitness function"
+        answer: A
+        explain: "If every string has 0 at some position, no crossover can produce a 1 there. Only mutation can."
+
+      - q: "What is premature convergence, and what is one remedy?"
+        options:
+          - "The run stops at generation 1; use a smaller population"
+          - "The population becomes uniform before a good solution is found; a bigger population or a suitable mutation rate helps"
+          - "The fitness values become negative; use a larger tournament size"
+          - "The mutation rate is too high; remove mutation completely"
+        answer: B
+        explain: "Premature convergence means the population loses variety and the search stalls. Remedies include more mutation (but not too much), a bigger population, weaker selection pressure and rank selection."
+
+      - q: "What does elitism do?"
+        options:
+          - "It removes the best strings from the population"
+          - "It flips every bit of the best strings"
+          - "It makes the fitness function cheaper"
+          - "It copies the best one or two strings unchanged into the next generation"
+        answer: D
+        explain: "Because the best strings are kept unchanged, the best fitness never goes down from one generation to the next."
+
+      - q: "Why is a plain bit string a poor chromosome for the travelling salesman problem?"
+        options:
+          - "Bit strings cannot store numbers"
+          - "Most bit strings are not valid tours, so a permutation of the cities with order crossover is used"
+          - "The fitness would always be zero"
+          - "Mutation cannot flip bits in this problem"
+        answer: B
+        explain: "A tour must visit each city exactly once. A permutation chromosome with order crossover and swap mutation keeps every child a valid tour."

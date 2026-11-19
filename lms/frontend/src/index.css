@@ -639,3 +639,19 @@ textarea:focus, select:focus, input[type='number']:focus { border-color: var(--o
 .session-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; }
 .grid-2 { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
 @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } .session { padding: 14px; gap: 12px; } .date-tile { width: 54px; } }
+
+/* Part page: video, key points, quiz, completion in one column */
+.part-outline { display: block; }
+.part-outline > summary { cursor: pointer; list-style: none; }
+.part-outline > summary::-webkit-details-marker { display: none; }
+.part-outline > summary h2 { display: inline; font-size: 1rem; }
+.part-outline[open] > summary { margin-bottom: 12px; }
+.part-outline > *:not(summary) + * { margin-top: 12px; }
+.step-title { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin: 0 0 10px; }
+.step-no { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--primary, #3f5378); color: #fff; font-size: 0.85rem; font-weight: 700; }
+.notes ul { padding-left: 1.2rem; margin: 0; display: grid; gap: 6px; }
+.part-quiz .q-card:first-of-type, .part-quiz .score-card { margin-top: 0; }
+.part-quiz .note { margin-top: 0; }
+.part-done { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.part-done p { margin: 2px 0 0; }
+.part-done .note { margin: 0; }

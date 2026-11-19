@@ -77,6 +77,7 @@ export interface Part {
   slides_url: string | null
   is_preview: boolean
   completed: boolean
+  quiz_slug: string | null
   unit_code: string | null
   unit_title: string | null
   prev: PartSummary | null

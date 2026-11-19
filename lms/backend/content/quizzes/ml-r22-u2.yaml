@@ -1,0 +1,273 @@
+# Machine Learning (JNTUH R22 CSE-AIML, III-I), Unit II quizzes.
+# DRAFT for Sateesh's review. Nothing is shown to students until a quiz has `status: approved`.
+#
+# How to review: read each question; fix wording, options, the answer letter or the explanation;
+# then change that quiz's `status` from draft to approved. `answer` is the letter of the correct option.
+# Questions are original; they follow the Unit II slides (5 parts), not the textbook wording.
+
+course:
+  slug: machine-learning-r22
+  title: "Machine Learning: JNTUH R22 B.Tech CSE (AI&ML), III-I"
+  description: "Unit-wise video parts and quizzes for Machine Learning (AM502PC), following S. Marsland, Machine Learning: An Algorithmic Perspective, 2nd ed."
+  published: false          # flip to true when the first videos are uploaded
+unit:
+  code: U2
+  title: "Neural Networks and Support Vector Machines"
+  label: "Unit - II"
+  textbook_ref: "Marsland ch. 4, 5, 8"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u2-p1
+    title: "Part 1: The multi-layer perceptron and going forwards"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Why can a multi-layer perceptron solve XOR when a single perceptron cannot?"
+        options:
+          - "Hidden nodes build new features, so the output node can separate the classes with a line in that new space"
+          - "It uses a larger learning rate"
+          - "It has more input nodes than a single perceptron"
+          - "It never needs a bias"
+        answer: A
+        explain: "The hidden layer turns the inputs into new features (for XOR, an OR-like and an AND-like feature) in which the classes are linearly separable."
+
+      - q: "An MLP has 3 inputs, 4 hidden nodes and 2 outputs, with a bias at every hidden and output node. How many weights does it have?"
+        options:
+          - "20"
+          - "26"
+          - "14"
+          - "24"
+        answer: B
+        explain: "(m+1)L + (L+1)n = (3+1)(4) + (4+1)(2) = 16 + 10 = 26."
+
+      - q: "What goes wrong if every hidden node uses a linear activation?"
+        options:
+          - "The network cannot compute a weighted sum"
+          - "The outputs always lie between 0 and 1"
+          - "The stacked layers collapse into a single linear layer, so depth gives no benefit"
+          - "The forward pass needs more memory"
+        answer: C
+        explain: "Two linear layers multiply out to one linear layer with new weights, so the network can only draw straight boundaries."
+
+      - q: "Which output setup suits a problem with five mutually exclusive classes?"
+        options:
+          - "One linear output node"
+          - "One sigmoid output node with a 0.5 threshold"
+          - "Five ReLU outputs with no normalisation"
+          - "Five softmax outputs, whose values are positive and add up to 1"
+        answer: D
+        explain: "Softmax gives one probability-like output per class, and the largest one is the predicted class."
+
+      - q: "In the forward pass, what is computed at a hidden node j?"
+        options:
+          - "The activation a_j = g(z_j), where z_j is the weighted sum of the inputs plus the bias"
+          - "The error between the target and the output"
+          - "The gradient of E with respect to each weight"
+          - "The weighted sum of the output errors"
+        answer: A
+        explain: "Going forwards means net input then activation, layer by layer. Errors and gradients belong to the backward pass."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u2-p2
+    title: "Part 2: Back-propagation of error"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Why can the output error not be used directly to update a hidden node's weights?"
+        options:
+          - "Hidden nodes use a different activation function"
+          - "A hidden node has no target of its own, so its share of the output error must be passed back along the weights"
+          - "Hidden nodes have no bias"
+          - "The hidden weights are always fixed"
+        answer: B
+        explain: "Only output nodes have known targets. Back-propagation passes the output deltas backwards to give each hidden node its error signal."
+
+      - q: "For a sigmoid output node, the output delta is:"
+        options:
+          - "(y - t) only"
+          - "(t - y) times the input"
+          - "(y - t) y (1 - y)"
+          - "y (1 - y) times the sum of the next layer's weights"
+        answer: C
+        explain: "delta_k = (y_k - t_k) g'(u_k), and for the sigmoid g' = y(1 - y). The last option is the form of the hidden delta."
+
+      - q: "If a sigmoid node has activation a = 0.5, what is g'(z) at that node?"
+        options:
+          - "0.5"
+          - "1.0"
+          - "0.0"
+          - "0.25"
+        answer: D
+        explain: "g' = a(1 - a) = 0.5 x 0.5 = 0.25, which is the largest value the sigmoid derivative can take."
+
+      - q: "In the update w(k,j) = w(k,j) - eta delta_k a_j, what is a_j?"
+        options:
+          - "The target of output node k"
+          - "The activation of hidden node j, which feeds the weight being updated"
+          - "The learning rate"
+          - "The derivative of the sigmoid"
+        answer: B
+        explain: "A weight's gradient is the delta of the node it feeds times the value that comes through it, here the hidden activation a_j."
+
+      - q: "What is the difference between batch and sequential (online) training?"
+        options:
+          - "Batch updates after every example; sequential updates once per pass"
+          - "Sequential updates after every example; batch adds up the gradients over all examples and updates once"
+          - "Batch uses back-propagation and sequential does not"
+          - "Sequential needs no learning rate"
+        answer: B
+        explain: "Both use back-propagation. Sequential is noisier but often faster (shuffle the order); batch follows the true gradient of the total error."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u2-p3
+    title: "Part 3: The multi-layer perceptron in practice"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Training error keeps falling, but validation error starts to rise. What should you do?"
+        options:
+          - "Keep training, because training error is still improving"
+          - "Stop and keep the weights from the lowest validation error"
+          - "Double the learning rate"
+          - "Move the validation data into the training set"
+        answer: B
+        explain: "A rising validation error signals overfitting. Early stopping keeps the weights that generalise best."
+
+      - q: "Why must the test set be used only once, at the very end?"
+        options:
+          - "It is too small to use more than once"
+          - "It gives a faster estimate than the validation set"
+          - "It is needed to update the weights"
+          - "Using it to make choices would make the final estimate too optimistic"
+        answer: D
+        explain: "If we tune on the test set it stops being unseen data, and the reported performance no longer shows how the model does on new data."
+
+      - q: "What is the main purpose of adding momentum to the weight update?"
+        options:
+          - "To remove the need for a learning rate"
+          - "To guarantee reaching the global minimum"
+          - "To smooth zig-zags and speed up movement along valleys of the error surface"
+          - "To increase the number of hidden nodes"
+        answer: C
+        explain: "Momentum carries part of the previous change into the next one, which damps oscillation and speeds progress in a consistent direction."
+
+      - q: "Why do we restart training from several random initial weight sets?"
+        options:
+          - "Gradient descent can get stuck in a poor local minimum, and different starts may avoid it"
+          - "To reduce the number of weights"
+          - "To avoid scaling the inputs"
+          - "Because the sigmoid has no derivative at zero"
+        answer: A
+        explain: "The error surface has many valleys. In the XOR experiment, 2 hidden nodes solved 17 of 20 starts, so restarts help."
+
+      - q: "For a classification problem with 3 classes, which setup is typical?"
+        options:
+          - "One linear output with targets 1, 2 and 3"
+          - "Three outputs with one-of-N targets such as (0,1,0), usually with softmax"
+          - "Three hidden layers and one sigmoid output"
+          - "No output layer"
+        answer: B
+        explain: "One-of-N coding gives each class its own output node, and softmax turns the outputs into class scores that add up to 1."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u2-p4
+    title: "Part 4: Radial basis functions and splines"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "What is the key difference between a Gaussian RBF hidden unit and a sigmoid hidden unit?"
+        options:
+          - "The sigmoid unit responds only near a centre; the Gaussian unit responds over half the space"
+          - "The Gaussian unit responds mainly near its centre; the sigmoid unit responds over a whole half of the input space"
+          - "The Gaussian unit has no output"
+          - "The sigmoid unit needs a centre and a width"
+        answer: B
+        explain: "A Gaussian unit has a local receptive field set by its centre and width. A sigmoid unit is a global unit that splits the space in two."
+
+      - q: "How are the output weights of an RBF network usually found, once centres and widths are fixed?"
+        options:
+          - "By back-propagation through the hidden layer"
+          - "By k-means"
+          - "By solving a linear least-squares problem"
+          - "By picking random numbers"
+        answer: C
+        explain: "The output is linear in the hidden activations, so least squares gives the weights directly. k-means is used earlier, to place the centres."
+
+      - q: "In an RBF network with Gaussian units, what does making sigma very small do?"
+        options:
+          - "Every unit responds to the whole input space"
+          - "The output becomes constant"
+          - "The weights become huge"
+          - "The bumps stop overlapping, so the network fits poorly between the centres"
+        answer: D
+        explain: "A small width gives narrow bumps with gaps between them. A very wide sigma is the opposite problem, with large weights."
+
+      - q: "Which statement best describes the curse of dimensionality?"
+        options:
+          - "As the number of inputs grows, data becomes sparse, so far more examples are needed to cover the space"
+          - "Adding inputs always improves accuracy"
+          - "Distances become easier to measure in high dimensions"
+          - "It only affects neural networks"
+        answer: A
+        explain: "To hold 10 percent of the data, a cube needs an edge of about 0.98 at d = 100, so no neighbourhood is truly local."
+
+      - q: "Compared with a linear spline, a cubic spline with the same knots:"
+        options:
+          - "Has sharp corners at the knots"
+          - "Uses straight lines between knots"
+          - "Is smooth, with continuous slope and curvature, and usually fits a smooth function better"
+          - "Passes through no data points"
+        answer: C
+        explain: "Cubic pieces join smoothly at the knots. In the video, with 6 knots, the maximum error fell from 0.149 (linear) to 0.042 (cubic)."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u2-p5
+    title: "Part 5: Support vector machines"
+    status: draft
+    pass_percent: 70
+    questions:
+      - q: "Among all lines that separate two classes without error, which one does a linear SVM choose?"
+        options:
+          - "The line passing through the most data points"
+          - "The line with the widest margin, that is, the largest empty gap to the nearest points"
+          - "The line closest to the class means"
+          - "The first line found"
+        answer: B
+        explain: "A wide margin is more robust to noise in new data, so the SVM maximises it."
+
+      - q: "If the margin equals 2 / |w|, how do we make the margin larger?"
+        options:
+          - "Increase the length of w"
+          - "Increase the number of support vectors"
+          - "Add more training points"
+          - "Make w shorter, which is why we minimise 1/2 |w|^2"
+        answer: D
+        explain: "Margin is inversely proportional to the length of w, so minimising |w|^2 subject to the class constraints maximises the margin."
+
+      - q: "In the dual form w = sum of alpha_i t_i x_i, which training points have alpha_i greater than zero?"
+        options:
+          - "All of them"
+          - "Only the points far from the line"
+          - "Only the support vectors"
+          - "Only the points of class +1"
+        answer: C
+        explain: "Points not on the margin edges have alpha = 0, so removing them would not change the line at all."
+
+      - q: "In a soft-margin SVM, what does a very large C do?"
+        options:
+          - "Punishes margin violations heavily, giving a narrower margin that fits the training data closely"
+          - "Makes the margin wider and ignores errors"
+          - "Removes the slack variables"
+          - "Turns the SVM into a regression model"
+        answer: A
+        explain: "C weighs the slack penalty against margin width. Large C means few violations are allowed, so the margin shrinks and noise can hurt."
+
+      - q: "What does the kernel trick allow an SVM to do?"
+        options:
+          - "Skip training altogether"
+          - "Work in a high-dimensional feature space by evaluating K(x, z), without computing phi(x) explicitly"
+          - "Handle more than two classes without extra classifiers"
+          - "Avoid choosing C"
+        answer: B
+        explain: "K(x, z) equals the inner product phi(x).phi(z), so non-linear boundaries are possible while only kernel values are computed."

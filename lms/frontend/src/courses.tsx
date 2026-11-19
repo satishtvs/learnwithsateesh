@@ -7,6 +7,7 @@ import {
   getCourse,
   getCourseProgress,
   getPart,
+  getQuiz,
   listCourses,
   setPartCompleted,
   type CourseProgress,
@@ -16,6 +17,7 @@ import {
 } from './api'
 import { useAuth } from './auth'
 import { partsWord } from './format'
+import { QuizRunner } from './quiz'
 import { Cover, Icon, PageHeader, ProgressBar } from './ui'
 
 function useCourses() {
@@ -242,6 +244,13 @@ export function PartPage() {
     enabled: !!user,
     retry: false,
   })
+  const quizSlug = data?.quiz_slug ?? ''
+  const quizState = useQuery({
+    queryKey: ['quiz', slug, quizSlug, user?.id ?? 'anon'],
+    queryFn: () => getQuiz(slug, quizSlug),
+    enabled: !!user && !!quizSlug,
+    retry: false,
+  })
   const toggle = useMutation({
     mutationFn: (completed: boolean) => setPartCompleted(slug, partSlug, completed),
     onSuccess: () => {
@@ -275,6 +284,8 @@ export function PartPage() {
 
   const signedIn = !!user
   const done = new Set(progress.data?.completed_slugs ?? [])
+  // A part with a visible quiz is completed by passing it (the quiz result is cached by the quiz runner).
+  const quizPending = !!data.quiz_slug && !quizState.data?.passed
   return (
     <>
       <nav className="crumbs" aria-label="Breadcrumb">
@@ -296,16 +307,53 @@ export function PartPage() {
             />
           </div>
 
-          <div className="part-actions">
+          {data.slides_url && (
+            <p><a className="btn ghost" href={data.slides_url} target="_blank" rel="noreferrer">Download slides</a></p>
+          )}
+
+          {data.notes_md && (
+            <section className="panel notes">
+              <h2 className="step-title"><span className="step-no">1</span> Key points</h2>
+              <Markdown>{data.notes_md}</Markdown>
+            </section>
+          )}
+
+          {data.quiz_slug && (
+            <section className="panel part-quiz" id="quiz">
+              <h2 className="step-title"><span className="step-no">2</span> Check yourself</h2>
+              <QuizRunner
+                slug={slug}
+                quizSlug={data.quiz_slug}
+                embedded
+                onPassed={() => {
+                  if (!data.completed) toggle.mutate(true)
+                }}
+              />
+            </section>
+          )}
+
+          <section className="panel part-done">
             {user ? (
-              <button
-                type="button"
-                className={`btn${data.completed ? ' success' : ''}`}
-                disabled={toggle.isPending}
-                onClick={() => toggle.mutate(!data.completed)}
-              >
-                <Icon name="check" size={16} /> {data.completed ? 'Completed (click to undo)' : 'Mark as complete'}
-              </button>
+              <>
+                <div>
+                  <strong>{data.completed ? 'This part is complete.' : 'Finished this part?'}</strong>
+                  <p className="muted small">
+                    {data.completed
+                      ? 'Your progress is saved.'
+                      : quizPending
+                        ? 'Pass the quiz above and this part is marked complete automatically.'
+                        : 'Mark it complete to track your progress.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={`btn${data.completed ? ' success' : ''}`}
+                  disabled={toggle.isPending || (quizPending && !data.completed)}
+                  onClick={() => toggle.mutate(!data.completed)}
+                >
+                  <Icon name="check" size={16} /> {data.completed ? 'Completed (click to undo)' : 'Mark as complete'}
+                </button>
+              </>
             ) : (
               <p className="note">
                 Enjoying this? <Link to="/register" state={{ from: loc.pathname }}>Create a free account</Link> to track
@@ -313,10 +361,7 @@ export function PartPage() {
               </p>
             )}
             {toggle.isError && <span role="alert" className="error">Could not save. Try again.</span>}
-            {data.slides_url && <a className="btn ghost" href={data.slides_url} target="_blank" rel="noreferrer">Download slides</a>}
-          </div>
-
-          {data.notes_md && <section className="panel notes"><Markdown>{data.notes_md}</Markdown></section>}
+          </section>
 
           <nav className="prevnext" aria-label="Part navigation">
             {data.prev ? <Link className="btn ghost" to={`/courses/${slug}/parts/${data.prev.slug}`}>← {data.prev.title}</Link> : <span />}
@@ -324,8 +369,8 @@ export function PartPage() {
           </nav>
         </article>
 
-        <aside className="part-outline" aria-label="Course content">
-          <h2>Course content</h2>
+        <details className="part-outline" open={typeof window === 'undefined' || window.innerWidth > 1000}>
+          <summary><h2>Course content</h2></summary>
           {progress.data && (
             <div className="card-progress">
               <ProgressBar percent={progress.data.percent} label="Course progress" />
@@ -353,7 +398,7 @@ export function PartPage() {
               ))}
             </>
           )}
-        </aside>
+        </details>
       </div>
     </>
   )

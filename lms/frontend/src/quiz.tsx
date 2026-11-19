@@ -58,11 +58,13 @@ function Result({
   quiz,
   result,
   course,
+  embedded = false,
   onRetake,
 }: {
   quiz: QuizDetail
   result: AttemptResult
   course: string
+  embedded?: boolean
   onRetake: () => void
 }) {
   const byId = new Map(result.results.map((r) => [r.question_id, r]))
@@ -80,7 +82,7 @@ function Result({
           </p>
           <div className="cta">
             <button type="button" className="btn" onClick={onRetake}>Retake quiz</button>
-            <Link className="btn ghost" to={`/courses/${course}`}>Back to course</Link>
+            {!embedded && <Link className="btn ghost" to={`/courses/${course}`}>Back to course</Link>}
           </div>
         </div>
       </section>
@@ -117,6 +119,42 @@ function Result({
 export function QuizPage() {
   const { slug = '', quizSlug = '' } = useParams()
   const { user, loading } = useAuth()
+  const { data } = useQuery({
+    queryKey: ['quiz', slug, quizSlug, user?.id ?? 'anon'],
+    queryFn: () => getQuiz(slug, quizSlug),
+    enabled: !loading,
+    retry: false,
+  })
+  return (
+    <>
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <Link to="/quizzes">Quizzes</Link><Icon name="chevron" size={14} />
+        <Link to={`/courses/${slug}`}>Course</Link>
+        {data?.unit_code && <><Icon name="chevron" size={14} /><span>{data.unit_code} · {data.unit_title}</span></>}
+      </nav>
+      {data && (
+        <PageHeader title={data.title}>
+          <QuizStatus q={data} />
+        </PageHeader>
+      )}
+      <QuizRunner slug={slug} quizSlug={quizSlug} />
+    </>
+  )
+}
+
+/** The questions, submit button and result. Used on the quiz page and inline under a part's video. */
+export function QuizRunner({
+  slug,
+  quizSlug,
+  embedded = false,
+  onPassed,
+}: {
+  slug: string
+  quizSlug: string
+  embedded?: boolean
+  onPassed?: () => void
+}) {
+  const { user, loading } = useAuth()
   const loc = useLocation()
   const qc = useQueryClient()
   const [answers, setAnswers] = useState<Record<number, number>>({})
@@ -136,7 +174,8 @@ export function QuizPage() {
     },
     onSuccess: (r) => {
       setResult(r)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      if (!embedded) window.scrollTo({ top: 0, behavior: 'smooth' })
+      if (r.passed) onPassed?.()
       qc.invalidateQueries({ queryKey: ['quizzes'] })
       qc.invalidateQueries({ queryKey: ['quiz', slug, quizSlug] })
       qc.invalidateQueries({ queryKey: ['my-attempts'] })
@@ -146,13 +185,11 @@ export function QuizPage() {
   if (loading || isLoading) return <p className="muted">Loading…</p>
   if (error instanceof ApiError && error.status === 401) {
     return (
-      <>
-        <nav className="crumbs"><Link to={`/courses/${slug}`}>← Course</Link></nav>
-        <LoginGate back={loc.pathname} title="Sign in to take this quiz" text="Quizzes are free; you just need a free account so we can save your scores." />
-      </>
+      <LoginGate back={loc.pathname} title="Sign in to take this quiz" text="Quizzes are free; you just need a free account so we can save your scores." />
     )
   }
   if (error || !data) {
+    if (embedded) return <p className="muted">Could not load the quiz.</p>
     return (
       <div className="empty">
         <h3>{error instanceof ApiError && error.status === 404 ? 'Quiz not found' : 'Could not load this quiz'}</h3>
@@ -167,22 +204,13 @@ export function QuizPage() {
   const retake = () => {
     setAnswers({})
     setResult(null)
-    window.scrollTo({ top: 0 })
+    if (!embedded) window.scrollTo({ top: 0 })
   }
 
   return (
     <>
-      <nav className="crumbs" aria-label="Breadcrumb">
-        <Link to="/quizzes">Quizzes</Link><Icon name="chevron" size={14} />
-        <Link to={`/courses/${slug}`}>Course</Link>
-        {data.unit_code && <><Icon name="chevron" size={14} /><span>{data.unit_code} · {data.unit_title}</span></>}
-      </nav>
-      <PageHeader title={data.title}>
-        <QuizStatus q={data} />
-      </PageHeader>
-
       {result ? (
-        <Result quiz={data} result={result} course={slug} onRetake={retake} />
+        <Result quiz={data} result={result} course={slug} embedded={embedded} onRetake={retake} />
       ) : (
         <form
           onSubmit={(e) => {

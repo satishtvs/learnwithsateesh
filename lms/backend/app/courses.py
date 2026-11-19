@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db import get_async_session
-from app.models import Unit, Course, Part, User
+from app.models import Unit, Course, Part, Quiz, User
 from app.users import optional_user
 
 router = APIRouter(prefix="/courses", tags=["courses"])
@@ -52,6 +52,7 @@ class PartOut(BaseModel):
     slides_url: str | None
     is_preview: bool
     completed: bool = False  # for the signed-in user; always False for anonymous visitors
+    quiz_slug: str | None = None  # the part's own published quiz (quiz slug == part slug), if any
     unit_code: str | None
     unit_title: str | None
     prev: PartSummary | None
@@ -143,6 +144,11 @@ async def get_part(
     if not part.is_preview and user is None:
         raise HTTPException(401, "login_required")
     unit = next((c for c in course.units if c.id == part.unit_id), None)
+    has_quiz = (
+        await session.execute(
+            select(Quiz.id).where(Quiz.course_id == course.id, Quiz.slug == part.slug, Quiz.published.is_(True))
+        )
+    ).first() is not None
 
     completed = False
     if user is not None:  # lazy import: progress.py imports this module
@@ -152,6 +158,7 @@ async def get_part(
         completed = part.id in await completed_part_ids(session, user, [part])
     return PartOut(
         completed=completed,
+        quiz_slug=part.slug if has_quiz else None,
         slug=part.slug,
         title=part.title,
         youtube_id=part.youtube_id,
