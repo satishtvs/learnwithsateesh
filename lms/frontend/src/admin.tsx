@@ -4,12 +4,12 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   admin,
   ApiError,
-  type AdminChapter,
+  type AdminUnit,
   type AdminOverview,
-  type AdminLesson,
+  type AdminPart,
   type AdminQuestion,
   type AdminQuiz,
-  type LessonForm,
+  type PartForm,
   type QuestionForm,
 } from './api'
 import { useAuth } from './auth'
@@ -90,7 +90,7 @@ function OverviewPanel({ o }: { o: AdminOverview }) {
   const tiles = [
     { icon: 'learning' as const, label: 'Learners', value: o.learners, tone: 'orange' },
     { icon: 'sparkle' as const, label: 'Active this week', value: o.active_7d, tone: 'navy' },
-    { icon: 'check' as const, label: 'Lessons completed', value: o.lessons_completed, tone: 'green' },
+    { icon: 'check' as const, label: 'Parts completed', value: o.parts_completed, tone: 'green' },
     { icon: 'quiz' as const, label: o.pass_rate === null ? 'Quiz attempts' : `Quiz attempts · ${o.pass_rate}% passed`, value: o.attempts, tone: 'violet' },
   ]
   return (
@@ -107,7 +107,7 @@ function OverviewPanel({ o }: { o: AdminOverview }) {
         <section className="panel">
           <h2>Courses</h2>
           <table className="tbl">
-            <thead><tr><th>Course</th><th>Learners</th><th>Lessons done</th></tr></thead>
+            <thead><tr><th>Course</th><th>Learners</th><th>Parts done</th></tr></thead>
             <tbody>
               {o.courses.map((c) => (
                 <tr key={c.id}>
@@ -153,7 +153,7 @@ export function AdminHome() {
 
   return (
     <Gate>
-      <PageHeader title="Instructor area" subtitle="Create courses, add lessons by pasting a YouTube link, and manage quizzes.">
+      <PageHeader title="Instructor area" subtitle="Create courses, add parts by pasting a YouTube link, and manage quizzes.">
         <Link className="btn ghost" to="/admin/live">Live sessions</Link>
         <button type="button" className="btn" onClick={() => setOpen((v) => !v)}>New course</button>
       </PageHeader>
@@ -182,8 +182,8 @@ export function AdminHome() {
                 <h3>{c.title}</h3>
                 <p className="clamp">{c.description || 'No description yet.'}</p>
                 <div className="chips">
-                  <span className="chip">{c.chapter_count} chapters</span>
-                  <span className="chip">{c.lesson_count} lessons</span>
+                  <span className="chip">{c.unit_count} units</span>
+                  <span className="chip">{c.part_count} parts</span>
                   <span className="chip">{c.quiz_count} quizzes</span>
                 </div>
               </div>
@@ -204,7 +204,7 @@ export function CourseEditor() {
   if (error || !data) {
     return <Gate><div className="empty"><h3>Course not found</h3><Link className="btn" to="/admin">Back</Link></div></Gate>
   }
-  const { course, chapters, lessons, quizzes } = data
+  const { course, units, parts, quizzes } = data
   return (
     <Gate>
       <nav className="crumbs"><Link to="/admin">Instructor area</Link><Icon name="chevron" size={14} /><span>{course.title}</span></nav>
@@ -212,9 +212,9 @@ export function CourseEditor() {
         {course.published && <Link className="btn ghost" to={`/courses/${course.slug}`}>View on site</Link>}
       </PageHeader>
       <CourseDetails key={course.id} course={course} refresh={key} />
-      <ChaptersPanel courseId={id} chapters={chapters} refresh={key} />
-      <LessonsPanel courseId={id} chapters={chapters} lessons={lessons} refresh={key} />
-      <QuizzesPanel courseId={id} chapters={chapters} quizzes={quizzes} refresh={key} />
+      <UnitsPanel courseId={id} units={units} refresh={key} />
+      <PartsPanel courseId={id} units={units} parts={parts} refresh={key} />
+      <QuizzesPanel courseId={id} units={units} quizzes={quizzes} refresh={key} />
     </Gate>
   )
 }
@@ -255,72 +255,72 @@ function CourseDetails({ course, refresh }: { course: { id: number; title: strin
   )
 }
 
-// ---------------------------------------------------------------- chapters
-function ChaptersPanel({ courseId, chapters, refresh }: { courseId: number; chapters: AdminChapter[]; refresh: unknown[] }) {
+// ---------------------------------------------------------------- units
+function UnitsPanel({ courseId, units, refresh }: { courseId: number; units: AdminUnit[]; refresh: unknown[] }) {
   const [editing, setEditing] = useState<number | null>(null)
-  const move = useAdminMutation(({ id, d }: { id: number; d: 'up' | 'down' }) => admin.moveChapter(id, d), [refresh])
-  const del = useAdminMutation((id: number) => admin.deleteChapter(id), [refresh])
-  const add = useAdminMutation((b: { code: string; title: string; unit: string | null; textbook_ref: string | null }) => admin.createChapter(courseId, b), [refresh])
+  const move = useAdminMutation(({ id, d }: { id: number; d: 'up' | 'down' }) => admin.moveUnit(id, d), [refresh])
+  const del = useAdminMutation((id: number) => admin.deleteUnit(id), [refresh])
+  const add = useAdminMutation((b: { code: string; title: string; label: string | null; textbook_ref: string | null }) => admin.createUnit(courseId, b), [refresh])
 
   function onAdd(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.currentTarget
     const f = new FormData(form)
     add.mutate(
-      { code: String(f.get('code')), title: String(f.get('title')), unit: String(f.get('unit') || '') || null, textbook_ref: String(f.get('ref') || '') || null },
+      { code: String(f.get('code')), title: String(f.get('title')), label: String(f.get('label') || '') || null, textbook_ref: String(f.get('ref') || '') || null },
       { onSuccess: () => form.reset() },
     )
   }
 
   return (
     <section className="panel">
-      <h2>Chapters <small>Units or topics that group your lessons</small></h2>
+      <h2>Units <small>Groups that hold your parts</small></h2>
       <ul className="rows">
-        {chapters.map((ch) => (
+        {units.map((ch) => (
           <li key={ch.id}>
             <div className="row static">
               <span className="code">{ch.code}</span>
-              <span className="t">{ch.title}<small>{[ch.unit, ch.textbook_ref].filter(Boolean).join(' · ')}</small></span>
+              <span className="t">{ch.title}<small>{[ch.label, ch.textbook_ref].filter(Boolean).join(' · ')}</small></span>
               <MoveButtons onMove={(d) => move.mutate({ id: ch.id, d })} disabled={move.isPending} />
               <button type="button" className="btn ghost small" onClick={() => setEditing(editing === ch.id ? null : ch.id)}>Edit</button>
               <button
                 type="button"
                 className="btn ghost small danger"
-                onClick={() => ask(`Delete chapter ${ch.code}?`) && del.mutate(ch.id)}
+                onClick={() => ask(`Delete unit ${ch.code}?`) && del.mutate(ch.id)}
               >
                 Delete
               </button>
             </div>
-            {editing === ch.id && <ChapterEdit chapter={ch} refresh={refresh} onDone={() => setEditing(null)} />}
+            {editing === ch.id && <UnitEdit unit={ch} refresh={refresh} onDone={() => setEditing(null)} />}
           </li>
         ))}
-        {chapters.length === 0 && <li className="muted small">No chapters yet.</li>}
+        {units.length === 0 && <li className="muted small">No units yet.</li>}
       </ul>
       <ErrorNote error={move.error ?? del.error} />
       <form className="inline-form" onSubmit={onAdd}>
-        <input name="code" placeholder="Code, e.g. U1" required maxLength={10} aria-label="Chapter code" />
-        <input name="title" placeholder="Chapter title" required maxLength={200} aria-label="Chapter title" className="grow" />
-        <input name="unit" placeholder="Unit, e.g. Unit - I" maxLength={20} aria-label="Unit" />
+        <input name="code" placeholder="Code, e.g. U1" required maxLength={10} aria-label="Unit code" />
+        <input name="title" placeholder="Unit title" required maxLength={200} aria-label="Unit title" className="grow" />
+        <input name="label" placeholder="Unit label, e.g. Unit - I" maxLength={20} aria-label="Unit label" />
         <input name="ref" placeholder="Textbook reference" maxLength={200} aria-label="Textbook reference" />
-        <button className="btn small" disabled={add.isPending}>Add chapter</button>
+        <button className="btn small" disabled={add.isPending}>Add unit</button>
       </form>
       <ErrorNote error={add.error} />
     </section>
   )
 }
 
-function ChapterEdit({ chapter, refresh, onDone }: { chapter: AdminChapter; refresh: unknown[]; onDone: () => void }) {
-  const [v, setV] = useState({ code: chapter.code, title: chapter.title, unit: chapter.unit ?? '', textbook_ref: chapter.textbook_ref ?? '' })
+function UnitEdit({ unit, refresh, onDone }: { unit: AdminUnit; refresh: unknown[]; onDone: () => void }) {
+  const [v, setV] = useState({ code: unit.code, title: unit.title, label: unit.label ?? '', textbook_ref: unit.textbook_ref ?? '' })
   const save = useAdminMutation(
-    () => admin.updateChapter(chapter.id, { code: v.code, title: v.title, unit: v.unit || null, textbook_ref: v.textbook_ref || null }),
+    () => admin.updateUnit(unit.id, { code: v.code, title: v.title, label: v.label || null, textbook_ref: v.textbook_ref || null }),
     [refresh, ['course']],
     onDone,
   )
   return (
     <form className="inline-form edit" onSubmit={(e) => { e.preventDefault(); save.mutate(undefined) }}>
-      <input value={v.code} onChange={(e) => setV({ ...v, code: e.target.value })} required maxLength={10} aria-label="Chapter code" />
-      <input value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} required className="grow" aria-label="Chapter title" />
-      <input value={v.unit} onChange={(e) => setV({ ...v, unit: e.target.value })} placeholder="Unit" aria-label="Unit" />
+      <input value={v.code} onChange={(e) => setV({ ...v, code: e.target.value })} required maxLength={10} aria-label="Unit code" />
+      <input value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} required className="grow" aria-label="Unit title" />
+      <input value={v.label} onChange={(e) => setV({ ...v, label: e.target.value })} placeholder="Unit label" aria-label="Unit label" />
       <input value={v.textbook_ref} onChange={(e) => setV({ ...v, textbook_ref: e.target.value })} placeholder="Textbook reference" aria-label="Textbook reference" />
       <button className="btn small" disabled={save.isPending}>Save</button>
       <button type="button" className="btn ghost small" onClick={onDone}>Cancel</button>
@@ -329,21 +329,21 @@ function ChapterEdit({ chapter, refresh, onDone }: { chapter: AdminChapter; refr
   )
 }
 
-// ---------------------------------------------------------------- lessons
-function LessonsPanel({ courseId, chapters, lessons, refresh }: { courseId: number; chapters: AdminChapter[]; lessons: AdminLesson[]; refresh: unknown[] }) {
+// ---------------------------------------------------------------- parts
+function PartsPanel({ courseId, units, parts, refresh }: { courseId: number; units: AdminUnit[]; parts: AdminPart[]; refresh: unknown[] }) {
   const [editing, setEditing] = useState<number | 'new' | null>(null)
-  const move = useAdminMutation(({ id, d }: { id: number; d: 'up' | 'down' }) => admin.moveLesson(id, d), [refresh])
-  const del = useAdminMutation((id: number) => admin.deleteLesson(id), [refresh, ['course'], ['progress']])
+  const move = useAdminMutation(({ id, d }: { id: number; d: 'up' | 'down' }) => admin.movePart(id, d), [refresh])
+  const del = useAdminMutation((id: number) => admin.deletePart(id), [refresh, ['course'], ['progress']])
 
-  const groups: { key: string; title: string; items: AdminLesson[] }[] = [
-    { key: 'none', title: 'Start here (no chapter)', items: lessons.filter((l) => l.chapter_id === null) },
-    ...chapters.map((c) => ({ key: String(c.id), title: `${c.code} · ${c.title}`, items: lessons.filter((l) => l.chapter_id === c.id) })),
+  const groups: { key: string; title: string; items: AdminPart[] }[] = [
+    { key: 'none', title: 'Start here (no unit)', items: parts.filter((l) => l.unit_id === null) },
+    ...units.map((c) => ({ key: String(c.id), title: `${c.code} · ${c.title}`, items: parts.filter((l) => l.unit_id === c.id) })),
   ].filter((g) => g.items.length > 0)
 
   return (
     <section className="panel">
-      <h2>Lessons <small>Each lesson is one YouTube video with optional notes</small></h2>
-      {groups.length === 0 && <p className="muted small">No lessons yet. Add the first one below.</p>}
+      <h2>Parts <small>Each part is one YouTube video with optional notes</small></h2>
+      {groups.length === 0 && <p className="muted small">No parts yet. Add the first one below.</p>}
       {groups.map((g) => (
         <div key={g.key} className="group">
           <h3>{g.title}</h3>
@@ -356,9 +356,9 @@ function LessonsPanel({ courseId, chapters, lessons, refresh }: { courseId: numb
                   {l.is_preview && <span className="chip free">Free</span>}
                   <MoveButtons onMove={(d) => move.mutate({ id: l.id, d })} disabled={move.isPending} />
                   <button type="button" className="btn ghost small" onClick={() => setEditing(editing === l.id ? null : l.id)}>Edit</button>
-                  <button type="button" className="btn ghost small danger" onClick={() => ask(`Delete the lesson "${l.title}"? Learners' progress on it is removed too.`) && del.mutate(l.id)}>Delete</button>
+                  <button type="button" className="btn ghost small danger" onClick={() => ask(`Delete the part "${l.title}"? Learners' progress on it is removed too.`) && del.mutate(l.id)}>Delete</button>
                 </div>
-                {editing === l.id && <LessonEditor courseId={courseId} chapters={chapters} lesson={l} refresh={refresh} onDone={() => setEditing(null)} />}
+                {editing === l.id && <PartEditor courseId={courseId} units={units} part={l} refresh={refresh} onDone={() => setEditing(null)} />}
               </li>
             ))}
           </ul>
@@ -366,44 +366,44 @@ function LessonsPanel({ courseId, chapters, lessons, refresh }: { courseId: numb
       ))}
       <ErrorNote error={move.error ?? del.error} />
       {editing === 'new' ? (
-        <LessonEditor courseId={courseId} chapters={chapters} refresh={refresh} onDone={() => setEditing(null)} />
+        <PartEditor courseId={courseId} units={units} refresh={refresh} onDone={() => setEditing(null)} />
       ) : (
-        <div className="cta"><button type="button" className="btn small" onClick={() => setEditing('new')}>Add lesson</button></div>
+        <div className="cta"><button type="button" className="btn small" onClick={() => setEditing('new')}>Add part</button></div>
       )}
     </section>
   )
 }
 
-function LessonEditor({ courseId, chapters, lesson, refresh, onDone }: { courseId: number; chapters: AdminChapter[]; lesson?: AdminLesson; refresh: unknown[]; onDone: () => void }) {
-  const [v, setV] = useState<LessonForm>({
-    title: lesson?.title ?? '',
-    youtube: lesson ? `https://youtu.be/${lesson.youtube_id}` : '',
-    chapter_id: lesson?.chapter_id ?? chapters[0]?.id ?? null,
-    notes_md: lesson?.notes_md ?? '',
-    slides_url: lesson?.slides_url ?? '',
-    published: lesson?.published ?? true,
-    is_preview: lesson?.is_preview ?? false,
+function PartEditor({ courseId, units, part, refresh, onDone }: { courseId: number; units: AdminUnit[]; part?: AdminPart; refresh: unknown[]; onDone: () => void }) {
+  const [v, setV] = useState<PartForm>({
+    title: part?.title ?? '',
+    youtube: part ? `https://youtu.be/${part.youtube_id}` : '',
+    unit_id: part?.unit_id ?? units[0]?.id ?? null,
+    notes_md: part?.notes_md ?? '',
+    slides_url: part?.slides_url ?? '',
+    published: part?.published ?? true,
+    is_preview: part?.is_preview ?? false,
   })
-  const set = <K extends keyof LessonForm>(k: K, val: LessonForm[K]) => setV((p) => ({ ...p, [k]: val }))
+  const set = <K extends keyof PartForm>(k: K, val: PartForm[K]) => setV((p) => ({ ...p, [k]: val }))
   const save = useAdminMutation(
     () => {
       const body = { ...v, slides_url: v.slides_url?.trim() || null }
-      return lesson ? admin.updateLesson(lesson.id, body) : admin.createLesson(courseId, body)
+      return part ? admin.updatePart(part.id, body) : admin.createPart(courseId, body)
     },
     [refresh, ['course'], ['courses']],
     onDone,
   )
   return (
     <form className="form edit-box" onSubmit={(e) => { e.preventDefault(); save.mutate(undefined) }}>
-      <h3>{lesson ? 'Edit lesson' : 'New lesson'}</h3>
+      <h3>{part ? 'Edit part' : 'New part'}</h3>
       <Field label="Title"><input value={v.title} onChange={(e) => set('title', e.target.value)} required maxLength={200} /></Field>
       <Field label="YouTube link" hint="Paste any YouTube link (watch, youtu.be, embed) or the 11-character video id.">
         <input value={v.youtube} onChange={(e) => set('youtube', e.target.value)} required placeholder="https://youtu.be/…" />
       </Field>
-      <Field label="Chapter">
-        <select value={v.chapter_id ?? ''} onChange={(e) => set('chapter_id', e.target.value ? Number(e.target.value) : null)}>
-          <option value="">No chapter (shown under "Start here")</option>
-          {chapters.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.title}</option>)}
+      <Field label="Unit">
+        <select value={v.unit_id ?? ''} onChange={(e) => set('unit_id', e.target.value ? Number(e.target.value) : null)}>
+          <option value="">No unit (shown under "Start here")</option>
+          {units.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.title}</option>)}
         </select>
       </Field>
       <Field label="Notes (Markdown, optional)"><textarea value={v.notes_md} onChange={(e) => set('notes_md', e.target.value)} rows={5} /></Field>
@@ -414,7 +414,7 @@ function LessonEditor({ courseId, chapters, lesson, refresh, onDone }: { courseI
       </div>
       <ErrorNote error={save.error} />
       <div className="cta">
-        <button className="btn" disabled={save.isPending}>{lesson ? 'Save lesson' : 'Add lesson'}</button>
+        <button className="btn" disabled={save.isPending}>{part ? 'Save part' : 'Add part'}</button>
         <button type="button" className="btn ghost" onClick={onDone}>Cancel</button>
       </div>
     </form>
@@ -422,22 +422,22 @@ function LessonEditor({ courseId, chapters, lesson, refresh, onDone }: { courseI
 }
 
 // ---------------------------------------------------------------- quizzes (course level)
-function QuizzesPanel({ courseId, chapters, quizzes, refresh }: { courseId: number; chapters: AdminChapter[]; quizzes: AdminQuiz[]; refresh: unknown[] }) {
+function QuizzesPanel({ courseId, units, quizzes, refresh }: { courseId: number; units: AdminUnit[]; quizzes: AdminQuiz[]; refresh: unknown[] }) {
   const nav = useNavigate()
   const move = useAdminMutation(({ id, d }: { id: number; d: 'up' | 'down' }) => admin.moveQuiz(id, d), [refresh])
   const toggle = useAdminMutation(({ id, published }: { id: number; published: boolean }) => admin.updateQuiz(id, { published }), [refresh, ['quizzes']])
   const del = useAdminMutation((id: number) => admin.deleteQuiz(id), [refresh, ['quizzes']])
-  const add = useAdminMutation((b: { title: string; chapter_id: number | null; pass_percent: number }) => admin.createQuiz(courseId, b), [refresh], (q) => nav(`/admin/quizzes/${q.id}`))
+  const add = useAdminMutation((b: { title: string; unit_id: number | null; pass_percent: number }) => admin.createQuiz(courseId, b), [refresh], (q) => nav(`/admin/quizzes/${q.id}`))
 
   function onAdd(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const f = new FormData(e.currentTarget)
-    add.mutate({ title: String(f.get('title')), chapter_id: f.get('chapter') ? Number(f.get('chapter')) : null, pass_percent: Number(f.get('pass') || 70) })
+    add.mutate({ title: String(f.get('title')), unit_id: f.get('unit') ? Number(f.get('unit')) : null, pass_percent: Number(f.get('pass') || 70) })
   }
 
   return (
     <section className="panel">
-      <h2>Quizzes <small>Multiple-choice questions students can take after the lessons</small></h2>
+      <h2>Quizzes <small>Multiple-choice questions students can take after the parts</small></h2>
       <ul className="rows">
         {quizzes.map((q) => (
           <li key={q.id}>
@@ -459,9 +459,9 @@ function QuizzesPanel({ courseId, chapters, quizzes, refresh }: { courseId: numb
       <ErrorNote error={move.error ?? toggle.error ?? del.error} />
       <form className="inline-form" onSubmit={onAdd}>
         <input name="title" placeholder="Quiz title" required maxLength={200} className="grow" aria-label="Quiz title" />
-        <select name="chapter" aria-label="Chapter" defaultValue="">
-          <option value="">No chapter</option>
-          {chapters.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.title}</option>)}
+        <select name="unit" aria-label="Unit" defaultValue="">
+          <option value="">No unit</option>
+          {units.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.title}</option>)}
         </select>
         <input name="pass" type="number" min={1} max={100} defaultValue={70} aria-label="Pass mark percent" className="narrow" />
         <button className="btn small" disabled={add.isPending}>Add quiz</button>

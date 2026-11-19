@@ -47,7 +47,7 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   return res
 }
 
-export interface LessonSummary {
+export interface PartSummary {
   slug: string
   title: string
   is_preview: boolean
@@ -56,20 +56,20 @@ export interface CourseSummary {
   slug: string
   title: string
   description: string
-  lesson_count: number
-  previews: LessonSummary[]
+  part_count: number
+  previews: PartSummary[]
 }
 export interface CourseOutline extends CourseSummary {
-  overview_lessons: LessonSummary[]
-  chapters: {
+  overview_parts: PartSummary[]
+  units: {
     code: string
     title: string
-    unit: string | null
+    label: string | null
     textbook_ref: string | null
-    lessons: LessonSummary[]
+    parts: PartSummary[]
   }[]
 }
-export interface Lesson {
+export interface Part {
   slug: string
   title: string
   youtube_id: string
@@ -77,10 +77,10 @@ export interface Lesson {
   slides_url: string | null
   is_preview: boolean
   completed: boolean
-  chapter_code: string | null
-  chapter_title: string | null
-  prev: LessonSummary | null
-  next: LessonSummary | null
+  unit_code: string | null
+  unit_title: string | null
+  prev: PartSummary | null
+  next: PartSummary | null
 }
 
 export async function listCourses(): Promise<CourseSummary[]> {
@@ -89,8 +89,8 @@ export async function listCourses(): Promise<CourseSummary[]> {
 export async function getCourse(slug: string): Promise<CourseOutline> {
   return (await request(`/courses/${encodeURIComponent(slug)}`)).json()
 }
-export async function getLesson(course: string, lesson: string): Promise<Lesson> {
-  return (await request(`/courses/${encodeURIComponent(course)}/lessons/${encodeURIComponent(lesson)}`)).json()
+export async function getPart(course: string, part: string): Promise<Part> {
+  return (await request(`/courses/${encodeURIComponent(course)}/parts/${encodeURIComponent(part)}`)).json()
 }
 
 export interface CourseProgress {
@@ -101,7 +101,7 @@ export interface CourseProgress {
   percent: number
   started: boolean
   completed_slugs: string[]
-  resume: LessonSummary | null
+  resume: PartSummary | null
   quizzes_total: number
   quizzes_passed: number
 }
@@ -112,9 +112,9 @@ export async function getCourseProgress(course: string): Promise<CourseProgress>
 export async function getAllProgress(): Promise<CourseProgress[]> {
   return (await request('/progress')).json()
 }
-export async function setLessonCompleted(course: string, lesson: string, completed: boolean): Promise<CourseProgress> {
+export async function setPartCompleted(course: string, part: string, completed: boolean): Promise<CourseProgress> {
   return (
-    await request(`/courses/${encodeURIComponent(course)}/lessons/${encodeURIComponent(lesson)}/progress`, {
+    await request(`/courses/${encodeURIComponent(course)}/parts/${encodeURIComponent(part)}/progress`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed }),
@@ -125,7 +125,7 @@ export async function setLessonCompleted(course: string, lesson: string, complet
 export interface QuizSummary {
   slug: string
   title: string
-  chapter_code: string | null
+  unit_code: string | null
   question_count: number
   pass_percent: number
   best_percent: number | null
@@ -143,8 +143,8 @@ export interface QuizQuestion {
 export interface QuizDetail {
   slug: string
   title: string
-  chapter_code: string | null
-  chapter_title: string | null
+  unit_code: string | null
+  unit_title: string | null
   pass_percent: number
   questions: QuizQuestion[]
   best_percent: number | null
@@ -221,21 +221,21 @@ export interface AdminCourse {
   description: string
   published: boolean
   position: number
-  chapter_count: number
-  lesson_count: number
+  unit_count: number
+  part_count: number
   quiz_count: number
 }
-export interface AdminChapter {
+export interface AdminUnit {
   id: number
   code: string
   title: string
-  unit: string | null
+  label: string | null
   textbook_ref: string | null
   position: number
 }
-export interface AdminLesson {
+export interface AdminPart {
   id: number
-  chapter_id: number | null
+  unit_id: number | null
   slug: string
   title: string
   youtube_id: string
@@ -250,7 +250,7 @@ export interface AdminQuiz {
   course_id: number
   slug: string
   title: string
-  chapter_id: number | null
+  unit_id: number | null
   pass_percent: number
   published: boolean
   position: number
@@ -266,8 +266,8 @@ export interface AdminQuestion {
 }
 export interface AdminCourseDetail {
   course: AdminCourse
-  chapters: AdminChapter[]
-  lessons: AdminLesson[]
+  units: AdminUnit[]
+  parts: AdminPart[]
   quizzes: AdminQuiz[]
 }
 export interface AdminQuizDetail {
@@ -287,10 +287,10 @@ async function adminCall<T>(method: string, path: string, body?: unknown): Promi
 export interface AdminOverview {
   learners: number
   active_7d: number
-  lessons_completed: number
+  parts_completed: number
   attempts: number
   pass_rate: number | null
-  courses: { id: number; title: string; published: boolean; learners: number; completions: number; lesson_count: number }[]
+  courses: { id: number; title: string; published: boolean; learners: number; completions: number; part_count: number }[]
   recent_attempts: { learner: string; quiz_title: string; course_title: string; score: number; total: number; passed: boolean; created_at: string }[]
 }
 
@@ -306,21 +306,21 @@ export const admin = {
   updateCourse: (id: number, b: Partial<Pick<AdminCourse, 'title' | 'slug' | 'description' | 'published'>>) =>
     adminCall<AdminCourse>('PATCH', `/courses/${id}`, b),
 
-  createChapter: (course: number, b: { code: string; title: string; unit?: string | null; textbook_ref?: string | null }) =>
-    adminCall<AdminChapter>('POST', `/courses/${course}/chapters`, b),
-  updateChapter: (id: number, b: Partial<Omit<AdminChapter, 'id' | 'position'>>) => adminCall<AdminChapter>('PATCH', `/chapters/${id}`, b),
-  deleteChapter: (id: number) => adminCall<void>('DELETE', `/chapters/${id}`),
-  moveChapter: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/chapters/${id}/move`, { direction }),
+  createUnit: (course: number, b: { code: string; title: string; label?: string | null; textbook_ref?: string | null }) =>
+    adminCall<AdminUnit>('POST', `/courses/${course}/units`, b),
+  updateUnit: (id: number, b: Partial<Omit<AdminUnit, 'id' | 'position'>>) => adminCall<AdminUnit>('PATCH', `/units/${id}`, b),
+  deleteUnit: (id: number) => adminCall<void>('DELETE', `/units/${id}`),
+  moveUnit: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/units/${id}/move`, { direction }),
 
-  createLesson: (course: number, b: LessonForm) => adminCall<AdminLesson>('POST', `/courses/${course}/lessons`, b),
-  updateLesson: (id: number, b: Partial<LessonForm>) => adminCall<AdminLesson>('PATCH', `/lessons/${id}`, b),
-  deleteLesson: (id: number) => adminCall<void>('DELETE', `/lessons/${id}`),
-  moveLesson: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/lessons/${id}/move`, { direction }),
+  createPart: (course: number, b: PartForm) => adminCall<AdminPart>('POST', `/courses/${course}/parts`, b),
+  updatePart: (id: number, b: Partial<PartForm>) => adminCall<AdminPart>('PATCH', `/parts/${id}`, b),
+  deletePart: (id: number) => adminCall<void>('DELETE', `/parts/${id}`),
+  movePart: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/parts/${id}/move`, { direction }),
 
-  createQuiz: (course: number, b: { title: string; chapter_id?: number | null; pass_percent?: number }) =>
+  createQuiz: (course: number, b: { title: string; unit_id?: number | null; pass_percent?: number }) =>
     adminCall<AdminQuiz>('POST', `/courses/${course}/quizzes`, b),
   quiz: (id: number) => adminCall<AdminQuizDetail>('GET', `/quizzes/${id}`),
-  updateQuiz: (id: number, b: Partial<Pick<AdminQuiz, 'title' | 'chapter_id' | 'pass_percent' | 'published'>>) =>
+  updateQuiz: (id: number, b: Partial<Pick<AdminQuiz, 'title' | 'unit_id' | 'pass_percent' | 'published'>>) =>
     adminCall<AdminQuiz>('PATCH', `/quizzes/${id}`, b),
   deleteQuiz: (id: number) => adminCall<void>('DELETE', `/quizzes/${id}`),
   moveQuiz: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/quizzes/${id}/move`, { direction }),
@@ -331,10 +331,10 @@ export const admin = {
   moveQuestion: (id: number, direction: 'up' | 'down') => adminCall<void>('POST', `/questions/${id}/move`, { direction }),
 }
 
-export interface LessonForm {
+export interface PartForm {
   title: string
   youtube: string
-  chapter_id: number | null
+  unit_id: number | null
   notes_md: string
   slides_url: string | null
   published: boolean
@@ -406,7 +406,7 @@ export interface Certificate {
   learner_name: string
   course_slug: string
   course_title: string
-  lesson_count: number
+  part_count: number
   issued_at: string
 }
 export async function claimCertificate(course: string): Promise<Certificate> {

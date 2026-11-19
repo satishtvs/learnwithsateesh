@@ -76,7 +76,7 @@ function Result({
           <h2>{result.passed ? 'Well done, you passed!' : 'Not there yet. Keep going!'}</h2>
           <p>
             You got <strong>{result.score}</strong> of <strong>{result.total}</strong> right. Pass mark: {result.pass_percent}%.
-            {!result.passed && ' Read the explanations below, rewatch the lesson and try again.'}
+            {!result.passed && ' Read the explanations below, rewatch the part and try again.'}
           </p>
           <div className="cta">
             <button type="button" className="btn" onClick={onRetake}>Retake quiz</button>
@@ -175,7 +175,7 @@ export function QuizPage() {
       <nav className="crumbs" aria-label="Breadcrumb">
         <Link to="/quizzes">Quizzes</Link><Icon name="chevron" size={14} />
         <Link to={`/courses/${slug}`}>Course</Link>
-        {data.chapter_code && <><Icon name="chevron" size={14} /><span>{data.chapter_code} · {data.chapter_title}</span></>}
+        {data.unit_code && <><Icon name="chevron" size={14} /><span>{data.unit_code} · {data.unit_title}</span></>}
       </nav>
       <PageHeader title={data.title}>
         <QuizStatus q={data} />

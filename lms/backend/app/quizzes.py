@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db import get_async_session
-from app.models import Chapter, Course, Quiz, QuizAttempt, User
+from app.models import Unit, Course, Quiz, QuizAttempt, User
 from app.users import current_active_user, optional_user
 
 router = APIRouter(prefix="/courses/{slug}/quizzes", tags=["quizzes"])
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/courses/{slug}/quizzes", tags=["quizzes"])
 class QuizSummary(BaseModel):
     slug: str
     title: str
-    chapter_code: str | None
+    unit_code: str | None
     question_count: int
     pass_percent: int
     best_percent: int | None  # the signed-in user's best attempt; None if never attempted
@@ -33,8 +33,8 @@ class QuestionOut(BaseModel):
 class QuizOut(BaseModel):
     slug: str
     title: str
-    chapter_code: str | None
-    chapter_title: str | None
+    unit_code: str | None
+    unit_title: str | None
     pass_percent: int
     questions: list[QuestionOut]
     best_percent: int | None
@@ -81,7 +81,7 @@ async def _best_by_quiz(session: AsyncSession, user: User | None, quiz_ids: list
     return best
 
 
-async def _load_quiz(session: AsyncSession, slug: str, quiz_slug: str) -> tuple[Course, Quiz, Chapter | None]:
+async def _load_quiz(session: AsyncSession, slug: str, quiz_slug: str) -> tuple[Course, Quiz, Unit | None]:
     course = (
         await session.execute(select(Course).where(Course.slug == slug, Course.published.is_(True)))
     ).scalar_one_or_none()
@@ -96,8 +96,8 @@ async def _load_quiz(session: AsyncSession, slug: str, quiz_slug: str) -> tuple[
     ).scalar_one_or_none()
     if quiz is None:
         raise HTTPException(404, "Quiz not found")
-    chapter = await session.get(Chapter, quiz.chapter_id) if quiz.chapter_id else None
-    return course, quiz, chapter
+    unit = await session.get(Unit, quiz.unit_id) if quiz.unit_id else None
+    return course, quiz, unit
 
 
 class CourseQuiz(QuizSummary):
@@ -114,13 +114,13 @@ async def _course_summaries(session: AsyncSession, course: Course, user: User | 
             .order_by(Quiz.position)
         )
     ).scalars().all()
-    chapters = {c.id: c.code for c in (await session.execute(select(Chapter).where(Chapter.course_id == course.id))).scalars()}
+    units = {c.id: c.code for c in (await session.execute(select(Unit).where(Unit.course_id == course.id))).scalars()}
     best = await _best_by_quiz(session, user, [qz.id for qz in quizzes])
     return [
         QuizSummary(
             slug=qz.slug,
             title=qz.title,
-            chapter_code=chapters.get(qz.chapter_id),
+            unit_code=units.get(qz.unit_id),
             question_count=len(qz.questions),
             pass_percent=qz.pass_percent,
             best_percent=best[qz.id][0] if qz.id in best else None,
@@ -206,13 +206,13 @@ async def get_quiz(
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_active_user),
 ):
-    _, quiz, chapter = await _load_quiz(session, slug, quiz_slug)
+    _, quiz, unit = await _load_quiz(session, slug, quiz_slug)
     best = (await _best_by_quiz(session, user, [quiz.id])).get(quiz.id)
     return QuizOut(
         slug=quiz.slug,
         title=quiz.title,
-        chapter_code=chapter.code if chapter else None,
-        chapter_title=chapter.title if chapter else None,
+        unit_code=unit.code if unit else None,
+        unit_title=unit.title if unit else None,
         pass_percent=quiz.pass_percent,
         questions=[QuestionOut(id=q.id, prompt=q.prompt, options=list(q.options)) for q in quiz.questions],
         best_percent=best[0] if best else None,

@@ -6,16 +6,16 @@ import {
   getAllProgress,
   getCourse,
   getCourseProgress,
-  getLesson,
+  getPart,
   listCourses,
-  setLessonCompleted,
+  setPartCompleted,
   type CourseProgress,
   type CourseSummary,
-  type LessonSummary,
+  type PartSummary,
   type QuizSummary,
 } from './api'
 import { useAuth } from './auth'
-import { lessonsWord } from './format'
+import { partsWord } from './format'
 import { Cover, Icon, PageHeader, ProgressBar } from './ui'
 
 function useCourses() {
@@ -45,7 +45,7 @@ function CourseCard({ c, progress }: { c: CourseSummary; progress?: CourseProgre
         <h3>{c.title}</h3>
         <p className="clamp">{c.description}</p>
         <div className="chips">
-          <span className="chip"><Icon name="play" size={12} /> {c.lesson_count} {c.lesson_count === 1 ? 'lesson' : 'lessons'}</span>
+          <span className="chip"><Icon name="play" size={12} /> {c.part_count} {c.part_count === 1 ? 'part' : 'parts'}</span>
           {c.previews.length > 0 && <span className="chip free">{c.previews.length} free</span>}
         </div>
         {progress?.started && (
@@ -88,7 +88,7 @@ export function CoursesPage() {
   const q = params.get('q') ?? ''
   return (
     <>
-      <PageHeader title="Courses" subtitle="Syllabus-aligned video lessons, organised unit by unit." />
+      <PageHeader title="Courses" subtitle="Syllabus-aligned video parts, organised unit by unit." />
       <form className="search-bar" role="search" onSubmit={(e) => e.preventDefault()}>
         <Icon name="search" size={18} />
         <input
@@ -128,12 +128,12 @@ export function ContinueLearning({ empty }: { empty?: boolean }) {
             <h3>{p.course_title}</h3>
             <div className="card-progress">
               <ProgressBar percent={p.percent} label={`${p.course_title} progress`} />
-              <span>{p.completed} of {p.total} {lessonsWord(p.total)} · {p.percent}%</span>
+              <span>{p.completed} of {p.total} {partsWord(p.total)} · {p.percent}%</span>
             </div>
             {p.resume ? (
-              <Link className="btn small" to={`/courses/${p.course_slug}/lessons/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
+              <Link className="btn small" to={`/courses/${p.course_slug}/parts/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
             ) : (
-              <p className="muted small">All lessons completed. Well done!</p>
+              <p className="muted small">All parts completed. Well done!</p>
             )}
           </div>
         </div>
@@ -142,19 +142,19 @@ export function ContinueLearning({ empty }: { empty?: boolean }) {
   )
 }
 
-/** Lessons anyone can watch without an account, across all courses. */
+/** Parts anyone can watch without an account, across all courses. */
 export function FreePreviews() {
   const { data, isLoading } = useCourses()
   if (isLoading) return <p className="muted">Loading…</p>
-  const items = (data ?? []).flatMap((c) => c.previews.map((l) => ({ course: c.slug, lesson: l })))
-  if (!items.length) return <p className="muted">Free lessons are coming soon.</p>
+  const items = (data ?? []).flatMap((c) => c.previews.map((l) => ({ course: c.slug, part: l })))
+  if (!items.length) return <p className="muted">Free parts are coming soon.</p>
   return (
     <ul className="rows">
-      {items.map(({ course, lesson }) => (
-        <li key={`${course}/${lesson.slug}`}>
-          <Link to={`/courses/${course}/lessons/${lesson.slug}`} className="row">
+      {items.map(({ course, part }) => (
+        <li key={`${course}/${part.slug}`}>
+          <Link to={`/courses/${course}/parts/${part.slug}`} className="row">
             <span className="ico play"><Icon name="play" size={15} /></span>
-            <span className="t">{lesson.title}</span>
+            <span className="t">{part.title}</span>
             <span className="chip free">Free</span>
           </Link>
         </li>
@@ -163,32 +163,32 @@ export function FreePreviews() {
   )
 }
 
-export function LessonRow({
+export function PartRow({
   course,
-  lesson,
+  part,
   signedIn,
   done,
   current,
 }: {
   course: string
-  lesson: LessonSummary
+  part: PartSummary
   signedIn: boolean
   done: boolean
   current?: boolean
 }) {
-  const locked = !lesson.is_preview && !signedIn
+  const locked = !part.is_preview && !signedIn
   return (
     <li>
       <Link
-        to={`/courses/${course}/lessons/${lesson.slug}`}
+        to={`/courses/${course}/parts/${part.slug}`}
         className={`row${done ? ' done' : ''}${current ? ' current' : ''}`}
         aria-current={current ? 'page' : undefined}
       >
         <span className={`ico${done ? ' ok' : ''}`}>
           <Icon name={done ? 'check' : locked ? 'lock' : 'play'} size={15} />
         </span>
-        <span className="t">{lesson.title}</span>
-        {lesson.is_preview && !signedIn && <span className="chip free">Free</span>}
+        <span className="t">{part.title}</span>
+        {part.is_preview && !signedIn && <span className="chip free">Free</span>}
       </Link>
     </li>
   )
@@ -223,15 +223,15 @@ export function LoginGate({ back, title, text }: { back: string; title: string; 
   )
 }
 
-export function LessonPage() {
-  const { slug = '', lessonSlug = '' } = useParams()
+export function PartPage() {
+  const { slug = '', partSlug = '' } = useParams()
   const { user, loading } = useAuth()
   const loc = useLocation()
   const qc = useQueryClient()
   const { data, error, isLoading } = useQuery({
     // user id in the key: re-fetch after signing in or out
-    queryKey: ['lesson', slug, lessonSlug, user?.id ?? 'anon'],
-    queryFn: () => getLesson(slug, lessonSlug),
+    queryKey: ['part', slug, partSlug, user?.id ?? 'anon'],
+    queryFn: () => getPart(slug, partSlug),
     enabled: !loading,
     retry: false,
   })
@@ -243,10 +243,10 @@ export function LessonPage() {
     retry: false,
   })
   const toggle = useMutation({
-    mutationFn: (completed: boolean) => setLessonCompleted(slug, lessonSlug, completed),
+    mutationFn: (completed: boolean) => setPartCompleted(slug, partSlug, completed),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['progress'] })
-      qc.invalidateQueries({ queryKey: ['lesson', slug, lessonSlug] })
+      qc.invalidateQueries({ queryKey: ['part', slug, partSlug] })
     },
   })
 
@@ -257,8 +257,8 @@ export function LessonPage() {
         <nav className="crumbs"><Link to={`/courses/${slug}`}>← Course</Link></nav>
         <LoginGate
           back={loc.pathname}
-          title="This lesson is for registered learners"
-          text="Create a free account to watch this lesson and every other lesson in the course. It is free for now."
+          title="This part is for registered learners"
+          text="Create a free account to watch this part and every other part in the course. It is free for now."
         />
       </>
     )
@@ -267,7 +267,7 @@ export function LessonPage() {
     const missing = error instanceof ApiError && error.status === 404
     return (
       <div className="empty">
-        <h3>{missing ? 'Lesson not found' : 'Could not load this lesson'}</h3>
+        <h3>{missing ? 'Part not found' : 'Could not load this part'}</h3>
         <Link className="btn" to={`/courses/${slug}`}>Back to course</Link>
       </div>
     )
@@ -280,11 +280,11 @@ export function LessonPage() {
       <nav className="crumbs" aria-label="Breadcrumb">
         <Link to="/courses">Courses</Link><Icon name="chevron" size={14} />
         <Link to={`/courses/${slug}`}>{course.data?.title ?? 'Course'}</Link>
-        {data.chapter_code && <><Icon name="chevron" size={14} /><span>{data.chapter_code} · {data.chapter_title}</span></>}
+        {data.unit_code && <><Icon name="chevron" size={14} /><span>{data.unit_code} · {data.unit_title}</span></>}
       </nav>
 
-      <div className="lesson-layout">
-        <article className="lesson-main">
+      <div className="part-layout">
+        <article className="part-main">
           <h1>{data.title}</h1>
           <div className="video">
             <iframe
@@ -296,7 +296,7 @@ export function LessonPage() {
             />
           </div>
 
-          <div className="lesson-actions">
+          <div className="part-actions">
             {user ? (
               <button
                 type="button"
@@ -318,13 +318,13 @@ export function LessonPage() {
 
           {data.notes_md && <section className="panel notes"><Markdown>{data.notes_md}</Markdown></section>}
 
-          <nav className="prevnext" aria-label="Lesson navigation">
-            {data.prev ? <Link className="btn ghost" to={`/courses/${slug}/lessons/${data.prev.slug}`}>← {data.prev.title}</Link> : <span />}
-            {data.next ? <Link className="btn" to={`/courses/${slug}/lessons/${data.next.slug}`}>{data.next.title} →</Link> : <span />}
+          <nav className="prevnext" aria-label="Part navigation">
+            {data.prev ? <Link className="btn ghost" to={`/courses/${slug}/parts/${data.prev.slug}`}>← {data.prev.title}</Link> : <span />}
+            {data.next ? <Link className="btn" to={`/courses/${slug}/parts/${data.next.slug}`}>{data.next.title} →</Link> : <span />}
           </nav>
         </article>
 
-        <aside className="lesson-outline" aria-label="Course content">
+        <aside className="part-outline" aria-label="Course content">
           <h2>Course content</h2>
           {progress.data && (
             <div className="card-progress">
@@ -334,19 +334,19 @@ export function LessonPage() {
           )}
           {course.data && (
             <>
-              {course.data.overview_lessons.length > 0 && (
+              {course.data.overview_parts.length > 0 && (
                 <ul className="rows compact">
-                  {course.data.overview_lessons.map((l) => (
-                    <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} current={l.slug === lessonSlug} />
+                  {course.data.overview_parts.map((l) => (
+                    <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} current={l.slug === partSlug} />
                   ))}
                 </ul>
               )}
-              {course.data.chapters.filter((c) => c.lessons.length > 0).map((ch) => (
+              {course.data.units.filter((c) => c.parts.length > 0).map((ch) => (
                 <div key={ch.code}>
                   <h3><span className="code">{ch.code}</span> {ch.title}</h3>
                   <ul className="rows compact">
-                    {ch.lessons.map((l) => (
-                      <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} current={l.slug === lessonSlug} />
+                    {ch.parts.map((l) => (
+                      <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} current={l.slug === partSlug} />
                     ))}
                   </ul>
                 </div>

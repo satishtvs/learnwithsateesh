@@ -15,14 +15,14 @@ export function Landing() {
 
   // Real numbers from our own catalogue, never placeholders.
   const nCourses = courses.data?.length
-  const nLessons = courses.data?.reduce((n, c) => n + c.lesson_count, 0)
+  const nParts = courses.data?.reduce((n, c) => n + c.part_count, 0)
   const nFree = courses.data?.reduce((n, c) => n + c.previews.length, 0)
   const nQuizzes = quizzes.data?.length
   const show = (n: number | undefined) => (n === undefined ? '–' : n)
 
   const STATS: { icon: IconName; value: number | string; label: string; tone: string }[] = [
     { icon: 'courses', value: show(nCourses), label: 'Courses', tone: 'orange' },
-    { icon: 'play', value: show(nLessons), label: 'Video lessons', tone: 'navy' },
+    { icon: 'play', value: show(nParts), label: 'Video parts', tone: 'navy' },
     { icon: 'quiz', value: show(nQuizzes), label: 'Practice quizzes', tone: 'violet' },
     { icon: 'sparkle', value: show(nFree), label: 'Free to watch', tone: 'green' },
   ]
@@ -50,7 +50,7 @@ export function Landing() {
           <span className="eyebrow">JNTUH R22 · B.Tech CSE (AI &amp; ML)</span>
           <h1>Learn AI &amp; ML the <span>exam-ready</span> way</h1>
           <p>
-            Clear, focused video lessons organised unit by unit and aligned to your syllabus. Watch free, then create an
+            Clear, focused video parts organised unit by unit and aligned to your syllabus. Watch free, then create an
             account to track progress and take quizzes.
           </p>
           <form className="hero-search" role="search" onSubmit={onSearch}>
@@ -93,7 +93,7 @@ export function Landing() {
 
       <section className="master">
         <div className="steps" aria-hidden="true">
-          {['Watch the lesson', 'Take the quiz', 'See your progress'].map((t, i) => (
+          {['Watch the part', 'Take the quiz', 'See your progress'].map((t, i) => (
             <div key={t} className="step"><span>{i + 1}</span>{t}</div>
           ))}
         </div>

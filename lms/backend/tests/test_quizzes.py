@@ -14,7 +14,7 @@ C = "/api/courses/ai-y3s1/quizzes"
 
 DATA = {
     "course": {"slug": "ai-y3s1", "title": "x"},
-    "chapter": {"code": "C01", "title": "Introduction", "unit": "Unit - I", "textbook_ref": "AIMA ch. 1"},
+    "unit": {"code": "C01", "title": "Introduction", "label": "Unit - I", "textbook_ref": "AIMA ch. 1"},
     "quizzes": [
         {
             "slug": "intro",
@@ -135,7 +135,7 @@ async def test_listing_is_public_and_hides_drafts(client):
     assert r.status_code == 200
     body = r.json()
     assert [q["slug"] for q in body] == ["intro"]
-    assert body[0]["question_count"] == 3 and body[0]["chapter_code"] == "C01"
+    assert body[0]["question_count"] == 3 and body[0]["unit_code"] == "C01"
     assert body[0]["best_percent"] is None and body[0]["passed"] is False
 
 

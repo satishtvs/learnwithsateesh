@@ -109,74 +109,74 @@ async def test_publishing_a_course_makes_it_public(admin, client):
     assert c["slug"] in [x["slug"] for x in (await client.get("/api/courses")).json()]
 
 
-# ---------------------------------------------------------------- chapters and lessons
-async def test_chapter_crud_and_duplicate_code(admin):
+# ---------------------------------------------------------------- units and parts
+async def test_unit_crud_and_duplicate_code(admin):
     c = await make_course(admin)
-    r = await admin.post(f"/api/admin/courses/{c['id']}/chapters", json={"code": "U1", "title": "Unit I", "unit": "Unit - I"})
+    r = await admin.post(f"/api/admin/courses/{c['id']}/units", json={"code": "U1", "title": "Unit I", "label": "Unit - I"})
     assert r.status_code == 201
-    assert (await admin.post(f"/api/admin/courses/{c['id']}/chapters", json={"code": "U1", "title": "Again"})).status_code == 409
-    assert (await admin.post(f"/api/admin/courses/{c['id']}/chapters", json={"code": "bad code!", "title": "x"})).status_code == 422
+    assert (await admin.post(f"/api/admin/courses/{c['id']}/units", json={"code": "U1", "title": "Again"})).status_code == 409
+    assert (await admin.post(f"/api/admin/courses/{c['id']}/units", json={"code": "bad code!", "title": "x"})).status_code == 422
     ch = r.json()
-    assert (await admin.patch(f"/api/admin/chapters/{ch['id']}", json={"title": "Learning"})).json()["title"] == "Learning"
-    assert (await admin.delete(f"/api/admin/chapters/{ch['id']}")).status_code == 204
+    assert (await admin.patch(f"/api/admin/units/{ch['id']}", json={"title": "Learning"})).json()["title"] == "Learning"
+    assert (await admin.delete(f"/api/admin/units/{ch['id']}")).status_code == 204
 
 
-async def test_cannot_delete_a_chapter_that_still_has_lessons(admin):
+async def test_cannot_delete_a_unit_that_still_has_parts(admin):
     c = await make_course(admin)
-    ch = (await admin.post(f"/api/admin/courses/{c['id']}/chapters", json={"code": "U1", "title": "Unit I"})).json()
-    await admin.post(f"/api/admin/courses/{c['id']}/lessons", json={"title": "L1", "youtube": YT, "chapter_id": ch["id"]})
-    assert (await admin.delete(f"/api/admin/chapters/{ch['id']}")).status_code == 409
+    ch = (await admin.post(f"/api/admin/courses/{c['id']}/units", json={"code": "U1", "title": "Unit I"})).json()
+    await admin.post(f"/api/admin/courses/{c['id']}/parts", json={"title": "L1", "youtube": YT, "unit_id": ch["id"]})
+    assert (await admin.delete(f"/api/admin/units/{ch['id']}")).status_code == 409
 
 
-async def test_lesson_create_from_url_and_visible_publicly(admin, client):
+async def test_part_create_from_url_and_visible_publicly(admin, client):
     c = await make_course(admin, published=True)
-    ch = (await admin.post(f"/api/admin/courses/{c['id']}/chapters", json={"code": "U1", "title": "Unit I"})).json()
+    ch = (await admin.post(f"/api/admin/courses/{c['id']}/units", json={"code": "U1", "title": "Unit I"})).json()
     r = await admin.post(
-        f"/api/admin/courses/{c['id']}/lessons",
-        json={"title": "What is learning?", "youtube": f"https://youtu.be/{YT}", "chapter_id": ch["id"], "is_preview": True},
+        f"/api/admin/courses/{c['id']}/parts",
+        json={"title": "What is learning?", "youtube": f"https://youtu.be/{YT}", "unit_id": ch["id"], "is_preview": True},
     )
     assert r.status_code == 201
-    lesson = r.json()
-    assert (lesson["slug"], lesson["youtube_id"], lesson["position"]) == ("what-is-learning", YT, 0)
-    pub = await client.get(f"/api/courses/{c['slug']}/lessons/what-is-learning")
+    part = r.json()
+    assert (part["slug"], part["youtube_id"], part["position"]) == ("what-is-learning", YT, 0)
+    pub = await client.get(f"/api/courses/{c['slug']}/parts/what-is-learning")
     assert pub.status_code == 200 and pub.json()["youtube_id"] == YT
     # unpublish: gone from the public API again
-    await admin.patch(f"/api/admin/lessons/{lesson['id']}", json={"published": False})
-    assert (await client.get(f"/api/courses/{c['slug']}/lessons/what-is-learning")).status_code == 404
+    await admin.patch(f"/api/admin/parts/{part['id']}", json={"published": False})
+    assert (await client.get(f"/api/courses/{c['slug']}/parts/what-is-learning")).status_code == 404
 
 
-async def test_lesson_validation(admin):
+async def test_part_validation(admin):
     c = await make_course(admin)
-    base = f"/api/admin/courses/{c['id']}/lessons"
+    base = f"/api/admin/courses/{c['id']}/parts"
     assert (await admin.post(base, json={"title": "x", "youtube": "not a link"})).status_code == 422
-    assert (await admin.post(base, json={"title": "x", "youtube": YT, "chapter_id": 99999})).status_code == 422
+    assert (await admin.post(base, json={"title": "x", "youtube": YT, "unit_id": 99999})).status_code == 422
     other = await make_course(admin, "Other")
-    och = (await admin.post(f"/api/admin/courses/{other['id']}/chapters", json={"code": "U1", "title": "t"})).json()
-    # a chapter of a different course is refused
-    assert (await admin.post(base, json={"title": "x", "youtube": YT, "chapter_id": och["id"]})).status_code == 422
+    och = (await admin.post(f"/api/admin/courses/{other['id']}/units", json={"code": "U1", "title": "t"})).json()
+    # a unit of a different course is refused
+    assert (await admin.post(base, json={"title": "x", "youtube": YT, "unit_id": och["id"]})).status_code == 422
 
 
-async def test_lesson_edit_move_and_delete(admin):
+async def test_part_edit_move_and_delete(admin):
     c = await make_course(admin)
-    base = f"/api/admin/courses/{c['id']}/lessons"
+    base = f"/api/admin/courses/{c['id']}/parts"
     ids = [(await admin.post(base, json={"title": t, "youtube": YT})).json()["id"] for t in ("A", "B", "C")]
     # move C up once -> A, C, B
-    assert (await admin.post(f"/api/admin/lessons/{ids[2]}/move", json={"direction": "up"})).status_code == 204
+    assert (await admin.post(f"/api/admin/parts/{ids[2]}/move", json={"direction": "up"})).status_code == 204
     detail = (await admin.get(f"/api/admin/courses/{c['id']}")).json()
-    assert [le["title"] for le in detail["lessons"]] == ["A", "C", "B"]
+    assert [le["title"] for le in detail["parts"]] == ["A", "C", "B"]
     # moving the first one up is a harmless no-op
-    await admin.post(f"/api/admin/lessons/{ids[0]}/move", json={"direction": "up"})
-    assert [le["title"] for le in (await admin.get(f"/api/admin/courses/{c['id']}")).json()["lessons"]] == ["A", "C", "B"]
-    r = await admin.patch(f"/api/admin/lessons/{ids[0]}", json={"title": "A2", "notes_md": "# Notes", "youtube": f"https://youtu.be/{'a' * 11}"})
+    await admin.post(f"/api/admin/parts/{ids[0]}/move", json={"direction": "up"})
+    assert [le["title"] for le in (await admin.get(f"/api/admin/courses/{c['id']}")).json()["parts"]] == ["A", "C", "B"]
+    r = await admin.patch(f"/api/admin/parts/{ids[0]}", json={"title": "A2", "notes_md": "# Notes", "youtube": f"https://youtu.be/{'a' * 11}"})
     assert r.json()["youtube_id"] == "a" * 11 and r.json()["notes_md"] == "# Notes"
-    assert (await admin.delete(f"/api/admin/lessons/{ids[1]}")).status_code == 204
-    assert (await admin.get(f"/api/admin/courses/{c['id']}")).json()["course"]["lesson_count"] == 2
+    assert (await admin.delete(f"/api/admin/parts/{ids[1]}")).status_code == 204
+    assert (await admin.get(f"/api/admin/courses/{c['id']}")).json()["course"]["part_count"] == 2
 
 
 async def test_invalid_move_direction_rejected(admin):
     c = await make_course(admin)
-    lid = (await admin.post(f"/api/admin/courses/{c['id']}/lessons", json={"title": "A", "youtube": YT})).json()["id"]
-    assert (await admin.post(f"/api/admin/lessons/{lid}/move", json={"direction": "sideways"})).status_code == 422
+    lid = (await admin.post(f"/api/admin/courses/{c['id']}/parts", json={"title": "A", "youtube": YT})).json()["id"]
+    assert (await admin.post(f"/api/admin/parts/{lid}/move", json={"direction": "sideways"})).status_code == 422
 
 
 # ---------------------------------------------------------------- quizzes
@@ -265,13 +265,13 @@ async def test_deleting_a_quiz_removes_it(admin):
 async def test_reseed_keeps_admin_edits(admin):
     ai = next(c for c in (await admin.get("/api/admin/courses")).json() if c["slug"] == "ai-y3s1")
     detail = (await admin.get(f"/api/admin/courses/{ai['id']}")).json()
-    lesson = next(le for le in detail["lessons"] if le["slug"] == "syllabus")
-    await admin.patch(f"/api/admin/lessons/{lesson['id']}", json={"title": "Edited title", "is_preview": False})
+    part = next(le for le in detail["parts"] if le["slug"] == "syllabus")
+    await admin.patch(f"/api/admin/parts/{part['id']}", json={"title": "Edited title", "is_preview": False})
     await seed()  # a later deploy runs the seed again
     again = (await admin.get(f"/api/admin/courses/{ai['id']}")).json()
-    edited = next(le for le in again["lessons"] if le["slug"] == "syllabus")
+    edited = next(le for le in again["parts"] if le["slug"] == "syllabus")
     assert edited["title"] == "Edited title" and edited["is_preview"] is False
-    assert len(again["lessons"]) == len(detail["lessons"])  # and nothing got duplicated
+    assert len(again["parts"]) == len(detail["parts"])  # and nothing got duplicated
 
 
 async def test_overview_is_staff_only_and_counts(client):

@@ -4,7 +4,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { getAllProgress, getMyAttempts, updateMe, type CourseProgress, type MyAttempt } from './api'
 import { useAuth } from './auth'
 import { ContinueLearning, LoginGate } from './courses'
-import { lessonsWord } from './format'
+import { partsWord } from './format'
 import { Cover, Icon, ProgressBar, type IconName } from './ui'
 
 const ROLE_LABEL: Record<string, string> = { student: 'Student', instructor: 'Instructor', admin: 'Administrator' }
@@ -165,7 +165,7 @@ export function EnrolledCourses() {
         <div className="empty">
           <Icon name="learning" size={28} />
           <h3>{started.length === 0 ? "You haven't started a course yet" : 'Nothing here yet'}</h3>
-          <p>{started.length === 0 ? 'Open any lesson and the course appears here with your progress.' : 'Try another filter.'}</p>
+          <p>{started.length === 0 ? 'Open any part and the course appears here with your progress.' : 'Try another filter.'}</p>
           {started.length === 0 && <Link className="btn" to="/courses">Browse courses</Link>}
         </div>
       ) : (
@@ -177,10 +177,10 @@ export function EnrolledCourses() {
                 <h3>{p.course_title}</h3>
                 <div className="card-progress">
                   <ProgressBar percent={p.percent} label={`${p.course_title} progress`} />
-                  <span>{p.completed} of {p.total} {lessonsWord(p.total)} · {p.percent}%</span>
+                  <span>{p.completed} of {p.total} {partsWord(p.total)} · {p.percent}%</span>
                 </div>
                 {p.resume ? (
-                  <Link className="btn small" to={`/courses/${p.course_slug}/lessons/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
+                  <Link className="btn small" to={`/courses/${p.course_slug}/parts/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
                 ) : (
                   <Link className="btn ghost small" to={`/courses/${p.course_slug}`}>Review course</Link>
                 )}

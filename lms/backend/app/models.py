@@ -32,42 +32,42 @@ class Course(Base):
     published: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     position: Mapped[int] = mapped_column(Integer, default=0)
 
-    chapters: Mapped[list["Chapter"]] = relationship(
-        back_populates="course", order_by="Chapter.position", cascade="all, delete-orphan"
+    units: Mapped[list["Unit"]] = relationship(
+        back_populates="course", order_by="Unit.position", cascade="all, delete-orphan"
     )
-    lessons: Mapped[list["Lesson"]] = relationship(
-        back_populates="course", order_by="Lesson.position", cascade="all, delete-orphan"
+    parts: Mapped[list["Part"]] = relationship(
+        back_populates="course", order_by="Part.position", cascade="all, delete-orphan"
     )
 
 
-class Chapter(Base):
-    __tablename__ = "chapter"
+class Unit(Base):
+    __tablename__ = "unit"
     __table_args__ = (UniqueConstraint("course_id", "code"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), index=True)
     code: Mapped[str] = mapped_column(String(10))  # "C01"
     title: Mapped[str] = mapped_column(String(200))
-    unit: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "Unit - I"
+    label: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "Unit - I"
     textbook_ref: Mapped[str | None] = mapped_column(String(200), nullable=True)  # "AIMA ch. 2"
     position: Mapped[int] = mapped_column(Integer, default=0)
 
-    course: Mapped[Course] = relationship(back_populates="chapters")
-    lessons: Mapped[list["Lesson"]] = relationship(
-        back_populates="chapter", order_by="Lesson.position"
+    course: Mapped[Course] = relationship(back_populates="units")
+    parts: Mapped[list["Part"]] = relationship(
+        back_populates="unit", order_by="Part.position"
     )
 
 
-class Lesson(Base):
-    """One video (plus notes/slides). chapter_id is NULL for course-level lessons (e.g. the syllabus)."""
+class Part(Base):
+    """One video (plus notes/slides). unit_id is NULL for course-level parts (e.g. the syllabus)."""
 
-    __tablename__ = "lesson"
+    __tablename__ = "part"
     __table_args__ = (UniqueConstraint("course_id", "slug"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), index=True)
-    chapter_id: Mapped[int | None] = mapped_column(
-        ForeignKey("chapter.id", ondelete="SET NULL"), nullable=True, index=True
+    unit_id: Mapped[int | None] = mapped_column(
+        ForeignKey("unit.id", ondelete="SET NULL"), nullable=True, index=True
     )
     slug: Mapped[str] = mapped_column(String(100))
     title: Mapped[str] = mapped_column(String(200))
@@ -79,35 +79,35 @@ class Lesson(Base):
     # Free preview: viewable without signing in (the rest needs a free account).
     is_preview: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
-    course: Mapped[Course] = relationship(back_populates="lessons")
-    chapter: Mapped[Chapter | None] = relationship(back_populates="lessons")
+    course: Mapped[Course] = relationship(back_populates="parts")
+    unit: Mapped[Unit | None] = relationship(back_populates="parts")
 
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-class LessonProgress(Base):
-    """One row per (user, lesson) the user has opened. completed_at is set once they mark it complete."""
+class PartProgress(Base):
+    """One row per (user, part) the user has opened. completed_at is set once they mark it complete."""
 
-    __tablename__ = "lesson_progress"
+    __tablename__ = "part_progress"
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    lesson_id: Mapped[int] = mapped_column(ForeignKey("lesson.id", ondelete="CASCADE"), primary_key=True)
+    part_id: Mapped[int] = mapped_column(ForeignKey("part.id", ondelete="CASCADE"), primary_key=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 
 class Quiz(Base):
-    """A set of multiple-choice questions for one chapter (unit part). Only published quizzes are visible."""
+    """A set of multiple-choice questions for one unit. Only published quizzes are visible."""
 
     __tablename__ = "quiz"
     __table_args__ = (UniqueConstraint("course_id", "slug"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), index=True)
-    chapter_id: Mapped[int | None] = mapped_column(
-        ForeignKey("chapter.id", ondelete="SET NULL"), nullable=True, index=True
+    unit_id: Mapped[int | None] = mapped_column(
+        ForeignKey("unit.id", ondelete="SET NULL"), nullable=True, index=True
     )
     slug: Mapped[str] = mapped_column(String(100))
     title: Mapped[str] = mapped_column(String(200))
@@ -150,7 +150,7 @@ class QuizAttempt(Base):
 
 
 class Certificate(Base):
-    """Issued once per (user, course) when every lesson is complete. The name is a snapshot at issue time."""
+    """Issued once per (user, course) when every part is complete. The name is a snapshot at issue time."""
 
     __tablename__ = "certificate"
     __table_args__ = (UniqueConstraint("user_id", "course_id"),)
@@ -160,7 +160,7 @@ class Certificate(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), index=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), index=True)
     learner_name: Mapped[str] = mapped_column(String(200))
-    lesson_count: Mapped[int] = mapped_column(Integer)
+    part_count: Mapped[int] = mapped_column(Integer)
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

@@ -5,7 +5,7 @@ import { AdminLive, LivePage } from './live'
 import { AdminHome, CourseEditor, QuizEditor } from './admin'
 import { AuthProvider } from './auth'
 import { CoursePage } from './course-detail'
-import { CoursesPage, LessonPage } from './courses'
+import { CoursesPage, PartPage } from './courses'
 import { DashboardHome, DashboardLayout, EnrolledCourses, ProfilePage, QuizAttempts } from './dashboard'
 import { AuthLayout } from './auth-ui'
 import { Shell } from './layout'
@@ -33,7 +33,7 @@ export default function App() {
               </Route>
               <Route path="/quizzes" element={<QuizzesPage />} />
               <Route path="/courses/:slug" element={<CoursePage />} />
-              <Route path="/courses/:slug/lessons/:lessonSlug" element={<LessonPage />} />
+              <Route path="/courses/:slug/parts/:partSlug" element={<PartPage />} />
               <Route path="/courses/:slug/quizzes/:quizSlug" element={<QuizPage />} />
               <Route path="/live" element={<LivePage />} />
               <Route path="/admin" element={<AdminHome />} />

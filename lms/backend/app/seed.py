@@ -8,8 +8,8 @@ import re
 from sqlalchemy import select
 
 from app.db import async_session_maker
-from app.models import Chapter, Course, Lesson
-from app.lesson_import import import_all_lessons
+from app.models import Unit, Course, Part
+from app.part_import import import_all_parts
 from app.quiz_import import import_all
 
 YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
@@ -23,8 +23,8 @@ COURSE = {
     ),
 }
 
-# (code, title, unit, textbook reference) — from the syllabus deck.
-CHAPTERS = [
+# (code, title, label, textbook reference) — from the syllabus deck.
+UNITS = [
     ("C01", "Introduction", "Unit - I", "AIMA ch. 1"),
     ("C02", "Intelligent Agents", "Unit - I", "AIMA ch. 2"),
     ("C03", "Solving Problems by Searching", "Unit - II", "AIMA ch. 3"),
@@ -37,9 +37,9 @@ CHAPTERS = [
     ("C10", "Philosophical Foundations", "Unit - V", "AIMA ch. 26-27"),
 ]
 
-# (chapter code or None, slug, title, youtube id, free preview?)
+# (unit code or None, slug, title, youtube id, free preview?)
 # Free previews can be watched without an account; everything else needs a (free) sign-in.
-LESSONS = [
+PARTS = [
     (None, "syllabus", "AI-Y3S1 Syllabus: B.Tech. Artificial Intelligence Course Syllabus", "zN6yG0iReXY", True),
     ("C01", "c01-introduction-part-1", "AI Y3S1C01 Introduction: Part 1", "f3LHSSHeHdU", True),
 ]
@@ -53,30 +53,30 @@ async def seed(force_quizzes: bool = False) -> None:
             s.add(course)
             await s.flush()
 
-        chapters: dict[str, Chapter] = {}
-        existing = {c.code: c for c in (await s.execute(select(Chapter).where(Chapter.course_id == course.id))).scalars()}
-        for pos, (code, title, unit, ref) in enumerate(CHAPTERS):
+        units: dict[str, Unit] = {}
+        existing = {c.code: c for c in (await s.execute(select(Unit).where(Unit.course_id == course.id))).scalars()}
+        for pos, (code, title, label, ref) in enumerate(UNITS):
             ch = existing.get(code)
-            if ch is None:  # create-only: existing chapters belong to the instructor admin now
-                ch = Chapter(course_id=course.id, code=code, title=title, unit=unit, textbook_ref=ref, position=pos)
+            if ch is None:  # create-only: existing units belong to the instructor admin now
+                ch = Unit(course_id=course.id, code=code, title=title, label=label, textbook_ref=ref, position=pos)
                 s.add(ch)
-            chapters[code] = ch
+            units[code] = ch
         await s.flush()
 
-        have = {le.slug: le for le in (await s.execute(select(Lesson).where(Lesson.course_id == course.id))).scalars()}
-        for pos, (code, slug, title, yt, preview) in enumerate(LESSONS):
+        have = {le.slug: le for le in (await s.execute(select(Part).where(Part.course_id == course.id))).scalars()}
+        for pos, (code, slug, title, yt, preview) in enumerate(PARTS):
             if not YOUTUBE_ID.match(yt):
                 raise ValueError(f"bad YouTube id for {slug}: {yt!r}")
             if slug in have:
-                continue  # create-only: edit existing lessons in the instructor admin
+                continue  # create-only: edit existing parts in the instructor admin
             s.add(
-                Lesson(
+                Part(
                     course_id=course.id, slug=slug, title=title, youtube_id=yt, position=pos, is_preview=preview,
-                    chapter_id=chapters[code].id if code else None,
+                    unit_id=units[code].id if code else None,
                 )
             )
         await s.commit()
-    print(f"seeded {COURSE['slug']}: {len(CHAPTERS)} chapters, {len(LESSONS)} lessons (existing ones are left as they are)")
+    print(f"seeded {COURSE['slug']}: {len(UNITS)} units, {len(PARTS)} parts (existing ones are left as they are)")
 
     async with async_session_maker() as s:
         nq, nn = await import_all(s, force=force_quizzes)
@@ -84,9 +84,9 @@ async def seed(force_quizzes: bool = False) -> None:
     print(f"imported quizzes: {nq} quizzes, {nn} questions created (only 'approved' ones are visible)")
 
     async with async_session_maker() as s:
-        nl = await import_all_lessons(s)
+        nl = await import_all_parts(s)
         await s.commit()
-    print(f"imported lessons: {nl} created (lessons without a youtube_id are skipped)")
+    print(f"imported parts: {nl} created (parts without a youtube_id are skipped)")
 
 
 if __name__ == "__main__":

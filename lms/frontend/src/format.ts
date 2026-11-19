@@ -1,5 +1,5 @@
-/** "1 lesson", "2 lessons". */
-export const lessonsWord = (n: number): string => (n === 1 ? 'lesson' : 'lessons')
+/** "1 part", "2 parts". */
+export const partsWord = (n: number): string => (n === 1 ? 'part' : 'parts')
 
 /**
  * Collapses references like "AIMA ch. 1", "AIMA ch. 2", "AIMA ch. 26-27" into one entry per book:
@@ -13,5 +13,5 @@ export function groupRefs(refs: string[]): string[] {
     if (m) byBook.set(m[1], [...(byBook.get(m[1]) ?? []), m[2]])
     else other.push(r)
   }
-  return [...[...byBook].map(([book, chapters]) => `${book} ch. ${chapters.join(', ')}`), ...other]
+  return [...[...byBook].map(([book, units]) => `${book} ch. ${units.join(', ')}`), ...other]
 }

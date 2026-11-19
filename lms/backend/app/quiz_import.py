@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import Chapter, Course, Question, Quiz
+from app.models import Unit, Course, Question, Quiz
 
 CONTENT_DIR = Path(__file__).resolve().parent.parent / "content" / "quizzes"
 LETTERS = "ABCDEF"
@@ -19,7 +19,7 @@ LETTERS = "ABCDEF"
 def parse_quiz_file(data: dict, source: str = "") -> dict:
     """Validate one YAML document and return it with `answer` letters converted to indexes."""
     where = f" ({source})" if source else ""
-    for key in ("course", "chapter", "quizzes"):
+    for key in ("course", "unit", "quizzes"):
         if key not in data:
             raise ValueError(f"missing '{key}'{where}")
     seen: set[str] = set()
@@ -49,12 +49,12 @@ def parse_quiz_file(data: dict, source: str = "") -> dict:
 
 
 async def import_quiz_data(session: AsyncSession, data: dict, force: bool = False) -> tuple[int, int]:
-    """Create the course, chapter, quizzes and questions that do not exist yet. Returns (quizzes, questions) created.
+    """Create the course, unit, quizzes and questions that do not exist yet. Returns (quizzes, questions) created.
 
     Existing content is never touched unless `force` is set: once something lives in the database the instructor
     admin owns it, and a deploy must not overwrite edits made there.
     """
-    cdata, chdata = data["course"], data["chapter"]
+    cdata, chdata = data["course"], data["unit"]
     course = (await session.execute(select(Course).where(Course.slug == cdata["slug"]))).scalar_one_or_none()
     if course is None:
         course = Course(slug=cdata["slug"], title=cdata["title"], description=cdata.get("description", ""),
@@ -63,17 +63,17 @@ async def import_quiz_data(session: AsyncSession, data: dict, force: bool = Fals
         await session.flush()
     # An existing course keeps its own published flag/title: the app (or the instructor) owns those.
 
-    chapter = (
-        await session.execute(select(Chapter).where(Chapter.course_id == course.id, Chapter.code == chdata["code"]))
+    unit = (
+        await session.execute(select(Unit).where(Unit.course_id == course.id, Unit.code == chdata["code"]))
     ).scalar_one_or_none()
-    if chapter is None or force:
-        if chapter is None:
-            pos = (await session.execute(select(func.count(Chapter.id)).where(Chapter.course_id == course.id))).scalar_one()
-            chapter = Chapter(course_id=course.id, code=chdata["code"], position=pos)
-            session.add(chapter)
-        chapter.title = chdata["title"]
-        chapter.unit = chdata.get("unit")
-        chapter.textbook_ref = chdata.get("textbook_ref")
+    if unit is None or force:
+        if unit is None:
+            pos = (await session.execute(select(func.count(Unit.id)).where(Unit.course_id == course.id))).scalar_one()
+            unit = Unit(course_id=course.id, code=chdata["code"], position=pos)
+            session.add(unit)
+        unit.title = chdata["title"]
+        unit.label = chdata.get("label")
+        unit.textbook_ref = chdata.get("textbook_ref")
     await session.flush()
 
     n_quizzes = n_questions = 0
@@ -90,7 +90,7 @@ async def import_quiz_data(session: AsyncSession, data: dict, force: bool = Fals
         if quiz is None:
             quiz = Quiz(course_id=course.id, slug=qd["slug"])
             session.add(quiz)
-        quiz.chapter_id = chapter.id
+        quiz.unit_id = unit.id
         quiz.title = qd["title"]
         quiz.pass_percent = int(qd.get("pass_percent", 70))
         quiz.published = qd["status"] == "approved"

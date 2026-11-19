@@ -1,4 +1,4 @@
-"""Instructor admin API: manage courses, chapters, lessons, quizzes and questions without touching code.
+"""Instructor admin API: manage courses, units, parts, quizzes and questions without touching code.
 
 Everything here needs a signed-in user whose role is "instructor" or "admin". Roles are only ever changed
 server-side (see app/promote.py); the public API deliberately has no way to self-promote.
@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_async_session
-from app.models import Chapter, Course, Lesson, LessonProgress, Question, Quiz, QuizAttempt, User
+from app.models import Unit, Course, Part, PartProgress, Question, Quiz, QuizAttempt, User
 from app.users import current_active_user
 
 
@@ -84,12 +84,12 @@ async def commit_or_409(session: AsyncSession, message: str) -> None:
         raise HTTPException(409, message) from None
 
 
-async def check_chapter(session: AsyncSession, course_id: int, chapter_id: int | None) -> None:
-    if chapter_id is None:
+async def check_unit(session: AsyncSession, course_id: int, unit_id: int | None) -> None:
+    if unit_id is None:
         return
-    ch = await session.get(Chapter, chapter_id)
+    ch = await session.get(Unit, unit_id)
     if ch is None or ch.course_id != course_id:
-        raise HTTPException(422, "Chapter does not belong to this course")
+        raise HTTPException(422, "Unit does not belong to this course")
 
 
 async def move_within(session: AsyncSession, siblings: list, item_id: int, direction: str) -> None:
@@ -113,8 +113,8 @@ class CourseOut(BaseModel):
     description: str
     published: bool
     position: int
-    chapter_count: int = 0
-    lesson_count: int = 0
+    unit_count: int = 0
+    part_count: int = 0
     quiz_count: int = 0
 
 
@@ -132,20 +132,20 @@ class CoursePatch(BaseModel):
     published: bool | None = None
 
 
-class ChapterOut(BaseModel):
+class UnitOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     code: str
     title: str
-    unit: str | None
+    label: str | None
     textbook_ref: str | None
     position: int
 
 
-class ChapterIn(BaseModel):
+class UnitIn(BaseModel):
     code: str
     title: str = Field(min_length=1, max_length=200)
-    unit: str | None = Field(default=None, max_length=20)
+    label: str | None = Field(default=None, max_length=20)
     textbook_ref: str | None = Field(default=None, max_length=200)
 
     @field_validator("code")
@@ -157,10 +157,10 @@ class ChapterIn(BaseModel):
         return v
 
 
-class ChapterPatch(BaseModel):
+class UnitPatch(BaseModel):
     code: str | None = None
     title: str | None = Field(default=None, min_length=1, max_length=200)
-    unit: str | None = Field(default=None, max_length=20)
+    label: str | None = Field(default=None, max_length=20)
     textbook_ref: str | None = Field(default=None, max_length=200)
 
     @field_validator("code")
@@ -171,10 +171,10 @@ class ChapterPatch(BaseModel):
         return v.strip() if v else v
 
 
-class LessonOut(BaseModel):
+class PartOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
-    chapter_id: int | None
+    unit_id: int | None
     slug: str
     title: str
     youtube_id: str
@@ -185,11 +185,11 @@ class LessonOut(BaseModel):
     is_preview: bool
 
 
-class LessonIn(BaseModel):
+class PartIn(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     slug: str | None = None
     youtube: str
-    chapter_id: int | None = None
+    unit_id: int | None = None
     notes_md: str = ""
     slides_url: str | None = Field(default=None, max_length=500)
     published: bool = True
@@ -201,11 +201,11 @@ class LessonIn(BaseModel):
         return parse_youtube_id(v)
 
 
-class LessonPatch(BaseModel):
+class PartPatch(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     slug: str | None = None
     youtube: str | None = None
-    chapter_id: int | None = None
+    unit_id: int | None = None
     notes_md: str | None = None
     slides_url: str | None = Field(default=None, max_length=500)
     published: bool | None = None
@@ -223,7 +223,7 @@ class QuizOut(BaseModel):
     course_id: int
     slug: str
     title: str
-    chapter_id: int | None
+    unit_id: int | None
     pass_percent: int
     published: bool
     position: int
@@ -233,13 +233,13 @@ class QuizOut(BaseModel):
 class QuizIn(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     slug: str | None = None
-    chapter_id: int | None = None
+    unit_id: int | None = None
     pass_percent: int = Field(default=70, ge=1, le=100)
 
 
 class QuizPatch(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
-    chapter_id: int | None = None
+    unit_id: int | None = None
     pass_percent: int | None = Field(default=None, ge=1, le=100)
     published: bool | None = None
 
@@ -311,21 +311,21 @@ class QuizDetail(BaseModel):
 
 class CourseDetail(BaseModel):
     course: CourseOut
-    chapters: list[ChapterOut]
-    lessons: list[LessonOut]
+    units: list[UnitOut]
+    parts: list[PartOut]
     quizzes: list[QuizOut]
 
 
 async def _counts(session: AsyncSession) -> tuple[dict, dict, dict]:
-    ch = dict((await session.execute(select(Chapter.course_id, func.count()).group_by(Chapter.course_id))).all())
-    le = dict((await session.execute(select(Lesson.course_id, func.count()).group_by(Lesson.course_id))).all())
+    ch = dict((await session.execute(select(Unit.course_id, func.count()).group_by(Unit.course_id))).all())
+    le = dict((await session.execute(select(Part.course_id, func.count()).group_by(Part.course_id))).all())
     qz = dict((await session.execute(select(Quiz.course_id, func.count()).group_by(Quiz.course_id))).all())
     return ch, le, qz
 
 
 def _course_out(c: Course, counts: tuple[dict, dict, dict]) -> CourseOut:
     out = CourseOut.model_validate(c)
-    out.chapter_count, out.lesson_count, out.quiz_count = (d.get(c.id, 0) for d in counts)
+    out.unit_count, out.part_count, out.quiz_count = (d.get(c.id, 0) for d in counts)
     return out
 
 
@@ -343,7 +343,7 @@ class CourseStat(BaseModel):
     published: bool
     learners: int
     completions: int
-    lesson_count: int
+    part_count: int
 
 
 class RecentAttempt(BaseModel):
@@ -359,7 +359,7 @@ class RecentAttempt(BaseModel):
 class Overview(BaseModel):
     learners: int
     active_7d: int
-    lessons_completed: int
+    parts_completed: int
     attempts: int
     pass_rate: int | None
     courses: list[CourseStat]
@@ -373,11 +373,11 @@ async def overview(session: AsyncSession = Depends(get_async_session)):
     learners = (await session.execute(select(func.count()).select_from(User).where(User.role == "student"))).scalar_one()
     active_7d = (
         await session.execute(
-            select(func.count(func.distinct(LessonProgress.user_id))).where(LessonProgress.last_seen_at >= week_ago)
+            select(func.count(func.distinct(PartProgress.user_id))).where(PartProgress.last_seen_at >= week_ago)
         )
     ).scalar_one()
     completed = (
-        await session.execute(select(func.count()).select_from(LessonProgress).where(LessonProgress.completed_at.is_not(None)))
+        await session.execute(select(func.count()).select_from(PartProgress).where(PartProgress.completed_at.is_not(None)))
     ).scalar_one()
     attempts, passed = (
         await session.execute(
@@ -388,19 +388,19 @@ async def overview(session: AsyncSession = Depends(get_async_session)):
     started = dict(
         (
             await session.execute(
-                select(Lesson.course_id, func.count(func.distinct(LessonProgress.user_id)))
-                .select_from(LessonProgress).join(Lesson, Lesson.id == LessonProgress.lesson_id)
-                .group_by(Lesson.course_id)
+                select(Part.course_id, func.count(func.distinct(PartProgress.user_id)))
+                .select_from(PartProgress).join(Part, Part.id == PartProgress.part_id)
+                .group_by(Part.course_id)
             )
         ).all()
     )
     done_by_course = dict(
         (
             await session.execute(
-                select(Lesson.course_id, func.count())
-                .select_from(LessonProgress).join(Lesson, Lesson.id == LessonProgress.lesson_id)
-                .where(LessonProgress.completed_at.is_not(None))
-                .group_by(Lesson.course_id)
+                select(Part.course_id, func.count())
+                .select_from(PartProgress).join(Part, Part.id == PartProgress.part_id)
+                .where(PartProgress.completed_at.is_not(None))
+                .group_by(Part.course_id)
             )
         ).all()
     )
@@ -409,7 +409,7 @@ async def overview(session: AsyncSession = Depends(get_async_session)):
     stats = [
         CourseStat(
             id=c.id, title=c.title, published=c.published, learners=started.get(c.id, 0),
-            completions=done_by_course.get(c.id, 0), lesson_count=counts[1].get(c.id, 0),
+            completions=done_by_course.get(c.id, 0), part_count=counts[1].get(c.id, 0),
         )
         for c in courses
     ]
@@ -432,7 +432,7 @@ async def overview(session: AsyncSession = Depends(get_async_session)):
         for a, u, q, c in rows
     ]
     return Overview(
-        learners=learners, active_7d=active_7d, lessons_completed=completed, attempts=attempts,
+        learners=learners, active_7d=active_7d, parts_completed=completed, attempts=attempts,
         pass_rate=round(100 * passed / attempts) if attempts else None, courses=stats, recent_attempts=recent,
     )
 
@@ -460,13 +460,13 @@ async def create_course(body: CourseIn, session: AsyncSession = Depends(get_asyn
 @router.get("/courses/{course_id}", response_model=CourseDetail)
 async def course_detail(course_id: int, session: AsyncSession = Depends(get_async_session)):
     course = await get_or_404(session, Course, course_id, "Course")
-    chapters = (await session.execute(select(Chapter).where(Chapter.course_id == course_id).order_by(Chapter.position, Chapter.id))).scalars().all()
-    lessons = (await session.execute(select(Lesson).where(Lesson.course_id == course_id).order_by(Lesson.position, Lesson.id))).scalars().all()
+    units = (await session.execute(select(Unit).where(Unit.course_id == course_id).order_by(Unit.position, Unit.id))).scalars().all()
+    parts = (await session.execute(select(Part).where(Part.course_id == course_id).order_by(Part.position, Part.id))).scalars().all()
     quizzes = (await session.execute(select(Quiz).where(Quiz.course_id == course_id).order_by(Quiz.position, Quiz.id))).scalars().all()
     return CourseDetail(
         course=_course_out(course, await _counts(session)),
-        chapters=[ChapterOut.model_validate(c) for c in chapters],
-        lessons=[LessonOut.model_validate(le) for le in lessons],
+        units=[UnitOut.model_validate(c) for c in units],
+        parts=[PartOut.model_validate(le) for le in parts],
         quizzes=[await _quiz_out(session, q) for q in quizzes],
     )
 
@@ -485,118 +485,118 @@ async def update_course(course_id: int, body: CoursePatch, session: AsyncSession
     return _course_out(course, await _counts(session))
 
 
-# ---------------------------------------------------------------- chapters
-@router.post("/courses/{course_id}/chapters", response_model=ChapterOut, status_code=201)
-async def create_chapter(course_id: int, body: ChapterIn, session: AsyncSession = Depends(get_async_session)):
+# ---------------------------------------------------------------- units
+@router.post("/courses/{course_id}/units", response_model=UnitOut, status_code=201)
+async def create_unit(course_id: int, body: UnitIn, session: AsyncSession = Depends(get_async_session)):
     await get_or_404(session, Course, course_id, "Course")
-    ch = Chapter(
-        course_id=course_id, code=body.code, title=body.title.strip(), unit=body.unit, textbook_ref=body.textbook_ref,
-        position=await next_position(session, Chapter, Chapter.course_id == course_id),
+    ch = Unit(
+        course_id=course_id, code=body.code, title=body.title.strip(), label=body.label, textbook_ref=body.textbook_ref,
+        position=await next_position(session, Unit, Unit.course_id == course_id),
     )
     session.add(ch)
-    await commit_or_409(session, f"This course already has a chapter with code {body.code}")
+    await commit_or_409(session, f"This course already has a unit with code {body.code}")
     return ch
 
 
-@router.patch("/chapters/{chapter_id}", response_model=ChapterOut)
-async def update_chapter(chapter_id: int, body: ChapterPatch, session: AsyncSession = Depends(get_async_session)):
-    ch = await get_or_404(session, Chapter, chapter_id, "Chapter")
+@router.patch("/units/{unit_id}", response_model=UnitOut)
+async def update_unit(unit_id: int, body: UnitPatch, session: AsyncSession = Depends(get_async_session)):
+    ch = await get_or_404(session, Unit, unit_id, "Unit")
     for k, v in body.model_dump(exclude_unset=True).items():
         if k in ("code", "title") and v is None:
             continue
         setattr(ch, k, v)
-    await commit_or_409(session, "This course already has a chapter with that code")
+    await commit_or_409(session, "This course already has a unit with that code")
     return ch
 
 
-@router.delete("/chapters/{chapter_id}", status_code=204)
-async def delete_chapter(chapter_id: int, session: AsyncSession = Depends(get_async_session)):
-    ch = await get_or_404(session, Chapter, chapter_id, "Chapter")
-    used = (await session.execute(select(func.count()).select_from(Lesson).where(Lesson.chapter_id == chapter_id))).scalar_one()
-    used += (await session.execute(select(func.count()).select_from(Quiz).where(Quiz.chapter_id == chapter_id))).scalar_one()
+@router.delete("/units/{unit_id}", status_code=204)
+async def delete_unit(unit_id: int, session: AsyncSession = Depends(get_async_session)):
+    ch = await get_or_404(session, Unit, unit_id, "Unit")
+    used = (await session.execute(select(func.count()).select_from(Part).where(Part.unit_id == unit_id))).scalar_one()
+    used += (await session.execute(select(func.count()).select_from(Quiz).where(Quiz.unit_id == unit_id))).scalar_one()
     if used:
-        raise HTTPException(409, "Move or delete this chapter's lessons and quizzes first")
+        raise HTTPException(409, "Move or delete this unit's parts and quizzes first")
     await session.delete(ch)
     await session.commit()
 
 
-@router.post("/chapters/{chapter_id}/move", status_code=204)
-async def move_chapter(chapter_id: int, body: MoveIn, session: AsyncSession = Depends(get_async_session)):
-    ch = await get_or_404(session, Chapter, chapter_id, "Chapter")
-    sibs = (await session.execute(select(Chapter).where(Chapter.course_id == ch.course_id))).scalars().all()
-    await move_within(session, list(sibs), chapter_id, body.direction)
+@router.post("/units/{unit_id}/move", status_code=204)
+async def move_unit(unit_id: int, body: MoveIn, session: AsyncSession = Depends(get_async_session)):
+    ch = await get_or_404(session, Unit, unit_id, "Unit")
+    sibs = (await session.execute(select(Unit).where(Unit.course_id == ch.course_id))).scalars().all()
+    await move_within(session, list(sibs), unit_id, body.direction)
 
 
-# ---------------------------------------------------------------- lessons
-@router.post("/courses/{course_id}/lessons", response_model=LessonOut, status_code=201)
-async def create_lesson(course_id: int, body: LessonIn, session: AsyncSession = Depends(get_async_session)):
+# ---------------------------------------------------------------- parts
+@router.post("/courses/{course_id}/parts", response_model=PartOut, status_code=201)
+async def create_part(course_id: int, body: PartIn, session: AsyncSession = Depends(get_async_session)):
     await get_or_404(session, Course, course_id, "Course")
-    await check_chapter(session, course_id, body.chapter_id)
-    scope = (Lesson.course_id == course_id,)
-    slug = check_slug(body.slug) if body.slug else await unique_slug(session, Lesson, slugify(body.title), *scope)
-    lesson = Lesson(
-        course_id=course_id, chapter_id=body.chapter_id, slug=slug, title=body.title.strip(), youtube_id=body.youtube,
+    await check_unit(session, course_id, body.unit_id)
+    scope = (Part.course_id == course_id,)
+    slug = check_slug(body.slug) if body.slug else await unique_slug(session, Part, slugify(body.title), *scope)
+    part = Part(
+        course_id=course_id, unit_id=body.unit_id, slug=slug, title=body.title.strip(), youtube_id=body.youtube,
         notes_md=body.notes_md, slides_url=body.slides_url or None, published=body.published, is_preview=body.is_preview,
-        position=await next_position(session, Lesson, *scope, Lesson.chapter_id == body.chapter_id if body.chapter_id else Lesson.chapter_id.is_(None)),
+        position=await next_position(session, Part, *scope, Part.unit_id == body.unit_id if body.unit_id else Part.unit_id.is_(None)),
     )
-    session.add(lesson)
-    await commit_or_409(session, "A lesson with this slug already exists in the course")
-    return lesson
+    session.add(part)
+    await commit_or_409(session, "A part with this slug already exists in the course")
+    return part
 
 
-@router.patch("/lessons/{lesson_id}", response_model=LessonOut)
-async def update_lesson(lesson_id: int, body: LessonPatch, session: AsyncSession = Depends(get_async_session)):
-    lesson = await get_or_404(session, Lesson, lesson_id, "Lesson")
+@router.patch("/parts/{part_id}", response_model=PartOut)
+async def update_part(part_id: int, body: PartPatch, session: AsyncSession = Depends(get_async_session)):
+    part = await get_or_404(session, Part, part_id, "Part")
     data = body.model_dump(exclude_unset=True)
-    if "chapter_id" in data:
-        await check_chapter(session, lesson.course_id, data["chapter_id"])
-        lesson.chapter_id = data.pop("chapter_id")
-        lesson.position = await next_position(
-            session, Lesson, Lesson.course_id == lesson.course_id,
-            Lesson.chapter_id == lesson.chapter_id if lesson.chapter_id else Lesson.chapter_id.is_(None),
+    if "unit_id" in data:
+        await check_unit(session, part.course_id, data["unit_id"])
+        part.unit_id = data.pop("unit_id")
+        part.position = await next_position(
+            session, Part, Part.course_id == part.course_id,
+            Part.unit_id == part.unit_id if part.unit_id else Part.unit_id.is_(None),
         )
     if "slug" in data:
         slug = data.pop("slug")
         if slug is not None:
-            lesson.slug = check_slug(slug)
+            part.slug = check_slug(slug)
     if "youtube" in data:
         yt = data.pop("youtube")
         if yt is not None:
-            lesson.youtube_id = yt
+            part.youtube_id = yt
     for k, v in data.items():
         if k == "title" and v is None:
             continue
         if k in ("published", "is_preview", "notes_md") and v is None:
             continue
-        setattr(lesson, k, (v.strip() or None) if k == "slides_url" and v is not None else (v.strip() if k == "title" else v))
-    await commit_or_409(session, "A lesson with this slug already exists in the course")
-    return lesson
+        setattr(part, k, (v.strip() or None) if k == "slides_url" and v is not None else (v.strip() if k == "title" else v))
+    await commit_or_409(session, "A part with this slug already exists in the course")
+    return part
 
 
-@router.delete("/lessons/{lesson_id}", status_code=204)
-async def delete_lesson(lesson_id: int, session: AsyncSession = Depends(get_async_session)):
-    lesson = await get_or_404(session, Lesson, lesson_id, "Lesson")
-    await session.delete(lesson)  # learners' progress rows for it go too (ON DELETE CASCADE)
+@router.delete("/parts/{part_id}", status_code=204)
+async def delete_part(part_id: int, session: AsyncSession = Depends(get_async_session)):
+    part = await get_or_404(session, Part, part_id, "Part")
+    await session.delete(part)  # learners' progress rows for it go too (ON DELETE CASCADE)
     await session.commit()
 
 
-@router.post("/lessons/{lesson_id}/move", status_code=204)
-async def move_lesson(lesson_id: int, body: MoveIn, session: AsyncSession = Depends(get_async_session)):
-    lesson = await get_or_404(session, Lesson, lesson_id, "Lesson")
-    same_chapter = Lesson.chapter_id == lesson.chapter_id if lesson.chapter_id else Lesson.chapter_id.is_(None)
-    sibs = (await session.execute(select(Lesson).where(Lesson.course_id == lesson.course_id, same_chapter))).scalars().all()
-    await move_within(session, list(sibs), lesson_id, body.direction)
+@router.post("/parts/{part_id}/move", status_code=204)
+async def move_part(part_id: int, body: MoveIn, session: AsyncSession = Depends(get_async_session)):
+    part = await get_or_404(session, Part, part_id, "Part")
+    same_unit = Part.unit_id == part.unit_id if part.unit_id else Part.unit_id.is_(None)
+    sibs = (await session.execute(select(Part).where(Part.course_id == part.course_id, same_unit))).scalars().all()
+    await move_within(session, list(sibs), part_id, body.direction)
 
 
 # ---------------------------------------------------------------- quizzes and questions
 @router.post("/courses/{course_id}/quizzes", response_model=QuizOut, status_code=201)
 async def create_quiz(course_id: int, body: QuizIn, session: AsyncSession = Depends(get_async_session)):
     await get_or_404(session, Course, course_id, "Course")
-    await check_chapter(session, course_id, body.chapter_id)
+    await check_unit(session, course_id, body.unit_id)
     scope = (Quiz.course_id == course_id,)
     slug = check_slug(body.slug) if body.slug else await unique_slug(session, Quiz, slugify(body.title), *scope)
     quiz = Quiz(
-        course_id=course_id, chapter_id=body.chapter_id, slug=slug, title=body.title.strip(),
+        course_id=course_id, unit_id=body.unit_id, slug=slug, title=body.title.strip(),
         pass_percent=body.pass_percent, published=False, position=await next_position(session, Quiz, *scope),
     )
     session.add(quiz)
@@ -615,9 +615,9 @@ async def quiz_detail(quiz_id: int, session: AsyncSession = Depends(get_async_se
 async def update_quiz(quiz_id: int, body: QuizPatch, session: AsyncSession = Depends(get_async_session)):
     quiz = await get_or_404(session, Quiz, quiz_id, "Quiz")
     data = body.model_dump(exclude_unset=True)
-    if "chapter_id" in data:
-        await check_chapter(session, quiz.course_id, data["chapter_id"])
-        quiz.chapter_id = data.pop("chapter_id")
+    if "unit_id" in data:
+        await check_unit(session, quiz.course_id, data["unit_id"])
+        quiz.unit_id = data.pop("unit_id")
     if data.get("published"):
         n = (await session.execute(select(func.count()).select_from(Question).where(Question.quiz_id == quiz_id))).scalar_one()
         if n == 0:

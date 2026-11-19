@@ -223,7 +223,7 @@ section.block, div.block { margin-top: 32px; } /* page section spacing; `.btn.bl
 .hero-progress .btn { justify-self: start; margin-top: 4px; }
 @media (max-width: 640px) { .hero-card { grid-template-columns: 1fr; } .hero-card .cover { height: 90px; min-height: 0; } }
 
-/* ---------- lesson / quiz rows ---------- */
+/* ---------- part / quiz rows ---------- */
 .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: var(--text); }
 a.row:hover { background: var(--surface-2); }
@@ -239,18 +239,18 @@ a.row:hover { background: var(--surface-2); }
 .rows.compact .row { padding: 7px 8px; font-size: 0.9rem; }
 .rows.compact .ico { width: 24px; height: 24px; }
 
-/* ---------- lesson page ---------- */
-.lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
-.lesson-main { display: grid; gap: 14px; min-width: 0; }
+/* ---------- part page ---------- */
+.part-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.part-main { display: grid; gap: 14px; min-width: 0; }
 .video { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius); overflow: hidden; }
 .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.lesson-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.lesson-actions .note { margin: 0; }
+.part-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.part-actions .note { margin: 0; }
 .notes { line-height: 1.65; margin-top: 0; }
 .prevnext { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.lesson-outline { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; box-shadow: var(--shadow); }
-.lesson-outline h3 { font-size: 0.82rem; margin: 6px 0 2px; color: var(--muted); }
-@media (max-width: 1000px) { .lesson-layout { grid-template-columns: 1fr; } .lesson-outline { position: static; max-height: none; } }
+.part-outline { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; position: sticky; top: 72px; max-height: calc(100vh - 92px); overflow-y: auto; box-shadow: var(--shadow); }
+.part-outline h3 { font-size: 0.82rem; margin: 6px 0 2px; color: var(--muted); }
+@media (max-width: 1000px) { .part-layout { grid-template-columns: 1fr; } .part-outline { position: static; max-height: none; } }
 
 /* ---------- quiz ---------- */
 .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 14px 0 0; min-width: 0; box-shadow: var(--shadow); }

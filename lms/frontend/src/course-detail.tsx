@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes } from './api'
 import { useAuth } from './auth'
-import { LessonRow, QuizRow } from './courses'
-import { groupRefs, lessonsWord } from './format'
+import { PartRow, QuizRow } from './courses'
+import { groupRefs, partsWord } from './format'
 import { Cover, Icon, ProgressBar } from './ui'
 
 // Taken from the instructor's own course slides ("About the instructor" slide).
@@ -38,13 +38,13 @@ export function CoursePage() {
 
   const signedIn = !!user
   const done = new Set(progress.data?.completed_slugs ?? [])
-  const allLessons = [...data.overview_lessons, ...data.chapters.flatMap((c) => c.lessons)]
-  const freeLessons = allLessons.filter((l) => l.is_preview)
+  const allParts = [...data.overview_parts, ...data.units.flatMap((c) => c.parts)]
+  const freeParts = allParts.filter((l) => l.is_preview)
   const allQuizzes = quizzes.data ?? []
-  const chapterCodes = new Set(data.chapters.map((c) => c.code))
-  const looseQuizzes = allQuizzes.filter((q) => !q.chapter_code || !chapterCodes.has(q.chapter_code))
-  const textbooks = groupRefs([...new Set(data.chapters.map((c) => c.textbook_ref).filter(Boolean))] as string[])
-  const firstFree = freeLessons[0]
+  const unitCodes = new Set(data.units.map((c) => c.code))
+  const looseQuizzes = allQuizzes.filter((q) => !q.unit_code || !unitCodes.has(q.unit_code))
+  const textbooks = groupRefs([...new Set(data.units.map((c) => c.textbook_ref).filter(Boolean))] as string[])
+  const firstFree = freeParts[0]
   const resume = progress.data?.resume
   const quizzesLeft = progress.data ? progress.data.quizzes_total - progress.data.quizzes_passed : 0
   const nextQuiz = allQuizzes.find((q) => !q.passed)
@@ -85,10 +85,10 @@ export function CoursePage() {
         <h1>{data.title}</h1>
         <p>{data.description}</p>
         <ul className="ch-meta">
-          <li><Icon name="play" size={15} /> {allLessons.length} {lessonsWord(allLessons.length)}</li>
-          <li><Icon name="courses" size={15} /> {data.chapters.length} {data.chapters.length === 1 ? 'chapter' : 'chapters'}</li>
+          <li><Icon name="play" size={15} /> {allParts.length} {partsWord(allParts.length)}</li>
+          <li><Icon name="courses" size={15} /> {data.units.length} {data.units.length === 1 ? 'unit' : 'units'}</li>
           {allQuizzes.length > 0 && <li><Icon name="quiz" size={15} /> {allQuizzes.length} {allQuizzes.length === 1 ? 'quiz' : 'quizzes'}</li>}
-          <li><Icon name="sparkle" size={15} /> {freeLessons.length} free to watch</li>
+          <li><Icon name="sparkle" size={15} /> {freeParts.length} free to watch</li>
         </ul>
         <div className="ch-instructor">
           <span className="avatar" aria-hidden="true">ST</span>
@@ -102,11 +102,11 @@ export function CoursePage() {
             <h2>Overview</h2>
             <h3>About this course</h3>
             <p className="lead">{data.description}</p>
-            {data.chapters.length > 0 && (
+            {data.units.length > 0 && (
               <>
                 <h3>What you will cover</h3>
                 <ul className="covers">
-                  {data.chapters.map((c) => <li key={c.code}><Icon name="check" size={15} /><span>{c.title}{c.unit && <small> · {c.unit}</small>}</span></li>)}
+                  {data.units.map((c) => <li key={c.code}><Icon name="check" size={15} /><span>{c.title}{c.label && <small> · {c.label}</small>}</span></li>)}
                 </ul>
               </>
             )}
@@ -121,34 +121,34 @@ export function CoursePage() {
           <section className="panel">
             <div className="section-row">
               <h2>Course content</h2>
-              <span className="muted small">{allLessons.length} {lessonsWord(allLessons.length)}{allQuizzes.length > 0 && ` · ${allQuizzes.length} ${allQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}</span>
+              <span className="muted small">{allParts.length} {partsWord(allParts.length)}{allQuizzes.length > 0 && ` · ${allQuizzes.length} ${allQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}</span>
             </div>
-            {data.overview_lessons.length > 0 && (
+            {data.overview_parts.length > 0 && (
               <details className="acc" open>
-                <summary><span>Start here</span><span className="muted small">{data.overview_lessons.length} {lessonsWord(data.overview_lessons.length)}</span></summary>
+                <summary><span>Start here</span><span className="muted small">{data.overview_parts.length} {partsWord(data.overview_parts.length)}</span></summary>
                 <ul className="rows">
-                  {data.overview_lessons.map((l) => <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />)}
+                  {data.overview_parts.map((l) => <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} />)}
                 </ul>
               </details>
             )}
-            {data.chapters.map((ch, i) => {
-              const chapterQuizzes = allQuizzes.filter((q) => q.chapter_code === ch.code)
-              const count = ch.lessons.length
+            {data.units.map((ch, i) => {
+              const unitQuizzes = allQuizzes.filter((q) => q.unit_code === ch.code)
+              const count = ch.parts.length
               return (
-                <details key={ch.code} className="acc" open={i === 0 && data.overview_lessons.length === 0 && count > 0}>
+                <details key={ch.code} className="acc" open={i === 0 && data.overview_parts.length === 0 && count > 0}>
                   <summary>
                     <span><span className="code">{ch.code}</span> {ch.title}</span>
                     <span className="muted small">
-                      {count > 0 ? `${count} ${lessonsWord(count)}` : 'Coming soon'}
-                      {chapterQuizzes.length > 0 && ` · ${chapterQuizzes.length} ${chapterQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}
+                      {count > 0 ? `${count} ${partsWord(count)}` : 'Coming soon'}
+                      {unitQuizzes.length > 0 && ` · ${unitQuizzes.length} ${unitQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}
                     </span>
                   </summary>
-                  {count === 0 && chapterQuizzes.length === 0 ? (
-                    <p className="muted small acc-empty">Lessons for this chapter are on the way.</p>
+                  {count === 0 && unitQuizzes.length === 0 ? (
+                    <p className="muted small acc-empty">Parts for this unit are on the way.</p>
                   ) : (
                     <ul className="rows">
-                      {ch.lessons.map((l) => <LessonRow key={l.slug} course={slug} lesson={l} signedIn={signedIn} done={done.has(l.slug)} />)}
-                      {chapterQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}
+                      {ch.parts.map((l) => <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} />)}
+                      {unitQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}
                     </ul>
                   )}
                 </details>
@@ -183,12 +183,12 @@ export function CoursePage() {
             {progress.data?.started && (
               <div className="card-progress">
                 <ProgressBar percent={progress.data.percent} label="Course progress" />
-                <span>{progress.data.completed} of {progress.data.total} {lessonsWord(progress.data.total)} · {progress.data.percent}%</span>
+                <span>{progress.data.completed} of {progress.data.total} {partsWord(progress.data.total)} · {progress.data.percent}%</span>
               </div>
             )}
             {signedIn ? (
               resume ? (
-                <Link className="btn block" to={`/courses/${slug}/lessons/${resume.slug}`}>
+                <Link className="btn block" to={`/courses/${slug}/parts/${resume.slug}`}>
                   {progress.data?.started ? 'Resume' : 'Start learning'}
                 </Link>
               ) : progress.data && progress.data.total > 0 ? (
@@ -196,7 +196,7 @@ export function CoursePage() {
                   {quizzesLeft > 0 ? (
                     <>
                       <p className="note small">
-                        You have completed every lesson. Pass {quizzesLeft === 1 ? 'the remaining quiz' : `the ${quizzesLeft} remaining quizzes`} to
+                        You have completed every part. Pass {quizzesLeft === 1 ? 'the remaining quiz' : `the ${quizzesLeft} remaining quizzes`} to
                         earn your certificate ({progress.data.quizzes_passed} of {progress.data.quizzes_total} passed).
                       </p>
                       {nextQuiz && (
@@ -208,7 +208,7 @@ export function CoursePage() {
                   ) : (
                     <>
                       <p className="note small">
-                        {progress.data.quizzes_total > 0 ? 'You have finished every lesson and passed every quiz. Well done!' : 'You have completed every lesson. Well done!'}
+                        {progress.data.quizzes_total > 0 ? 'You have finished every part and passed every quiz. Well done!' : 'You have completed every part. Well done!'}
                       </p>
                       <button type="button" className="btn block" onClick={claim} disabled={claiming}>
                         <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
@@ -218,13 +218,13 @@ export function CoursePage() {
                   {claimError && <p className="error small" role="alert">{claimError}</p>}
                 </>
               ) : (
-                <p className="muted small">Lessons are on the way.</p>
+                <p className="muted small">Parts are on the way.</p>
               )
             ) : (
               <>
                 <Link className="btn block" to="/register" state={{ from: `/courses/${slug}` }}>Create a free account</Link>
                 {firstFree && (
-                  <Link className="btn ghost block" to={`/courses/${slug}/lessons/${firstFree.slug}`}>Watch a free lesson</Link>
+                  <Link className="btn ghost block" to={`/courses/${slug}/parts/${firstFree.slug}`}>Watch a free part</Link>
                 )}
               </>
             )}
@@ -234,19 +234,19 @@ export function CoursePage() {
 
             <h3>This course includes</h3>
             <ul className="incl">
-              <li><Icon name="play" size={16} /> {allLessons.length} video {lessonsWord(allLessons.length)}</li>
+              <li><Icon name="play" size={16} /> {allParts.length} video {partsWord(allParts.length)}</li>
               {allQuizzes.length > 0 && <li><Icon name="quiz" size={16} /> {allQuizzes.length} practice {allQuizzes.length === 1 ? 'quiz' : 'quizzes'} with instant feedback</li>}
               <li><Icon name="learning" size={16} /> Progress tracking and resume</li>
-              {freeLessons.length > 0 && <li><Icon name="sparkle" size={16} /> {freeLessons.length} free preview {lessonsWord(freeLessons.length)}</li>}
-              <li><Icon name="award" size={16} /> Certificate when you finish every lesson{allQuizzes.length > 0 && ' and pass every quiz'}</li>
+              {freeParts.length > 0 && <li><Icon name="sparkle" size={16} /> {freeParts.length} free preview {partsWord(freeParts.length)}</li>}
+              <li><Icon name="award" size={16} /> Certificate when you finish every part{allQuizzes.length > 0 && ' and pass every quiz'}</li>
             </ul>
 
             <h3>Course features</h3>
             <dl className="feat">
-              <div><dt>Chapters</dt><dd>{data.chapters.length}</dd></div>
-              <div><dt>Lessons</dt><dd>{allLessons.length}</dd></div>
+              <div><dt>Units</dt><dd>{data.units.length}</dd></div>
+              <div><dt>Parts</dt><dd>{allParts.length}</dd></div>
               <div><dt>Quizzes</dt><dd>{allQuizzes.length}</dd></div>
-              <div><dt>Free lessons</dt><dd>{freeLessons.length}</dd></div>
+              <div><dt>Free parts</dt><dd>{freeParts.length}</dd></div>
             </dl>
           </div>
         </aside>

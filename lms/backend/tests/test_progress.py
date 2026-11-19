@@ -2,7 +2,7 @@ import pytest_asyncio
 from sqlalchemy import update
 
 from app.db import async_session_maker
-from app.models import Course, Lesson
+from app.models import Course, Part
 from app.seed import seed
 
 A = {"email": "asha@example.com", "password": "S3cure-passw0rd!"}
@@ -22,8 +22,8 @@ async def signin(client, creds):
     return client
 
 
-async def mark(client, lesson, completed=True):
-    return await client.put(f"{C}/lessons/{lesson}/progress", json={"completed": completed})
+async def mark(client, part, completed=True):
+    return await client.put(f"{C}/parts/{part}/progress", json={"completed": completed})
 
 
 async def test_progress_requires_login(client):
@@ -66,15 +66,15 @@ async def test_marking_is_idempotent_and_reversible(client):
     assert undone["completed"] == 0 and undone["percent"] == 0
 
 
-async def test_opening_a_lesson_sets_resume_and_completed_flag(client):
+async def test_opening_a_part_sets_resume_and_completed_flag(client):
     await signin(client, A)
     await mark(client, "syllabus")
-    lesson = (await client.get(f"{C}/lessons/syllabus")).json()
-    assert lesson["completed"] is True
-    await client.get(f"{C}/lessons/c01-introduction-part-1")  # opened, not completed
+    part = (await client.get(f"{C}/parts/syllabus")).json()
+    assert part["completed"] is True
+    await client.get(f"{C}/parts/c01-introduction-part-1")  # opened, not completed
     p = (await client.get(f"{C}/progress")).json()
     assert p["resume"]["slug"] == "c01-introduction-part-1"
-    assert (await client.get(f"{C}/lessons/c01-introduction-part-1")).json()["completed"] is False
+    assert (await client.get(f"{C}/parts/c01-introduction-part-1")).json()["completed"] is False
 
 
 async def test_progress_is_per_user(client):
@@ -86,23 +86,23 @@ async def test_progress_is_per_user(client):
 
 
 async def test_anonymous_preview_view_records_nothing(client):
-    r = await client.get(f"{C}/lessons/syllabus")
+    r = await client.get(f"{C}/parts/syllabus")
     assert r.status_code == 200 and r.json()["completed"] is False
 
 
-async def test_unknown_lesson_or_course_404(client):
+async def test_unknown_part_or_course_404(client):
     await signin(client, A)
     assert (await mark(client, "nope")).status_code == 404
-    r = await client.put("/api/courses/nope/lessons/syllabus/progress", json={"completed": True})
+    r = await client.put("/api/courses/nope/parts/syllabus/progress", json={"completed": True})
     assert r.status_code == 404
     assert (await client.get("/api/courses/nope/progress")).status_code == 404
 
 
-async def test_unpublished_lessons_do_not_count(client):
+async def test_unpublished_parts_do_not_count(client):
     await signin(client, A)
     await mark(client, "syllabus")
     async with async_session_maker() as s:
-        await s.execute(update(Lesson).where(Lesson.slug == "c01-introduction-part-1").values(published=False))
+        await s.execute(update(Part).where(Part.slug == "c01-introduction-part-1").values(published=False))
         await s.commit()
     p = (await client.get(f"{C}/progress")).json()
     assert (p["total"], p["completed"], p["percent"], p["resume"]) == (1, 1, 100, None)

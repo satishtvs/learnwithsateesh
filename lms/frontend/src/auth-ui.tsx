@@ -2,10 +2,10 @@ import { useState, type ReactNode } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { Icon, Logo, type IconName } from './ui'
 
-/** Original illustration for the sign-in panel: our book badge, a lesson card, a quiz result and a progress ring. */
+/** Original illustration for the sign-in panel: our book badge, a part card, a quiz result and a progress ring. */
 export function BrandArt() {
   return (
-    <svg className="auth-art" viewBox="0 0 420 360" role="img" aria-label="A lesson, a passed quiz and course progress">
+    <svg className="auth-art" viewBox="0 0 420 360" role="img" aria-label="A part, a passed quiz and course progress">
       <defs>
         <filter id="soft" x="-20%" y="-20%" width="140%" height="150%">
           <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#1e2a44" floodOpacity="0.14" />
@@ -21,7 +21,7 @@ export function BrandArt() {
 
       <image href="/icon-192.png" x="140" y="100" width="140" height="140" />
 
-      {/* lesson card */}
+      {/* part card */}
       <g filter="url(#soft)">
         <rect x="262" y="52" width="130" height="62" rx="14" className="art-card" />
         <circle cx="292" cy="83" r="14" fill="#F97316" />
@@ -57,7 +57,7 @@ export function AuthLayout() {
         <BrandArt />
         <div className="auth-welcome">
           <h2>Welcome to<br />Learn With <span>Sateesh</span></h2>
-          <p>Syllabus-aligned AI &amp; ML video lessons, practice quizzes and progress tracking for B.Tech students.</p>
+          <p>Syllabus-aligned AI &amp; ML video parts, practice quizzes and progress tracking for B.Tech students.</p>
         </div>
       </aside>
       <div className="auth-main">

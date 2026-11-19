@@ -30,7 +30,7 @@ export function CertificatePage() {
           <p className='cert-kicker'>Certificate of completion</p>
           <p className='cert-small'>This certifies that</p>
           <h1 className='cert-name'>{data.learner_name}</h1>
-          <p className='cert-small'>has completed all {data.lesson_count} lessons of</p>
+          <p className='cert-small'>has completed all {data.part_count} parts of</p>
           <h2 className='cert-course'>{data.course_title}</h2>
           <div className='cert-foot'>
             <div><strong>{fmtLong(data.issued_at)}</strong><span>Date issued</span></div>
@@ -54,7 +54,7 @@ export function MyCertificates() {
         <div className='empty plain'>
           <Icon name='award' size={28} />
           <h3>No certificates yet</h3>
-          <p>Finish every lesson in a course and you can claim its certificate from the course page.</p>
+          <p>Finish every part in a course and you can claim its certificate from the course page.</p>
           <Link className='btn' to='/courses'>Browse courses</Link>
         </div>
       ) : (

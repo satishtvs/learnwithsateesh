@@ -1,4 +1,4 @@
-"""Certificates of completion: claimed once every lesson is complete and every visible quiz is passed."""
+"""Certificates of completion: claimed once every part is complete and every visible quiz is passed."""
 import secrets
 from datetime import datetime
 
@@ -23,7 +23,7 @@ class CertificateOut(BaseModel):
     learner_name: str
     course_slug: str
     course_title: str
-    lesson_count: int
+    part_count: int
     issued_at: datetime
 
 
@@ -34,7 +34,7 @@ def new_code() -> str:
 def _out(cert: Certificate, course: Course) -> CertificateOut:
     return CertificateOut(
         code=cert.code, learner_name=cert.learner_name, course_slug=course.slug, course_title=course.title,
-        lesson_count=cert.lesson_count, issued_at=cert.issued_at,
+        part_count=cert.part_count, issued_at=cert.issued_at,
     )
 
 
@@ -52,11 +52,11 @@ async def claim_certificate(
         return _out(existing, course)
     progress = await build_progress(session, user, course)
     if progress.total == 0 or progress.completed < progress.total:
-        raise HTTPException(409, "Complete every lesson in this course to earn the certificate")
+        raise HTTPException(409, "Complete every part in this course to earn the certificate")
     if progress.quizzes_passed < progress.quizzes_total:
         raise HTTPException(409, "Pass every quiz in this course to earn the certificate")
     cert = Certificate(
-        code=new_code(), user_id=user.id, course_id=course.id, lesson_count=progress.total,
+        code=new_code(), user_id=user.id, course_id=course.id, part_count=progress.total,
         learner_name=(user.full_name or "").strip() or user.email.split("@")[0],
     )
     session.add(cert)

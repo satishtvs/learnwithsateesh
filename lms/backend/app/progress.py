@@ -1,4 +1,4 @@
-"""Per-user learning progress: which lessons are complete, and where to resume."""
+"""Per-user learning progress: which parts are complete, and where to resume."""
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.courses import LessonSummary, _course_query, _ordered_lessons
+from app.courses import PartSummary, _course_query, _ordered_parts
 from app.db import get_async_session
-from app.models import Course, Lesson, LessonProgress, Quiz, QuizAttempt, User
+from app.models import Course, Part, PartProgress, Quiz, QuizAttempt, User
 from app.users import current_active_user
 
 router = APIRouter(tags=["progress"])
@@ -20,9 +20,9 @@ class CourseProgress(BaseModel):
     total: int
     completed: int
     percent: int
-    started: bool  # the user has opened at least one lesson
+    started: bool  # the user has opened at least one part
     completed_slugs: list[str]
-    resume: LessonSummary | None  # where to continue; None when nothing is left
+    resume: PartSummary | None  # where to continue; None when nothing is left
     quizzes_total: int = 0  # visible quizzes in the course
     quizzes_passed: int = 0  # of those, how many this user has passed at least once
 
@@ -31,25 +31,25 @@ class CompletedBody(BaseModel):
     completed: bool
 
 
-async def record_visit(session: AsyncSession, user: User, lesson: Lesson) -> None:
-    """Remember that the user opened this lesson (drives 'resume')."""
-    row = await session.get(LessonProgress, (user.id, lesson.id))
+async def record_visit(session: AsyncSession, user: User, part: Part) -> None:
+    """Remember that the user opened this part (drives 'resume')."""
+    row = await session.get(PartProgress, (user.id, part.id))
     now = datetime.now(timezone.utc)
     if row is None:
-        session.add(LessonProgress(user_id=user.id, lesson_id=lesson.id, last_seen_at=now))
+        session.add(PartProgress(user_id=user.id, part_id=part.id, last_seen_at=now))
     else:
         row.last_seen_at = now
     await session.commit()
 
 
-async def completed_lesson_ids(session: AsyncSession, user: User, lessons: list[Lesson]) -> set[int]:
-    ids = [le.id for le in lessons]
+async def completed_part_ids(session: AsyncSession, user: User, parts: list[Part]) -> set[int]:
+    ids = [le.id for le in parts]
     if not ids:
         return set()
-    q = select(LessonProgress.lesson_id).where(
-        LessonProgress.user_id == user.id,
-        LessonProgress.lesson_id.in_(ids),
-        LessonProgress.completed_at.is_not(None),
+    q = select(PartProgress.part_id).where(
+        PartProgress.user_id == user.id,
+        PartProgress.part_id.in_(ids),
+        PartProgress.completed_at.is_not(None),
     )
     return set((await session.execute(q)).scalars().all())
 
@@ -70,23 +70,23 @@ async def quiz_counts(session: AsyncSession, user: User, course: Course) -> tupl
 
 
 async def build_progress(session: AsyncSession, user: User, course: Course) -> CourseProgress:
-    ordered = _ordered_lessons(course)
+    ordered = _ordered_parts(course)
     rows = []
     if ordered:
-        q = select(LessonProgress).where(
-            LessonProgress.user_id == user.id, LessonProgress.lesson_id.in_([le.id for le in ordered])
+        q = select(PartProgress).where(
+            PartProgress.user_id == user.id, PartProgress.part_id.in_([le.id for le in ordered])
         )
         rows = (await session.execute(q)).scalars().all()
-    done = {r.lesson_id for r in rows if r.completed_at is not None}
+    done = {r.part_id for r in rows if r.completed_at is not None}
     position = {le.id: i for i, le in enumerate(ordered)}
 
-    resume: Lesson | None = None
+    resume: Part | None = None
     if len(done) < len(ordered):
         last = max(rows, key=lambda r: r.last_seen_at) if rows else None
-        if last is not None and last.lesson_id not in done:
-            resume = ordered[position[last.lesson_id]]  # still watching this one
+        if last is not None and last.part_id not in done:
+            resume = ordered[position[last.part_id]]  # still watching this one
         else:
-            start = position[last.lesson_id] + 1 if last is not None else 0
+            start = position[last.part_id] + 1 if last is not None else 0
             resume = next((le for le in ordered[start:] if le.id not in done), None) or next(
                 le for le in ordered if le.id not in done
             )
@@ -100,7 +100,7 @@ async def build_progress(session: AsyncSession, user: User, course: Course) -> C
         percent=round(100 * len(done) / total) if total else 0,
         started=bool(rows),
         completed_slugs=[le.slug for le in ordered if le.id in done],
-        resume=LessonSummary.model_validate(resume) if resume else None,
+        resume=PartSummary.model_validate(resume) if resume else None,
         quizzes_total=quizzes_total,
         quizzes_passed=quizzes_passed,
     )
@@ -124,10 +124,10 @@ async def course_progress(
     return await build_progress(session, user, course)
 
 
-@router.put("/courses/{slug}/lessons/{lesson_slug}/progress", response_model=CourseProgress)
-async def set_lesson_completed(
+@router.put("/courses/{slug}/parts/{part_slug}/progress", response_model=CourseProgress)
+async def set_part_completed(
     slug: str,
-    lesson_slug: str,
+    part_slug: str,
     body: CompletedBody,
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_active_user),
@@ -135,14 +135,14 @@ async def set_lesson_completed(
     course = (await session.execute(_course_query(Course.slug == slug))).scalar_one_or_none()
     if course is None:
         raise HTTPException(404, "Course not found")
-    lesson = next((le for le in _ordered_lessons(course) if le.slug == lesson_slug), None)
-    if lesson is None:
-        raise HTTPException(404, "Lesson not found")
+    part = next((le for le in _ordered_parts(course) if le.slug == part_slug), None)
+    if part is None:
+        raise HTTPException(404, "Part not found")
 
     now = datetime.now(timezone.utc)
-    row = await session.get(LessonProgress, (user.id, lesson.id))
+    row = await session.get(PartProgress, (user.id, part.id))
     if row is None:
-        row = LessonProgress(user_id=user.id, lesson_id=lesson.id)
+        row = PartProgress(user_id=user.id, part_id=part.id)
         session.add(row)
     row.last_seen_at = now
     if body.completed:

@@ -23,9 +23,9 @@ async def signin(client, creds, name=None):
 
 async def finish_course(client):
     course = (await client.get(C)).json()
-    slugs = [l["slug"] for l in course["overview_lessons"]] + [l["slug"] for ch in course["chapters"] for l in ch["lessons"]]
+    slugs = [l["slug"] for l in course["overview_parts"]] + [l["slug"] for ch in course["units"] for l in ch["parts"]]
     for s in slugs:
-        assert (await client.put(f"{C}/lessons/{s}/progress", json={"completed": True})).status_code == 200
+        assert (await client.put(f"{C}/parts/{s}/progress", json={"completed": True})).status_code == 200
     return len(slugs)
 
 
@@ -46,7 +46,7 @@ async def test_claim_verify_and_idempotent(client):
     r = await client.post(f"{C}/certificate")
     assert r.status_code == 200
     cert = r.json()
-    assert cert["learner_name"] == "Asha Rao" and cert["lesson_count"] == n and cert["code"].startswith("LWS-")
+    assert cert["learner_name"] == "Asha Rao" and cert["part_count"] == n and cert["code"].startswith("LWS-")
     assert (await client.post(f"{C}/certificate")).json()["code"] == cert["code"]
     assert len((await client.get("/api/me/certificates")).json()) == 1
     # public verification, no login, case-insensitive
@@ -67,7 +67,7 @@ async def test_certificates_are_per_user(client):
 
 QUIZ_DATA = {
     "course": {"slug": "ai-y3s1", "title": "x"},
-    "chapter": {"code": "C01", "title": "Introduction", "unit": "Unit - I", "textbook_ref": "AIMA ch. 1"},
+    "unit": {"code": "C01", "title": "Introduction", "label": "Unit - I", "textbook_ref": "AIMA ch. 1"},
     "quizzes": [
         {"slug": "q1", "title": "Quiz one", "status": "approved", "pass_percent": 100,
          "questions": [{"q": "Two plus two?", "options": ["3", "4"], "answer": "B", "explain": "4"}]},
