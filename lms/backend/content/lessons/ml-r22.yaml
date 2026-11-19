@@ -14,19 +14,19 @@ chapters:
     unit: "Unit - I"
     textbook_ref: "Marsland ch. 1-3; Mitchell ch. 1-2"
     lessons:
-      - {slug: u1-p1, title: "Part 1: What is learning? Supervised learning and the neuron", youtube_id: null, preview: true}
-      - {slug: u1-p2, title: "Part 2: Designing a learning system", youtube_id: null}
-      - {slug: u1-p3, title: "Part 3: Concept learning and Find-S", youtube_id: null}
-      - {slug: u1-p4, title: "Part 4: Version spaces and candidate elimination", youtube_id: null}
-      - {slug: u1-p5, title: "Part 5: The perceptron and linear separability", youtube_id: null}
-      - {slug: u1-p6, title: "Part 6: Linear regression", youtube_id: null}
+      - {slug: u1-p1, title: "Part 1: What is learning? Supervised learning and the neuron", youtube_id: qVhszEep_j0, preview: true}
+      - {slug: u1-p2, title: "Part 2: Designing a learning system", youtube_id: RGiu750_W0Y}
+      - {slug: u1-p3, title: "Part 3: Concept learning and Find-S", youtube_id: 062ic9yXyC4}
+      - {slug: u1-p4, title: "Part 4: Version spaces and candidate elimination", youtube_id: AqBYLOVjSr8}
+      - {slug: u1-p5, title: "Part 5: The perceptron and linear separability", youtube_id: SPHa2KSOgHM}
+      - {slug: u1-p6, title: "Part 6: Linear regression", youtube_id: e1zz1QYeCqQ}
   - code: U2
     title: "Neural Networks and Support Vector Machines"
     unit: "Unit - II"
     textbook_ref: "Marsland ch. 4, 5, 8"
     lessons:
-      - {slug: u2-p1, title: "Part 1: The multi-layer perceptron and going forwards", youtube_id: null}
-      - {slug: u2-p2, title: "Part 2: Back-propagation of error", youtube_id: null}
-      - {slug: u2-p3, title: "Part 3: The multi-layer perceptron in practice", youtube_id: null}
-      - {slug: u2-p4, title: "Part 4: Radial basis functions and splines", youtube_id: null}
-      - {slug: u2-p5, title: "Part 5: Support vector machines", youtube_id: null}
+      - {slug: u2-p1, title: "Part 1: The multi-layer perceptron and going forwards", youtube_id: wWPoc23-EC8}
+      - {slug: u2-p2, title: "Part 2: Back-propagation of error", youtube_id: 7DLbpKzEQJc}
+      - {slug: u2-p3, title: "Part 3: The multi-layer perceptron in practice", youtube_id: xvAqc8rAtTE}
+      - {slug: u2-p4, title: "Part 4: Radial basis functions and splines", youtube_id: UCRjhS3EKQE}
+      - {slug: u2-p5, title: "Part 5: Support vector machines", youtube_id: 7rOJy3B0F2U}
