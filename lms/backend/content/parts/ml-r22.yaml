@@ -41,3 +41,14 @@ units:
       - {slug: u3-p4, title: "Part 4: Basic statistics and Gaussian mixture models", youtube_id: d-wHDD6XmM0}
       - {slug: u3-p5, title: "Part 5: Nearest neighbour methods", youtube_id: 0FaCRtFZgto}
       - {slug: u3-p6, title: "Part 6: Unsupervised learning and k-means", youtube_id: 6Vc4vat1yWc}
+  - code: U4
+    title: "Dimensionality Reduction and Evolutionary Learning"
+    label: "Unit - IV"
+    textbook_ref: "Marsland ch. 6, 10"
+    parts:
+      - {slug: u4-p1, title: "Part 1: Dimensionality reduction and linear discriminant analysis", youtube_id: pOMBJrVaamY}
+      - {slug: u4-p2, title: "Part 2: Principal component analysis", youtube_id: 74P3Pvc3djU}
+      - {slug: u4-p3, title: "Part 3: Factor analysis and independent component analysis", youtube_id: plVjY-kGVZs}
+      - {slug: u4-p4, title: "Part 4: Isomap, locally linear embedding and least squares optimisation", youtube_id: IFvl6FQB6So}
+      - {slug: u4-p5, title: "Part 5: Evolutionary learning and genetic algorithms", youtube_id: MjFTxSZIpJc}
+      - {slug: u4-p6, title: "Part 6: Genetic operators and using genetic algorithms", youtube_id: F4b9htnruE4}

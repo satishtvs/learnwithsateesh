@@ -20,7 +20,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 1
   - slug: u4-p1
     title: "Part 1: Dimensionality reduction and linear discriminant analysis"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What happens to distances between random points as the number of dimensions becomes very large?"
@@ -116,7 +116,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 2
   - slug: u4-p2
     title: "Part 2: Principal component analysis"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Why is PCA called an unsupervised method?"
@@ -212,7 +212,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 3
   - slug: u4-p3
     title: "Part 3: Factor analysis and independent component analysis"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In the factor analysis model x = mean + L f + noise, what are the entries of L called?"
@@ -308,7 +308,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 4
   - slug: u4-p4
     title: "Part 4: Isomap, locally linear embedding and least squares optimisation"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What does Isomap use instead of the ordinary straight-line distance?"
@@ -404,7 +404,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 5
   - slug: u4-p5
     title: "Part 5: Evolutionary learning and genetic algorithms"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What does a genetic algorithm need from the problem in order to work?"
@@ -500,7 +500,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 6
   - slug: u4-p6
     title: "Part 6: Genetic operators and using genetic algorithms"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Parent A is ten ones and parent B is ten zeros. With one-point crossover after bit 4, taking the first part from A, which child is produced?"

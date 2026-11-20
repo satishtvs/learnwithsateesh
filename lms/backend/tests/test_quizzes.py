@@ -88,13 +88,13 @@ def test_parse_converts_letters_to_indexes():
 
 
 def test_shipped_unit1_file_is_valid():
-    """Every shipped quiz file must parse; Unit I should have six part-quizzes, all still drafts."""
+    """Every shipped quiz file must parse; Unit I should have six part-quizzes, all approved (live)."""
     path = CONTENT_DIR / "ml-r22-u1.yaml"
     data = parse_quiz_file(yaml.safe_load(path.read_text(encoding="utf-8")), path.name)
     assert [q["slug"] for q in data["quizzes"]] == [f"u1-p{i}" for i in range(1, 7)]
     assert sum(len(q["questions"]) for q in data["quizzes"]) >= 40
     for quiz in data["quizzes"]:
-        assert quiz["status"] == "draft"  # Sateesh approves them after review
+        assert quiz["status"] == "approved"  # live; Sateesh approved them
         for q in quiz["questions"]:
             assert len(q["options"]) >= 3 and q["explain"].strip()
 
