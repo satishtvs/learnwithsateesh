@@ -11,7 +11,7 @@ import { Home } from './landing'
 import { Shell } from './layout'
 import { PrivacyPage, TermsPage } from './legal'
 import { ForgotPassword, Login, Register, ResetPassword, VerifyEmail } from './pages'
-import { QuizPage, QuizzesPage } from './quiz'
+import { QuizPage } from './quiz'
 import { SyllabusProvider } from './syllabus'
 
 // Loaded on demand: the part page (Markdown renderer), live sessions and the instructor area.
@@ -43,7 +43,7 @@ export default function App() {
                   <Route path="certificates" element={<MyCertificates />} />
                   <Route path="profile" element={<ProfilePage />} />
                 </Route>
-                <Route path="/quizzes" element={<QuizzesPage />} />
+                <Route path="/quizzes" element={<Navigate to="/dashboard/quizzes" replace />} />
                 <Route path="/courses/:slug" element={<CoursePage />} />
                 <Route path="/courses/:slug/parts/:partSlug" element={<PartPage />} />
                 <Route path="/courses/:slug/quizzes/:quizSlug" element={<QuizPage />} />

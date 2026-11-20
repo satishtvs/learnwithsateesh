@@ -168,7 +168,7 @@ export function DashboardHome() {
         {attempts.isLoading ? (
           <p className="muted">Loading…</p>
         ) : latest.length === 0 ? (
-          <p className="muted">You have not taken a quiz yet. <Link to="/quizzes">See the quizzes</Link>.</p>
+          <p className="muted">You have not taken a quiz yet. Every part has one under its video: <Link to="/courses">open a course</Link>.</p>
         ) : (
           <ul className="rows">{latest.map((a, i) => <AttemptRow key={i} a={a} />)}</ul>
         )}
@@ -227,7 +227,7 @@ export function QuizAttempts() {
           <Icon name="quiz" size={28} />
           <h3>No attempts yet</h3>
           <p>Take a quiz and your scores will be listed here, newest first.</p>
-          <Link className="btn" to="/quizzes">See the quizzes</Link>
+          <Link className="btn" to="/courses">Open a course</Link>
         </div>
       ) : (
         <ul className="rows">{data.map((a, i) => <AttemptRow key={i} a={a} />)}</ul>

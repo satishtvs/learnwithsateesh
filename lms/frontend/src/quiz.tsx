@@ -128,7 +128,7 @@ export function QuizPage() {
   return (
     <>
       <nav className="crumbs" aria-label="Breadcrumb">
-        <Link to="/quizzes">Quizzes</Link><Icon name="chevron" size={14} />
+        <Link to="/courses">Courses</Link><Icon name="chevron" size={14} />
         <Link to={`/courses/${slug}`}>Course</Link>
         {data?.unit_code && <><Icon name="chevron" size={14} /><span>{data.unit_code} · {data.unit_title}</span></>}
       </nav>
@@ -194,7 +194,7 @@ export function QuizRunner({
     return (
       <div className="empty">
         <h3>{error instanceof ApiError && error.status === 404 ? 'Quiz not found' : 'Could not load this quiz'}</h3>
-        <Link className="btn" to="/quizzes">All quizzes</Link>
+        <Link className="btn" to="/courses">Back to courses</Link>
       </div>
     )
   }

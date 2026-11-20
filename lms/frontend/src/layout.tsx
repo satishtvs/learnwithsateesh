@@ -28,7 +28,7 @@ function readCollapsed(): boolean {
   }
 }
 
-type Section = 'home' | 'courses' | 'dashboard' | 'quizzes' | 'live' | 'admin' | 'me' | 'overview' | 'learners' | 'adminlive' | null
+type Section = 'home' | 'courses' | 'dashboard' | 'live' | 'admin' | 'me' | 'overview' | 'learners' | 'adminlive' | null
 
 function sectionOf(pathname: string, staff = false): Section {
   if (staff) {
@@ -37,14 +37,13 @@ function sectionOf(pathname: string, staff = false): Section {
     if (pathname === '/admin/live') return 'adminlive'
     if (pathname.startsWith('/admin')) return 'overview'
     if (pathname === '/dashboard/profile') return 'me'
-    if (pathname.startsWith('/courses') || pathname === '/quizzes') return 'courses'
+    if (pathname.startsWith('/courses')) return 'courses'
     return null
   }
   if (pathname === '/') return 'home'
   if (pathname.startsWith('/admin')) return 'admin'
   if (pathname === '/dashboard/profile') return 'me'
   if (pathname.startsWith('/dashboard')) return 'dashboard'
-  if (pathname === '/quizzes' || pathname.includes('/quizzes/')) return 'quizzes'
   if (pathname.startsWith('/courses')) return 'courses'
   if (pathname.startsWith('/live')) return 'live'
   return null
@@ -55,7 +54,6 @@ const PANEL_ENTRY: Record<Exclude<Section, null>, { label: string; to: string; i
   home: { label: 'Home', to: '/', icon: 'home' },
   courses: { label: 'Courses', to: '/courses', icon: 'courses' },
   dashboard: { label: 'Dashboard', to: '/dashboard', icon: 'grid' },
-  quizzes: { label: 'Quizzes', to: '/quizzes', icon: 'quiz' },
   live: { label: 'Live sessions', to: '/live', icon: 'live' },
   admin: { label: 'Manage content', to: '/admin', icon: 'settings' },
   me: { label: 'Me and settings', to: '/dashboard/profile', icon: 'user' },
@@ -168,7 +166,6 @@ export function Shell() {
             <RailLink to="/" label="Home" icon="home" active={section === 'home'} onActive={() => setOpen(!open)} />
             <RailLink to="/courses" label="Courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
             <RailLink to="/dashboard" label="Dashboard" icon="grid" active={section === 'dashboard'} onActive={() => setOpen(!open)} />
-            <RailLink to="/quizzes" label="Quizzes" icon="quiz" active={section === 'quizzes'} onActive={() => setOpen(!open)} />
             <RailLink to="/live" label="Live sessions" icon="live" active={section === 'live'} onActive={() => setOpen(!open)} />
           </>
         )}
@@ -269,7 +266,6 @@ export function Shell() {
           : [
               ['/', 'Home', 'home', section === 'home'],
               ['/courses', 'Courses', 'courses', section === 'courses'],
-              ['/quizzes', 'Quizzes', 'quiz', section === 'quizzes'],
               [meTo, 'Me', 'user', section === 'me' || section === 'dashboard'],
             ]) as [string, string, IconName, boolean][]).map(([to, label, icon, active]) => (
           <Link key={label} to={to} className={`tab${active ? ' active' : ''}`} aria-current={active ? 'page' : undefined}>
