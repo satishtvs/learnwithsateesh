@@ -126,6 +126,7 @@ export function Shell() {
         <footer className="foot">
           <span>© {YEAR} Learn With Sateesh</span>
           <span>AI &amp; ML for B.Tech students</span>
+          <Link to="/privacy">Privacy policy</Link>
         </footer>
       </div>
     </div>

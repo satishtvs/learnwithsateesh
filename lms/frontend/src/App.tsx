@@ -9,6 +9,7 @@ import { CoursesPage, PartPage } from './courses'
 import { DashboardHome, DashboardLayout, EnrolledCourses, ProfilePage, QuizAttempts } from './dashboard'
 import { AuthLayout } from './auth-ui'
 import { Shell } from './layout'
+import { PrivacyPage } from './legal'
 import { ForgotPassword, Home, Login, Register, ResetPassword, VerifyEmail } from './pages'
 import { QuizPage, QuizzesPage } from './quiz'
 
@@ -35,6 +36,7 @@ export default function App() {
               <Route path="/courses/:slug" element={<CoursePage />} />
               <Route path="/courses/:slug/parts/:partSlug" element={<PartPage />} />
               <Route path="/courses/:slug/quizzes/:quizSlug" element={<QuizPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/live" element={<LivePage />} />
               <Route path="/admin" element={<AdminHome />} />
               <Route path="/admin/live" element={<AdminLive />} />
