@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes, type PartSummary, type QuizSummary } from './api'
 import { isStaffUser, useAuth } from './auth'
 import { CourseMetaPills, QuizStatus } from './courses'
-import { groupRefs, partGroups, plural, shortTitle } from './format'
+import { groupRefs, partGroups, plural, progressDetail, shortTitle } from './format'
 import { CourseTile, Icon, Loading, PreviewBanner, ProgressBar } from './ui'
 
 // Taken from the instructor's own course slides ("About the instructor" slide).
@@ -165,7 +165,7 @@ export function CoursePage() {
         {signedIn && p && p.total > 0 && (
           <div className="ch-progress">
             <ProgressBar percent={p.percent} label="Course progress" light />
-            <span>{p.completed} of {p.total} parts complete · {p.percent}%</span>
+            <span>{p.percent}% · {p.completed} of {p.total} parts complete · {progressDetail(p)}</span>
           </div>
         )}
         <div className="cta">

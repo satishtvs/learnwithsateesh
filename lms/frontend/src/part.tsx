@@ -1,12 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import Markdown from 'react-markdown'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { ApiError, getCourse, getCourseProgress, getPart, getQuiz, setPartCompleted } from './api'
+import { ApiError, getCourse, getCourseProgress, getPart, getQuiz } from './api'
 import { isStaffUser, useAuth } from './auth'
 import { PartList } from './course-detail'
 import { LoginGate } from './courses'
 import { partGroups, shortTitle } from './format'
 import { QuizRunner } from './quiz'
+import { WatchedVideo } from './watch'
 import { Icon, Loading, PreviewBanner, ProgressBar } from './ui'
 
 export function PartPage() {
@@ -36,13 +37,11 @@ export function PartPage() {
     enabled: !!user && !!quizSlug,
     retry: false,
   })
-  const toggle = useMutation({
-    mutationFn: (completed: boolean) => setPartCompleted(slug, partSlug, completed),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['progress'] })
-      qc.invalidateQueries({ queryKey: ['part', slug, partSlug] })
-    },
-  })
+  // The server completes a part once the video is watched and its quiz (if any) is passed; refresh what it shows.
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ['progress'] })
+    qc.invalidateQueries({ queryKey: ['part', slug, partSlug] })
+  }
 
   const courseTitle = course.data ? shortTitle(course.data.title) : 'Course'
   const crumbs = (
@@ -78,23 +77,27 @@ export function PartPage() {
 
   const signedIn = !!user
   const done = new Set(progress.data?.completed_slugs ?? [])
-  // A part with a visible quiz is completed by passing it (the quiz result is cached by the quiz runner).
-  const quizPending = !!data.quiz_slug && !quizState.data?.passed
+  // A part is complete when the video is watched AND its quiz (if any) is passed; the server decides.
+  const quizPassed = !data.quiz_slug || !!quizState.data?.passed
   let step = 0
   return (
     <article className="part-page">
       {crumbs}
       {staff && <PreviewBanner />}
       <h1 className="part-title">{data.title}</h1>
-      <div className="video">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${data.youtube_id}`}
-          title={data.title}
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      </div>
+      <WatchedVideo
+        key={`${slug}/${partSlug}/${user?.id ?? 'anon'}`}
+        course={slug}
+        part={partSlug}
+        videoId={data.youtube_id}
+        title={data.title}
+        track={signedIn && !staff}
+        initialSeconds={data.watched_seconds}
+        knownDuration={data.duration_seconds}
+        onResult={(r) => {
+          if (r.watched || r.completed) refresh()
+        }}
+      />
 
       {/* Phones have no side panel open, so the course outline sits under the video. */}
       {course.data && (
@@ -131,9 +134,7 @@ export function PartPage() {
             slug={slug}
             quizSlug={data.quiz_slug}
             embedded
-            onPassed={() => {
-              if (!data.completed) toggle.mutate(true)
-            }}
+            onPassed={refresh}
           />
         </section>
       )}
@@ -142,23 +143,19 @@ export function PartPage() {
         {user && !staff ? (
           <>
             <div>
-              <strong>{data.completed ? 'This part is complete.' : quizPending ? 'Pass the quiz to complete this part.' : 'Finished this part?'}</strong>
-              <p className="muted small">
-                {data.completed
-                  ? 'Your progress is saved.'
-                  : quizPending
-                    ? 'It is marked complete automatically when you pass.'
-                    : 'Mark it complete to track your progress.'}
-              </p>
+              <strong>{data.completed ? 'This part is complete.' : 'To complete this part:'}</strong>
+              <ul className="req-list">
+                <li className={data.watched ? 'ok' : ''}>
+                  <Icon name="check" size={14} /> Watch the whole video
+                </li>
+                {data.quiz_slug && (
+                  <li className={quizPassed ? 'ok' : ''}>
+                    <Icon name="check" size={14} /> Pass the quiz
+                  </li>
+                )}
+              </ul>
+              <p className="muted small">It is marked complete automatically once both are done. Your progress is saved.</p>
             </div>
-            <button
-              type="button"
-              className={`btn${data.completed ? ' success' : ''}`}
-              disabled={toggle.isPending || (quizPending && !data.completed)}
-              onClick={() => toggle.mutate(!data.completed)}
-            >
-              <Icon name="check" size={16} /> {data.completed ? 'Completed (undo)' : 'Mark as complete'}
-            </button>
           </>
         ) : staff ? (
           <p className="muted small">Instructor preview: completion is not recorded for instructor accounts.</p>
@@ -168,7 +165,6 @@ export function PartPage() {
             progress and take the quizzes.
           </p>
         )}
-        {toggle.isError && <span role="alert" className="error">Could not save. Try again.</span>}
       </section>
 
       <nav className="prevnext" aria-label="Part navigation">

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getMatrix, listCourses, type CourseFilters, type CourseProgress, type CourseSummary, type QuizSummary, type Regulation } from './api'
-import { SEMESTERS, plural, semLabel, shortTitle } from './format'
+import { SEMESTERS, plural, progressDetail, semLabel, shortTitle } from './format'
 import { useAllProgress, useCatalogue, useSyllabus } from './state'
 import { CourseTile, Icon, Loading, PageHeader, ProgressBar, SkeletonGrid, Switch } from './ui'
 
@@ -49,7 +49,7 @@ export function CourseCard({ c, progress }: { c: CourseSummary; progress?: Cours
         {progress?.started && (
           <div className="card-progress">
             <ProgressBar percent={progress.percent} label={`${shortTitle(c.title)} progress`} />
-            <span>{progress.completed} of {progress.total} parts · {progress.percent}%</span>
+            <span>{progress.percent}% · {progressDetail(progress)}</span>
           </div>
         )}
       </div>

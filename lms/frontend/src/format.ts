@@ -65,3 +65,15 @@ export function groupRefs(refs: string[]): string[] {
   }
   return [...[...byBook].map(([book, units]) => `${book} ch. ${units.join(', ')}`), ...other]
 }
+
+/** 135 -> "2h 15m", 40 -> "40m". */
+export function minutesText(m: number): string {
+  const h = Math.floor(m / 60)
+  return h ? `${h}h ${m % 60}m` : `${m}m`
+}
+
+/** "2h 15m of 7h watched · 3 of 29 quizzes passed" (the quiz part is left out for a course without quizzes). */
+export function progressDetail(p: { minutes_watched: number; minutes_total: number; quizzes_passed: number; quizzes_total: number }): string {
+  const watched = `${minutesText(p.minutes_watched)} of ${minutesText(p.minutes_total)} watched`
+  return p.quizzes_total ? `${watched} · ${p.quizzes_passed} of ${p.quizzes_total} quizzes passed` : watched
+}

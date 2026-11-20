@@ -103,6 +103,9 @@ export interface Part {
   slides_url: string | null
   is_preview: boolean
   completed: boolean
+  watched: boolean
+  watched_seconds: number
+  duration_seconds: number | null
   quiz_slug: string | null
   unit_code: string | null
   unit_title: string | null
@@ -202,6 +205,8 @@ export interface CourseProgress {
   total: number
   completed: number
   percent: number
+  minutes_watched: number
+  minutes_total: number
   started: boolean
   completed_slugs: string[]
   resume: PartSummary | null
@@ -216,12 +221,20 @@ export async function getCourseProgress(course: string): Promise<CourseProgress>
 export async function getAllProgress(): Promise<CourseProgress[]> {
   return (await request('/progress')).json()
 }
-export async function setPartCompleted(course: string, part: string, completed: boolean): Promise<CourseProgress> {
+export interface WatchResult {
+  watched: boolean
+  watched_seconds: number
+  duration_seconds: number
+  completed: boolean
+  quiz_pending: boolean
+}
+/** Tell the server how much of the video this learner has really played (seeking ahead does not count). */
+export async function reportWatch(course: string, part: string, seconds: number, duration: number): Promise<WatchResult> {
   return (
-    await request(`/courses/${encodeURIComponent(course)}/parts/${encodeURIComponent(part)}/progress`, {
-      method: 'PUT',
+    await request(`/courses/${encodeURIComponent(course)}/parts/${encodeURIComponent(part)}/watch`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed }),
+      body: JSON.stringify({ seconds: Math.floor(seconds), duration: Math.floor(duration) }),
     })
   ).json()
 }

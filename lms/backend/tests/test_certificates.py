@@ -1,8 +1,9 @@
-﻿import pytest_asyncio
+import pytest_asyncio
 
 from app.db import async_session_maker
 from app.quiz_import import import_quiz_data, parse_quiz_file
 from app.seed import seed
+from tests.helpers import watch_and_complete
 
 A = {"email": "asha@example.com", "password": "S3cure-passw0rd!"}
 B = {"email": "ravi@example.com", "password": "S3cure-passw0rd!"}
@@ -25,7 +26,7 @@ async def finish_course(client):
     course = (await client.get(C)).json()
     slugs = [l["slug"] for l in course["overview_parts"]] + [l["slug"] for ch in course["units"] for l in ch["parts"]]
     for s in slugs:
-        assert (await client.put(f"{C}/parts/{s}/progress", json={"completed": True})).status_code == 200
+        assert (await watch_and_complete(client, C, s)).status_code == 200
     return len(slugs)
 
 

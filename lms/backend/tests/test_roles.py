@@ -3,6 +3,7 @@ import pytest_asyncio
 
 from app.promote import promote
 from app.seed import seed
+from tests.helpers import watch_and_complete
 
 STUDENT = {"email": "asha@example.com", "password": "S3cure-passw0rd!"}
 TEACHER = {"email": "sateesh@example.com", "password": "S3cure-passw0rd!"}
@@ -36,12 +37,12 @@ async def test_instructor_and_admin_cannot_record_progress_or_claim_certificates
 
 async def test_students_still_record_progress(client):
     await signin(client, STUDENT)
-    assert (await client.put(f"{C}/parts/syllabus/progress", json={"completed": True})).status_code == 200
+    assert (await watch_and_complete(client, C, "syllabus")).status_code == 200
 
 
 async def test_learners_list_is_instructor_only_and_students_only(client):
     await signin(client, STUDENT)
-    await client.put(f"{C}/parts/syllabus/progress", json={"completed": True})
+    await watch_and_complete(client, C, "syllabus")
     assert (await client.get("/api/admin/learners")).status_code == 403
     await signin(client, TEACHER, "admin")
     rows = (await client.get("/api/admin/learners")).json()

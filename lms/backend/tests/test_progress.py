@@ -4,6 +4,7 @@ from sqlalchemy import update
 from app.db import async_session_maker
 from app.models import Course, Part
 from app.seed import seed
+from tests.helpers import watch
 
 A = {"email": "asha@example.com", "password": "S3cure-passw0rd!"}
 B = {"email": "ravi@example.com", "password": "S3cure-passw0rd!"}
@@ -23,6 +24,8 @@ async def signin(client, creds):
 
 
 async def mark(client, part, completed=True):
+    if completed:
+        await watch(client, C, part)
     return await client.put(f"{C}/parts/{part}/progress", json={"completed": completed})
 
 
@@ -63,7 +66,7 @@ async def test_marking_is_idempotent_and_reversible(client):
     again = (await mark(client, "syllabus")).json()
     assert again["completed"] == 1
     undone = (await mark(client, "syllabus", completed=False)).json()
-    assert undone["completed"] == 0 and undone["percent"] == 0
+    assert undone["completed"] == 0 and undone["percent"] == 50  # the video stays watched
 
 
 async def test_opening_a_part_sets_resume_and_completed_flag(client):

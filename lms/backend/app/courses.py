@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db import get_async_session
-from app.models import Branch, Course, Part, Quiz, Regulation, Unit, University, User
+from app.models import Branch, Course, Part, PartProgress, Quiz, Regulation, Unit, University, User
 from app.users import optional_user
 
 router = APIRouter(prefix="/courses", tags=["courses"])
@@ -82,6 +82,9 @@ class PartOut(BaseModel):
     slides_url: str | None
     is_preview: bool
     completed: bool = False  # for the signed-in user; always False for anonymous visitors
+    watched: bool = False  # the signed-in user has watched the whole video
+    watched_seconds: int = 0
+    duration_seconds: int | None = None
     quiz_slug: str | None = None  # the part's own published quiz (quiz slug == part slug), if any
     unit_code: str | None
     unit_title: str | None
@@ -253,13 +256,20 @@ async def get_part(
     ).first() is not None
 
     completed = False
+    watched, watched_seconds = False, 0
     if user is not None:  # lazy import: progress.py imports this module
         from app.progress import completed_part_ids, record_visit
 
         await record_visit(session, user, part)
         completed = part.id in await completed_part_ids(session, user, [part])
+        pp = await session.get(PartProgress, (user.id, part.id))
+        if pp is not None:
+            watched, watched_seconds = pp.watched_at is not None, pp.watched_seconds or 0
     return PartOut(
         completed=completed,
+        watched=watched,
+        watched_seconds=watched_seconds,
+        duration_seconds=part.duration_seconds,
         quiz_slug=part.slug if has_quiz else None,
         slug=part.slug,
         title=part.title,

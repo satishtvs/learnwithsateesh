@@ -4,7 +4,7 @@ import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react
 import { getAllProgress, getMyAttempts, updateMe, type CourseProgress, type MyAttempt } from './api'
 import { isStaffUser, useAuth } from './auth'
 import { LoginGate } from './courses'
-import { initials, partsWord, shortTitle } from './format'
+import { initials, partsWord, progressDetail, shortTitle } from './format'
 import { SyllabusForm } from './syllabus-form'
 import { CourseTile, Icon, Loading, ProgressBar, type IconName } from './ui'
 
@@ -29,7 +29,7 @@ function ProgressCard({ p }: { p: CourseProgress }) {
         <h3>{shortTitle(p.course_title)}</h3>
         <div className="card-progress">
           <ProgressBar percent={p.percent} label={`${shortTitle(p.course_title)} progress`} />
-          <span>{p.completed} of {p.total} {partsWord(p.total)} · {p.percent}%</span>
+          <span>{p.percent}% · {progressDetail(p)}</span>
         </div>
         {p.resume ? (
           <Link className="btn small" to={`/courses/${p.course_slug}/parts/${p.resume.slug}`}>Resume: {p.resume.title}</Link>

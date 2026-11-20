@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db import get_async_session
-from app.models import Unit, Course, Quiz, QuizAttempt, User
+from app.models import Unit, Course, Part, Quiz, QuizAttempt, User
 from app.users import current_active_user, current_learner, optional_user
 
 router = APIRouter(prefix="/courses/{slug}/quizzes", tags=["quizzes"])
@@ -263,5 +263,13 @@ async def submit_attempt(
         )
     )
     await session.commit()
+    if passed:  # passing completes the part when its video has been watched too
+        from app.progress import complete_if_ready
+
+        part = (
+            await session.execute(select(Part).where(Part.course_id == quiz.course_id, Part.slug == quiz.slug))
+        ).scalar_one_or_none()
+        if part is not None:
+            await complete_if_ready(session, user, part)
     return AttemptOut(score=score, total=total, percent=percent, passed=passed,
                       pass_percent=quiz.pass_percent, results=results)

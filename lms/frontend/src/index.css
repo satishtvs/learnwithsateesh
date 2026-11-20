@@ -798,3 +798,9 @@ button.adorn:hover { background: var(--surface-2); color: var(--text); }
 .lp-entry.active { background: color-mix(in srgb, var(--orange) 22%, transparent); color: var(--navy); }
 
 .preview-banner { margin: 0 0 16px; padding: 10px 14px; border-radius: 10px; background: var(--orange-soft); color: var(--navy); font-size: 0.9rem; border: 1px solid color-mix(in srgb, var(--orange) 40%, transparent); }
+.watch-note { margin: 6px 2px 0; }
+.req-list { list-style: none; margin: 6px 0 4px; padding: 0; display: grid; gap: 4px; }
+.req-list li { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.req-list li svg { opacity: 0.35; }
+.req-list li.ok { color: var(--ok); font-weight: 600; }
+.req-list li.ok svg { opacity: 1; }

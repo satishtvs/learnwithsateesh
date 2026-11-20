@@ -159,6 +159,8 @@ class Part(Base):
     published: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     # Free preview: viewable without signing in (the rest needs a free account).
     is_preview: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Length of the video; used to check that a learner really watched it. Filled in from the player when unknown.
+    duration_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     course: Mapped[Course] = relationship(back_populates="parts")
     unit: Mapped[Unit | None] = relationship(back_populates="parts")
@@ -177,6 +179,10 @@ class PartProgress(Base):
     part_id: Mapped[int] = mapped_column(ForeignKey("part.id", ondelete="CASCADE"), primary_key=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    # Watch tracking: a part completes only when the video is watched AND its quiz (if any) is passed.
+    watch_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    watched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    watched_seconds: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
 
 class Quiz(Base):

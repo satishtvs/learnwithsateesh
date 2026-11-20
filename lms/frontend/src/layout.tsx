@@ -166,7 +166,7 @@ export function Shell() {
             <RailLink to="/" label="Home" icon="home" active={section === 'home'} onActive={() => setOpen(!open)} />
             <RailLink to="/courses" label="Courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
             <RailLink to="/dashboard" label="Dashboard" icon="grid" active={section === 'dashboard'} onActive={() => setOpen(!open)} />
-            <RailLink to="/live" label="Live sessions" icon="live" active={section === 'live'} onActive={() => setOpen(!open)} />
+            {user && <RailLink to="/live" label="Live sessions" icon="live" active={section === 'live'} onActive={() => setOpen(!open)} />}
           </>
         )}
         <span className="rail-push" />
