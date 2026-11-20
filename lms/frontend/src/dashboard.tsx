@@ -4,7 +4,7 @@ import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react
 import { getAllProgress, getMyAttempts, updateMe, type CourseProgress, type MyAttempt } from './api'
 import { isStaffUser, useAuth } from './auth'
 import { LoginGate } from './courses'
-import { initials, partsWord, progressDetail, shortTitle } from './format'
+import { initials, progressDetail, shortTitle } from './format'
 import { SyllabusForm } from './syllabus-form'
 import { CourseTile, Icon, Loading, ProgressBar, type IconName } from './ui'
 
