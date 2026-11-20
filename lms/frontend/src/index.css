@@ -787,3 +787,12 @@ button.adorn:hover { background: var(--surface-2); color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* Dashboard has no Learn panel: hide the phone "My semester" button too */
+.app.no-panel .sem-btn { display: none !important; }
+
+/* Panels of the icons other than Courses: one entry named after the icon (more can be added later) */
+.lp-entries { display: grid; gap: 4px; }
+.lp-entry { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: var(--text); font-weight: 600; text-decoration: none; }
+.lp-entry:hover { background: var(--surface-2); }
+.lp-entry.active { background: color-mix(in srgb, var(--orange) 22%, transparent); color: var(--navy); }

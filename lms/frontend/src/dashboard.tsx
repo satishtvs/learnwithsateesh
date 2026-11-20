@@ -264,7 +264,7 @@ export function ProfilePage() {
       <span className="eyebrow">Settings</span>
       <h2 id="syl-h" className="h-display">My syllabus</h2>
       <p className="muted small syl-intro">
-        Your syllabus shows in the Learn panel, pre-selects the course search, and sets which semester Home opens on.
+        Your syllabus shows in the Courses panel on the left, pre-selects the course search, and sets which semester Home opens on.
       </p>
       <SyllabusForm withOtherRegs />
     </section>
