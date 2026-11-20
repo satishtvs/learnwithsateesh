@@ -20,7 +20,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 1
   - slug: u5-p1
     title: "Part 1: Reinforcement learning and the Getting Lost example"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In reinforcement learning, what feedback does the agent receive after an action?"
@@ -116,7 +116,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 2
   - slug: u5-p2
     title: "Part 2: MDP, Bellman equation, Q-learning and Sarsa"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What does the Markov property say?"
@@ -212,7 +212,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 3
   - slug: u5-p3
     title: "Part 3: Sampling methods and Markov chain Monte Carlo"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In inverse transform sampling for an exponential distribution with rate 2, x = -ln(1 - u) / 2. For u = 0.5488, what is x (approximately)?"
@@ -308,7 +308,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 4
   - slug: u5-p4
     title: "Part 4: Graphical models: Bayesian networks and Markov random fields"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "How many numbers are needed for the full joint distribution of 10 yes/no variables?"
@@ -404,7 +404,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 5
   - slug: u5-p5
     title: "Part 5: Hidden Markov models"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In a hidden Markov model, what do we actually observe?"
@@ -500,7 +500,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 6
   - slug: u5-p6
     title: "Part 6: Tracking: Kalman filter and particle filter"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What are the two steps of each Kalman filter cycle?"

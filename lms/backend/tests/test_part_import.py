@@ -46,7 +46,7 @@ async def parts_of(slug):
 def test_shipped_file_is_valid_and_lists_all_published_videos():
     data = parse_part_file(yaml.safe_load((PARTS_DIR / "ml-r22.yaml").read_text(encoding="utf-8")))
     slugs = [le["slug"] for ch in data["units"] for le in ch["parts"]]
-    assert slugs == [f"u1-p{i}" for i in range(1, 7)] + [f"u2-p{i}" for i in range(1, 6)] + [f"u3-p{i}" for i in range(1, 7)] + [f"u4-p{i}" for i in range(1, 7)]
+    assert slugs == [f"u1-p{i}" for i in range(1, 7)] + [f"u2-p{i}" for i in range(1, 6)] + [f"u3-p{i}" for i in range(1, 7)] + [f"u4-p{i}" for i in range(1, 7)] + [f"u5-p{i}" for i in range(1, 7)]
 
 
 def test_parse_rejects_bad_youtube_id_and_duplicate_slugs():

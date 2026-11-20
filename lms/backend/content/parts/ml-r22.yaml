@@ -52,3 +52,14 @@ units:
       - {slug: u4-p4, title: "Part 4: Isomap, locally linear embedding and least squares optimisation", youtube_id: IFvl6FQB6So}
       - {slug: u4-p5, title: "Part 5: Evolutionary learning and genetic algorithms", youtube_id: MjFTxSZIpJc}
       - {slug: u4-p6, title: "Part 6: Genetic operators and using genetic algorithms", youtube_id: F4b9htnruE4}
+  - code: U5
+    title: "Reinforcement Learning, Sampling and Graphical Models"
+    label: "Unit - V"
+    textbook_ref: "Marsland ch. 11, 15-16"
+    parts:
+      - {slug: u5-p1, title: "Part 1: Reinforcement learning and the Getting Lost example", youtube_id: UmPYpVmBqSQ}
+      - {slug: u5-p2, title: "Part 2: MDP, Bellman equation, Q-learning and Sarsa", youtube_id: q9gtS8Q1rvI}
+      - {slug: u5-p3, title: "Part 3: Sampling methods and Markov chain Monte Carlo", youtube_id: jX2DWlGS4NI}
+      - {slug: u5-p4, title: "Part 4: Graphical models: Bayesian networks and Markov random fields", youtube_id: kJJkdobxVwU}
+      - {slug: u5-p5, title: "Part 5: Hidden Markov models", youtube_id: CeRQzxD6BkM}
+      - {slug: u5-p6, title: "Part 6: Tracking: Kalman filter and particle filter", youtube_id: CxYeLguuWXI}
