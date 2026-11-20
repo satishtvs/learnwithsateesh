@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { PageHeader } from './ui'
 
 // The public contact address for privacy requests (shown on the privacy page).
@@ -57,6 +58,79 @@ export function PrivacyPage() {
         <h2>Changes and contact</h2>
         <p>
           If this policy changes, the date at the top of this page changes. Questions or requests about your data:{' '}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+        </p>
+      </article>
+    </>
+  )
+}
+
+export function TermsPage() {
+  return (
+    <>
+      <PageHeader title="Terms and conditions" subtitle={`Learn With Sateesh (learnwithsateesh.in). Last updated ${UPDATED}.`} />
+      <article className="panel notes">
+        <p>
+          By using learnwithsateesh.in (the "site") you agree to these terms. If you do not agree, please do not use the site.
+          The site is run by Sateesh Kumar Talupuri ("we", "us").
+        </p>
+
+        <h2>What the site offers</h2>
+        <p>
+          Free video lessons, practice quizzes and completion certificates for engineering courses, starting with Machine
+          Learning for JNTUH R22 B.Tech CSE (AI and ML). The lessons are study aids that follow the published syllabus. They
+          are not a substitute for your college classes, textbooks or official notes.
+        </p>
+
+        <h2>Your account</h2>
+        <ul>
+          <li>Give correct details and keep your password private. You are responsible for activity on your account.</li>
+          <li>One person, one account. Do not share your account or take quizzes on behalf of someone else.</li>
+          <li>We may suspend or delete accounts that break these terms or harm the site or other learners.</li>
+        </ul>
+
+        <h2>Using the site fairly</h2>
+        <ul>
+          <li>Do not try to break, overload or gain unauthorised access to the site, or to collect its data automatically.</li>
+          <li>Do not cheat on quizzes, or copy the quiz questions and answers to sell or republish them.</li>
+          <li>Do not upload or post anything unlawful, abusive or misleading.</li>
+        </ul>
+
+        <h2>Our content</h2>
+        <p>
+          The videos, slides, notes, figures, quizzes and website are owned by Sateesh Kumar Talupuri. You may watch them and
+          learn from them for your own personal, non-commercial study, and share the link to a lesson. Please do not copy,
+          re-upload, sell or build a product from the content without written permission. The textbooks and papers we refer to
+          belong to their authors and publishers; our explanations and examples are our own summaries.
+        </p>
+
+        <h2>AI voice</h2>
+        <p>The narration in our videos is created with an AI voice made from the instructor's own voice, and this is disclosed on YouTube.</p>
+
+        <h2>Quizzes and certificates</h2>
+        <p>
+          A certificate of completion shows that you finished the lessons and quizzes of a course on this site. It is issued by
+          Learn With Sateesh. It is not a degree, is not issued by any university or board, and does not by itself guarantee
+          marks, admission or a job.
+        </p>
+
+        <h2>No guarantee, and limits of liability</h2>
+        <p>
+          We work hard to keep the content correct, but we cannot promise that it is free of mistakes or that it will match
+          every exam. The site and the lessons are provided "as they are", free of charge, and may change, pause or stop at any
+          time. To the extent the law allows, we are not liable for any loss arising from using the site or relying on its
+          content. Nothing here limits any right you have under the law that cannot be limited.
+        </p>
+
+        <h2>Privacy</h2>
+        <p>
+          How we handle your information is explained in our <Link to="/privacy">privacy policy</Link>.
+        </p>
+
+        <h2>Changes, law and contact</h2>
+        <p>
+          We may update these terms; the date at the top shows the latest version, and continuing to use the site means you
+          accept the update. These terms are governed by the laws of India. Questions:{' '}
           <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
         </p>
       </article>

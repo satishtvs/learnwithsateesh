@@ -127,6 +127,7 @@ export function Shell() {
           <span>© {YEAR} Learn With Sateesh</span>
           <span>AI &amp; ML for B.Tech students</span>
           <Link to="/privacy">Privacy policy</Link>
+          <Link to="/terms">Terms and conditions</Link>
         </footer>
       </div>
     </div>
