@@ -20,7 +20,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 1
   - slug: u3-p1
     title: "Part 1: Decision trees, entropy and ID3"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "A node holds 6 examples of class yes and 6 of class no. What is its entropy?"
@@ -116,7 +116,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 2
   - slug: u3-p2
     title: "Part 2: CART, Gini impurity and pruning"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "A node has 3 examples of one class and 1 of the other. What is its Gini impurity?"
@@ -212,7 +212,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 3
   - slug: u3-p3
     title: "Part 3: Ensemble learning, bagging, random forests and boosting"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "A bootstrap sample of N examples is drawn with replacement. Roughly what fraction of the distinct examples appears in it?"
@@ -308,7 +308,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 4
   - slug: u3-p4
     title: "Part 4: Basic statistics and Gaussian mixture models"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "The variance of the hours studied by six students is 6.25. What is the standard deviation?"
@@ -404,7 +404,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 5
   - slug: u3-p5
     title: "Part 5: Nearest neighbour methods"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Why is k-NN called a lazy learning method?"
@@ -500,7 +500,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 6
   - slug: u3-p6
     title: "Part 6: Unsupervised learning and k-means"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What is the key difference between unsupervised and supervised learning?"
