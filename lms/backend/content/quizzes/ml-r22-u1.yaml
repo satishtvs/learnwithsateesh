@@ -20,7 +20,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 1
   - slug: u1-p1
     title: "Part 1: What is learning? Supervised learning and the neuron"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In the spam-filter example of a learning problem, what is the experience E?"
@@ -116,7 +116,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 2
   - slug: u1-p2
     title: "Part 2: Designing a learning system"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Which is the correct order of the design steps for a learning system?"
@@ -212,7 +212,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 3
   - slug: u1-p3
     title: "Part 3: Concept learning and Find-S"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "In the EnjoySport concept, what does the hypothesis <Sunny, Warm, ?, Strong, ?, ?> say?"
@@ -308,7 +308,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 4
   - slug: u1-p4
     title: "Part 4: Version spaces and candidate elimination"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What is the version space?"
@@ -404,7 +404,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 5
   - slug: u1-p5
     title: "Part 5: The perceptron and linear separability"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "A perceptron has a bias input of −1 with weight w0 = 2, and inputs x1 = 1 and x2 = 0 with weights w1 = 2 and w2 = 1. It outputs 1 if a > 0, otherwise 0. What does it output?"
@@ -500,7 +500,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 6
   - slug: u1-p6
     title: "Part 6: Linear regression"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What is the sum-of-squares error for targets t_i and predictions y_i?"

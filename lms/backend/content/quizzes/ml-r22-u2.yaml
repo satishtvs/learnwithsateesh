@@ -20,7 +20,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 1
   - slug: u2-p1
     title: "Part 1: The multi-layer perceptron and going forwards"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Why can a multi-layer perceptron solve XOR when a single perceptron cannot?"
@@ -116,7 +116,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 2
   - slug: u2-p2
     title: "Part 2: Back-propagation of error"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Why can the output error not be used directly to update a hidden node's weights?"
@@ -212,7 +212,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 3
   - slug: u2-p3
     title: "Part 3: The multi-layer perceptron in practice"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Training error keeps falling, but validation error starts to rise. What should you do?"
@@ -308,7 +308,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 4
   - slug: u2-p4
     title: "Part 4: Radial basis functions and splines"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "What is the key difference between a Gaussian RBF hidden unit and a sigmoid hidden unit?"
@@ -404,7 +404,7 @@ quizzes:
   # ------------------------------------------------------------------ Part 5
   - slug: u2-p5
     title: "Part 5: Support vector machines"
-    status: draft
+    status: approved
     pass_percent: 70
     questions:
       - q: "Among all lines that separate two classes without error, which one does a linear SVM choose?"
