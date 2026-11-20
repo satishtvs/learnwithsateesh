@@ -1,0 +1,39 @@
+# Catalogue: universities, their regulations and branches, and where each course sits.
+# Loaded by app/catalogue_import.py during the seed step (deploy runs it).
+#
+# Create-only: a university, regulation or branch that already exists is never changed here (edit it in the
+# database / admin). Course metadata is only filled where the course has none yet (university, year, semester,
+# subject_code; regulations/branches only when the course has none), so changes made later are never overwritten.
+# Courses that do not exist yet are skipped. More branches (ECE, EEE, ME, CE, ...) can be appended later.
+#
+# Browsing path: University > Branch > Course. A regulation is an attribute of a course (the same videos may
+# serve several regulations), and `joined_year` is the first batch it applies to (used to suggest a regulation).
+
+universities:
+  - slug: jntuh
+    name: "Jawaharlal Nehru Technological University Hyderabad"
+    short_name: JNTUH
+    regulations:
+      - {code: R18, label: "R18 (joined 2018-2019)", joined_year: 2018}
+      - {code: R20, label: "R20 (joined 2020-2021)", joined_year: 2020}
+      - {code: R22, label: "R22 (joined 2022-2024)", joined_year: 2022}
+      - {code: R25, label: "R25 (joined 2025 onwards)", joined_year: 2025}
+    branches:
+      - {slug: cse-aiml, name: "Computer Science and Engineering (Artificial Intelligence and Machine Learning)", short_name: "CSE (AI and ML)"}
+      - {slug: cse-ds, name: "Computer Science and Engineering (Data Science)", short_name: "CSE (Data Science)"}
+      - {slug: cse, name: "Computer Science and Engineering", short_name: "CSE"}
+
+courses:
+  - slug: machine-learning-r22
+    university: jntuh
+    regulations: [R22]
+    branches: [cse-aiml]
+    year: 3
+    semester: 1
+    subject_code: AM502PC
+  - slug: ai-y3s1
+    university: jntuh
+    regulations: [R22]
+    branches: [cse-aiml]
+    year: 3
+    semester: 1

@@ -86,6 +86,33 @@ quizzes:
         answer: B
         explain: "Hebb's rule: neurons that fire together strengthen their connection. It is the idea behind learning by weight changes."
 
+      - q: "Which data set is used to choose settings of the model and to decide when to stop training?"
+        options:
+          - "The test set"
+          - "The validation set"
+          - "The training set"
+          - "The set of all unlabelled data"
+        answer: B
+        explain: "The validation set is for tuning and for deciding when to stop. The test set must stay untouched until the end so that it gives an honest score."
+
+      - q: "For a handwriting recognition program, which of these is the performance measure P?"
+        options:
+          - "Images of handwritten words with their correct labels"
+          - "Recognising handwritten words from images"
+          - "The percentage of words it recognises correctly"
+          - "The weights of the classifier"
+        answer: C
+        explain: "P is the number we use to judge the program, here the percentage of words recognised correctly. The images with labels are E and recognising words is T."
+
+      - q: "A McCulloch and Pitts neuron has inputs x1 = 1, x2 = 1, x3 = 0 with weights 0.4, 0.5, 0.9 and a threshold of 1. What is its output?"
+        options:
+          - "0, because the weighted sum 0.9 is below the threshold"
+          - "1, because the weighted sum 0.9 is above the threshold"
+          - "1, because two of the three inputs are on"
+          - "0, because the third weight is the largest"
+        answer: A
+        explain: "Weighted sum = 0.4 + 0.5 + 0 = 0.9. The neuron fires only if the sum reaches the threshold of 1, so the output is 0."
+
   # ------------------------------------------------------------------ Part 2
   - slug: u1-p2
     title: "Part 2: Designing a learning system"
@@ -145,6 +172,42 @@ quizzes:
           - "The training set, to delete wrong examples"
         answer: C
         explain: "Learning is searching the hypothesis space for the hypotheses that best fit the data."
+
+      - q: "In the checkers example, what is direct training feedback?"
+        options:
+          - "Only the final win or loss of the game"
+          - "The score of the opponent after every game"
+          - "The learning rate set by the designer"
+          - "The best move for each board position"
+        answer: D
+        explain: "Direct feedback tells the learner the best move for each position. Indirect feedback gives only the final result, which leads to the credit assignment problem."
+
+      - q: "The checkers target function is V(b) = w0 + w1x1 + ... + w6x6, where x1 to x6 are board features. How many weights must be learned?"
+        options:
+          - "6"
+          - "8"
+          - "5"
+          - "7"
+        answer: D
+        explain: "There are six feature weights w1 to w6 plus the constant weight w0, so 7 weights in all."
+
+      - q: "Using the LMS rule with w_i = 1, η = 0.1, V_train(b) = 6, V(b) = 10 and x_i = 2, what is the new w_i?"
+        options:
+          - "0.2"
+          - "1.8"
+          - "0.8"
+          - "−0.8"
+        answer: A
+        explain: "Error = 6 − 10 = −4. Change = 0.1 × (−4) × 2 = −0.8. New weight = 1 − 0.8 = 0.2."
+
+      - q: "What happens if the learning rate η in the LMS rule is too large?"
+        options:
+          - "Learning always becomes faster and more accurate"
+          - "The weights never change"
+          - "The error can swing wider instead of shrinking"
+          - "The training experience is ignored"
+        answer: C
+        explain: "Big steps can jump over the best weights again and again. So η must be small."
 
   # ------------------------------------------------------------------ Part 3
   - slug: u1-p3
@@ -224,6 +287,24 @@ quizzes:
         answer: A
         explain: "Find-S returns one maximally specific hypothesis but cannot say whether others also fit. It also ignores negatives and cannot detect noisy data."
 
+      - q: "Find-S starts with <∅, ∅, ∅, ∅, ∅, ∅> and sees its first positive example (Sunny, Warm, Normal, Strong, Warm, Same). What is h now?"
+        options:
+          - "<?, ?, ?, ?, ?, ?>"
+          - "<Sunny, Warm, Normal, Strong, Warm, Same>"
+          - "<Sunny, ?, ?, ?, ?, ?>"
+          - "<∅, ∅, ∅, ∅, ∅, ∅>"
+        answer: B
+        explain: "The empty hypothesis covers nothing, so the smallest change that covers the example is to copy the example itself."
+
+      - q: "The relation 'more general than or equal to' between hypotheses is a partial order. What does this mean?"
+        options:
+          - "Every pair of hypotheses can be ranked"
+          - "No hypothesis is more general than another"
+          - "It only works for one attribute"
+          - "Some pairs of hypotheses cannot be compared"
+        answer: D
+        explain: "For example <Sunny, ?, ?, ?, ?, ?> and <?, Warm, ?, ?, ?, ?> accept different days and neither contains the other."
+
   # ------------------------------------------------------------------ Part 4
   - slug: u1-p4
     title: "Part 4: Version spaces and candidate elimination"
@@ -301,6 +382,24 @@ quizzes:
           - "The assumptions a learner makes (for example that the target is a conjunction of attribute constraints), without which it cannot generalise beyond its examples"
         answer: D
         explain: "A learner with no bias can only repeat the examples it has seen. Bias is what lets it classify new, unseen examples."
+
+      - q: "Why is List-Then-Eliminate impractical for large hypothesis spaces?"
+        options:
+          - "It lists every hypothesis first, and there are too many to store and check"
+          - "It gives wrong answers on positive examples"
+          - "It can only use negative examples"
+          - "It needs the S and G boundaries"
+        answer: A
+        explain: "It is correct but must list and test every hypothesis one by one. Candidate elimination avoids this by tracking only S and G."
+
+      - q: "In candidate elimination, what does it mean when S and G become the same single hypothesis?"
+        options:
+          - "The data must contain noise"
+          - "The learner has made an error"
+          - "The concept has been learned exactly"
+          - "No example has been seen yet"
+        answer: C
+        explain: "The version space has shrunk to one hypothesis, so only one hypothesis fits all the examples."
 
   # ------------------------------------------------------------------ Part 5
   - slug: u1-p5
@@ -380,6 +479,24 @@ quizzes:
         answer: C
         explain: "A single layer can only draw a straight line. Layers of neurons can combine lines into more complicated boundaries (Unit II)."
 
+      - q: "In perceptron training, what is one epoch?"
+        options:
+          - "One change of a single weight"
+          - "One test example"
+          - "One bias update"
+          - "One pass over all the training examples"
+        answer: D
+        explain: "An epoch is a full pass through the training set. Training stops when a whole pass gives no errors."
+
+      - q: "A perceptron trained on AND has w = (2, 2, 1) for the bias (input −1), x1 and x2. For the input x1 = 0, x2 = 1, what does it output?"
+        options:
+          - "0, because a = −1"
+          - "1, because a = 1"
+          - "1, because a = 3"
+          - "0, because a = 3"
+        answer: A
+        explain: "a = 2(−1) + 2(0) + 1(1) = −1. This is not greater than 0, so the output is 0, which is correct for AND."
+
   # ------------------------------------------------------------------ Part 6
   - slug: u1-p6
     title: "Part 6: Linear regression"
@@ -457,3 +574,21 @@ quizzes:
           - "Use only the negative examples"
         answer: A
         explain: "Fit targets coded as 0 and 1, then give the class whose value is closer (threshold). This works only when a straight line or plane suits the data."
+
+      - q: "In linear regression, what is a residual?"
+        options:
+          - "The slope of the line"
+          - "The intercept of the line"
+          - "The vertical gap t − y between a point and the line"
+          - "The number of data points"
+        answer: C
+        explain: "A residual is the error for one point. Least squares chooses the line that makes the sum of squared residuals smallest."
+
+      - q: "Which point does the least squares line always pass through?"
+        options:
+          - "(0, 0)"
+          - "(the largest x, the largest t)"
+          - "(the first x, the first t)"
+          - "(x̄, t̄), the means of x and t"
+        answer: D
+        explain: "Since β0 = t̄ − β1x̄, putting x = x̄ gives y = t̄. For the example line y = 2.2 + 0.6x, the point is (3, 4)."

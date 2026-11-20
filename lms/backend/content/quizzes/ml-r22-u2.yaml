@@ -68,6 +68,51 @@ quizzes:
         answer: A
         explain: "Going forwards means net input then activation, layer by layer. Errors and gradients belong to the backward pass."
 
+      - q: "Which activation function gives outputs between -1 and 1?"
+        options:
+          - "Sigmoid"
+          - "ReLU"
+          - "Tanh"
+          - "Step"
+        answer: C
+        explain: "Tanh is a stretched sigmoid with range (-1, 1). Sigmoid gives (0, 1) and ReLU gives 0 or more."
+
+      - q: "What is the sigmoid output when the net input z = 0?"
+        options:
+          - "0.5"
+          - "0"
+          - "1"
+          - "0.25"
+        answer: A
+        explain: "1 / (1 + e^0) = 1/2 = 0.5, the middle of the sigmoid curve."
+
+      - q: "How many weights does a 2-3-1 MLP have, counting biases at the hidden and output nodes?"
+        options:
+          - "9"
+          - "11"
+          - "15"
+          - "13"
+        answer: D
+        explain: "(2+1)(3) + (3+1)(1) = 9 + 4 = 13."
+
+      - q: "Which output node is the usual choice for a regression problem?"
+        options:
+          - "Softmax"
+          - "A linear output node"
+          - "A step output node"
+          - "A sigmoid output node"
+        answer: B
+        explain: "Regression needs any real value, so the output is linear. Sigmoid and softmax limit the output to between 0 and 1."
+
+      - q: "In the MLP that solves XOR, what do the two hidden nodes detect?"
+        options:
+          - "Two copies of the same input"
+          - "The bias and the learning rate"
+          - "One detects OR and the other detects AND"
+          - "Both detect NOT"
+        answer: C
+        explain: "The output node then fires for OR but not AND, which is exactly XOR."
+
   # ------------------------------------------------------------------ Part 2
   - slug: u2-p2
     title: "Part 2: Back-propagation of error"
@@ -118,6 +163,51 @@ quizzes:
           - "Sequential needs no learning rate"
         answer: B
         explain: "Both use back-propagation. Sequential is noisier but often faster (shuffle the order); batch follows the true gradient of the total error."
+
+      - q: "Which error function does back-propagation usually minimise?"
+        options:
+          - "E = 1/2 times the sum over outputs of (t - y)^2"
+          - "The number of weights"
+          - "The sum of the inputs"
+          - "The learning rate"
+        answer: A
+        explain: "The squared error is small when outputs match targets, and gradient descent lowers it step by step."
+
+      - q: "A sigmoid output node has y = 0.8 and target t = 1. What is its delta, (y - t) y (1 - y)?"
+        options:
+          - "-0.2"
+          - "0.032"
+          - "-0.16"
+          - "-0.032"
+        answer: D
+        explain: "(0.8 - 1) x 0.8 x 0.2 = -0.2 x 0.16 = -0.032."
+
+      - q: "What happens in gradient descent if the learning rate eta is too large?"
+        options:
+          - "The updates can overshoot the minimum and the error may grow"
+          - "Training becomes very slow but safe"
+          - "The weights never change"
+          - "The hidden nodes are removed"
+        answer: A
+        explain: "A big step jumps over the valley floor. Too small an eta is the opposite problem, very slow progress."
+
+      - q: "Which expression is the hidden delta for node j?"
+        options:
+          - "(y - t) y (1 - y)"
+          - "eta times the input"
+          - "a_j (1 - a_j) times the sum over k of w(k,j) delta_k"
+          - "The target minus the output"
+        answer: C
+        explain: "The output deltas are passed back along the weights w(k,j) and multiplied by the local sigmoid derivative a_j(1 - a_j)."
+
+      - q: "Take w = 0.3, eta = 0.5, delta_k = 0.2 and a_j = 0.6. What is the new weight after w = w - eta delta_k a_j?"
+        options:
+          - "0.36"
+          - "0.30"
+          - "0.18"
+          - "0.24"
+        answer: D
+        explain: "The change is 0.5 x 0.2 x 0.6 = 0.06, so w = 0.3 - 0.06 = 0.24."
 
   # ------------------------------------------------------------------ Part 3
   - slug: u2-p3
@@ -170,6 +260,51 @@ quizzes:
         answer: B
         explain: "One-of-N coding gives each class its own output node, and softmax turns the outputs into class scores that add up to 1."
 
+      - q: "How should inputs be scaled before training an MLP?"
+        options:
+          - "Square every input"
+          - "Remove the largest input"
+          - "Subtract the training mean and divide by the training standard deviation"
+          - "Multiply every input by the learning rate"
+        answer: C
+        explain: "Scaling stops one large-valued input from dominating. Use the training set statistics for the validation and test sets too."
+
+      - q: "What is the usual effect of using too many hidden nodes?"
+        options:
+          - "The network can overfit the training data"
+          - "The network always underfits"
+          - "Training becomes impossible"
+          - "The test error is guaranteed to be lowest"
+        answer: A
+        explain: "Extra nodes give the network too much flexibility, so it can memorise noise. Too few nodes underfit."
+
+      - q: "What is the validation set used for?"
+        options:
+          - "To change the weights directly"
+          - "To report the final accuracy"
+          - "To scale the inputs"
+          - "To decide when to stop and to compare settings such as the number of hidden nodes"
+        answer: D
+        explain: "The validation set guides our choices without touching the test set, which stays unseen until the end."
+
+      - q: "What happens to the error if the learning rate is far too large?"
+        options:
+          - "It falls very smoothly"
+          - "It can blow up instead of falling"
+          - "It stays exactly the same"
+          - "It reaches zero at once"
+        answer: B
+        explain: "Huge steps keep overshooting the minimum. Tune eta on the validation set."
+
+      - q: "There are 600 examples, split 50 percent training, 25 percent validation and 25 percent test. How many are in the validation set?"
+        options:
+          - "150"
+          - "300"
+          - "200"
+          - "100"
+        answer: A
+        explain: "25 percent of 600 is 150. The training set gets 300 and the test set 150."
+
   # ------------------------------------------------------------------ Part 4
   - slug: u2-p4
     title: "Part 4: Radial basis functions and splines"
@@ -221,6 +356,51 @@ quizzes:
         answer: C
         explain: "Cubic pieces join smoothly at the knots. In the video, with 6 knots, the maximum error fell from 0.149 (linear) to 0.042 (cubic)."
 
+      - q: "Which method is often used to choose the centres of an RBF network?"
+        options:
+          - "k-means clustering"
+          - "Back-propagation"
+          - "Softmax"
+          - "Early stopping"
+        answer: A
+        explain: "k-means places the centres where the data lies. The output weights are then found by least squares."
+
+      - q: "A Gaussian RBF unit uses phi = exp(-d^2 / (2 sigma^2)). What is phi when the input is exactly at the centre, d = 0?"
+        options:
+          - "0"
+          - "0.5"
+          - "2"
+          - "1"
+        answer: D
+        explain: "exp(0) = 1, the largest value. The response falls as the input moves away from the centre."
+
+      - q: "Why is training an RBF network usually faster and repeatable compared with an MLP?"
+        options:
+          - "It needs no data"
+          - "The output weights come from solving least squares, so there is no random restart problem there"
+          - "It has no hidden layer"
+          - "It uses a bigger learning rate"
+        answer: B
+        explain: "Least squares gives one answer directly. An MLP uses gradient descent from random weights, so results vary."
+
+      - q: "Which is a remedy for the curse of dimensionality?"
+        options:
+          - "Add many more useless inputs"
+          - "Use a smaller training set"
+          - "Use fewer inputs, for example by feature selection"
+          - "Avoid scaling the data"
+        answer: C
+        explain: "Fewer, useful inputs keep the data denser in the space, so neighbourhoods stay meaningful."
+
+      - q: "What is a knot in a spline?"
+        options:
+          - "A point where two polynomial pieces join"
+          - "The width of a Gaussian"
+          - "The learning rate"
+          - "A hidden node with no weights"
+        answer: A
+        explain: "A spline is made of polynomial pieces that meet at knots. More knots give more flexibility."
+
   # ------------------------------------------------------------------ Part 5
   - slug: u2-p5
     title: "Part 5: Support vector machines"
@@ -271,3 +451,48 @@ quizzes:
           - "Avoid choosing C"
         answer: B
         explain: "K(x, z) equals the inner product phi(x).phi(z), so non-linear boundaries are possible while only kernel values are computed."
+
+      - q: "Where do the support vectors of a linear SVM lie?"
+        options:
+          - "Far from the line"
+          - "At the class means"
+          - "On the edges of the margin"
+          - "Anywhere in the data"
+        answer: C
+        explain: "These are the points closest to the line. Only they decide where the line goes."
+
+      - q: "If |w| = 2, what is the margin 2 / |w|?"
+        options:
+          - "1"
+          - "4"
+          - "2"
+          - "0.5"
+        answer: A
+        explain: "Margin = 2 / 2 = 1. A shorter w would give a wider margin."
+
+      - q: "What does a small C do in a soft-margin SVM?"
+        options:
+          - "It forbids all errors"
+          - "It removes the kernel"
+          - "It makes the data linear"
+          - "It gives a wide, tolerant margin that allows some violations"
+        answer: D
+        explain: "With a small slack penalty, the SVM prefers a wide margin even if some points are inside it or misclassified."
+
+      - q: "A problem has 4 classes. How many classifiers does one-versus-one need, K(K-1)/2?"
+        options:
+          - "4"
+          - "6"
+          - "8"
+          - "12"
+        answer: B
+        explain: "4 x 3 / 2 = 6, one classifier for every pair of classes. One-versus-rest would need 4."
+
+      - q: "What is the risk of a very large gamma in the Gaussian kernel?"
+        options:
+          - "The margin becomes infinite"
+          - "The SVM stops using support vectors"
+          - "The model overfits, with each point creating its own tiny region"
+          - "The model becomes linear"
+        answer: C
+        explain: "A large gamma makes each kernel bump very narrow, so the boundary wraps around individual training points. Choose gamma and C by cross validation."

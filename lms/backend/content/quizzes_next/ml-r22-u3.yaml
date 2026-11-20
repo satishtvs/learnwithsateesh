@@ -68,6 +68,51 @@ quizzes:
         answer: B
         explain: "A tree grown until pure memorises noise. Stopping early (pre-pruning) or cutting back branches (pruning) controls this."
 
+      - q: "In the attendance example, which feature gave the highest information gain and became the root?"
+        options:
+          - "Weather"
+          - "Bus"
+          - "Day of the week"
+          - "Exam soon"
+        answer: D
+        explain: "Exam soon had gain 0.35, against 0.1258 for Weather and 0.0817 for Bus, so ID3 puts it at the root."
+
+      - q: "What does a leaf node of a decision tree hold?"
+        options:
+          - "A question about a feature"
+          - "A class label for the examples that reach it"
+          - "The entropy of the whole data set"
+          - "The list of all features"
+        answer: B
+        explain: "Internal nodes ask questions and branches are the answers. A leaf gives the final class."
+
+      - q: "Weather has gain 0.1258 and Bus has gain 0.0817. How much more gain does Weather have than Bus?"
+        options:
+          - "0.2075"
+          - "0.1258"
+          - "0.0441"
+          - "0.0817"
+        answer: C
+        explain: "0.1258 - 0.0817 = 0.0441. Weather is better than Bus, but both lose to Exam soon (0.35)."
+
+      - q: "Which method does C4.5 use to fix the bias of information gain towards features with many values?"
+        options:
+          - "Gain ratio"
+          - "Random feature subsets"
+          - "Gini impurity"
+          - "Boosting"
+        answer: A
+        explain: "Gain ratio divides the gain by the split information, which punishes features that split into many small groups."
+
+      - q: "What does each path from the root to a leaf represent?"
+        options:
+          - "A probability table"
+          - "A distance between two points"
+          - "A weight vector"
+          - "An if-then rule"
+        answer: D
+        explain: "Following the answers along a path gives conditions joined by AND, and the leaf gives the result. This is why trees are easy to explain."
+
   # ------------------------------------------------------------------ Part 2
   - slug: u3-p2
     title: "Part 2: CART, Gini impurity and pruning"
@@ -118,6 +163,51 @@ quizzes:
           - "It changes the leaf values to the median"
         answer: B
         explain: "A large alpha makes each leaf costly, so pruning removes more branches and leaves a smaller tree."
+
+      - q: "A node holds 5 examples, all from the same class. What is its Gini impurity?"
+        options:
+          - "0.5"
+          - "1"
+          - "0"
+          - "0.25"
+        answer: C
+        explain: "G = 1 - 1^2 = 0. A pure node has zero impurity, just like zero entropy."
+
+      - q: "In the worked example, how many candidate splits were compared to find study <= 3.5 as the best?"
+        options:
+          - "3"
+          - "11"
+          - "5"
+          - "19"
+        answer: B
+        explain: "Eleven candidate splits were tried, and study <= 3.5 had the lowest weighted Gini, 0.1667."
+
+      - q: "Where does CART place the candidate thresholds for a numeric feature?"
+        options:
+          - "Midway between neighbouring sorted values"
+          - "At the largest value only"
+          - "At random positions"
+          - "At the mean of the whole data only"
+        answer: A
+        explain: "After sorting, each midpoint between two neighbouring values is tried as a threshold."
+
+      - q: "Every cut in a CART tree is parallel to an axis. What shape of regions does the tree make in the input space?"
+        options:
+          - "Circles"
+          - "Diagonal strips"
+          - "Triangles only"
+          - "Rectangles"
+        answer: D
+        explain: "Each question tests one feature against a threshold, so the regions are boxes (rectangles in 2-D)."
+
+      - q: "A fully grown tree with 19 leaves scores train 1.000 and test 0.847. What does this show?"
+        options:
+          - "Underfitting"
+          - "A perfect model"
+          - "Overfitting, because the tree memorised the training data"
+          - "That the data has no noise"
+        answer: C
+        explain: "A perfect training score with a lower test score means the tree learned noise. Pruning should reduce the gap."
 
   # ------------------------------------------------------------------ Part 3
   - slug: u3-p3
@@ -170,6 +260,51 @@ quizzes:
         answer: B
         explain: "Bagging is parallel with equal votes. Boosting is sequential with weighted votes and can chase noisy labels."
 
+      - q: "In bagging, what does out-of-bag mean?"
+        options:
+          - "Examples that were not drawn into a tree's bootstrap sample"
+          - "Examples drawn twice"
+          - "Trees that gave the wrong vote"
+          - "Features left out of the data"
+        answer: A
+        explain: "About 36.8% of the examples miss each bootstrap sample. They can be used to test that tree."
+
+      - q: "A bootstrap sample of 1000 examples is drawn with replacement. About how many distinct examples does it contain?"
+        options:
+          - "About 500"
+          - "About 368"
+          - "About 632"
+          - "About 900"
+        answer: C
+        explain: "About 63.2% of the distinct examples appear, so roughly 632 of 1000. The other 368 or so are out-of-bag."
+
+      - q: "A random forest data set has d = 16 features. About how many features does each split consider?"
+        options:
+          - "About 2"
+          - "About 8"
+          - "All 16"
+          - "About 4"
+        answer: D
+        explain: "The usual choice is about the square root of d, and sqrt(16) = 4."
+
+      - q: "What is stacking?"
+        options:
+          - "Training the same tree many times on the same data"
+          - "A meta-learner is trained to combine the predictions of several base models"
+          - "Averaging the data before training"
+          - "Pruning trees one by one"
+        answer: B
+        explain: "In stacking, the outputs of the base models become the inputs of a second model that learns how to combine them."
+
+      - q: "Why does an ensemble help only when its models make different errors?"
+        options:
+          - "Because different models train faster"
+          - "Because voting needs an even number of models"
+          - "If all models make the same mistakes, voting just repeats the mistake"
+          - "Because errors cancel only in boosting"
+        answer: C
+        explain: "Independent errors get outvoted, as in the three 60% voters giving 0.648. Identical errors cannot be fixed by voting."
+
   # ------------------------------------------------------------------ Part 4
   - slug: u3-p4
     title: "Part 4: Basic statistics and Gaussian mixture models"
@@ -220,6 +355,51 @@ quizzes:
           - "All three are equally good"
         answer: C
         explain: "A lower BIC is better, and K = 2 has the lowest value (1145.62)."
+
+      - q: "For a Gaussian curve, about what share of values lies within 1 standard deviation of the mean?"
+        options:
+          - "50%"
+          - "95.45%"
+          - "99.73%"
+          - "68.27%"
+        answer: D
+        explain: "The 68-95-99.7 rule: 68.27% within 1 sigma, 95.45% within 2 sigma, 99.73% within 3 sigma."
+
+      - q: "Between which values does a correlation coefficient always lie?"
+        options:
+          - "-1 and +1"
+          - "0 and 1"
+          - "0 and 100"
+          - "-100 and +100"
+        answer: A
+        explain: "Correlation is the covariance divided by both standard deviations, which forces it into the range -1 to +1."
+
+      - q: "In a Gaussian mixture, which quantity is the hidden (latent) variable?"
+        options:
+          - "The mean of the data"
+          - "The number of data points N"
+          - "Which component produced each data point"
+          - "The value of BIC"
+        answer: C
+        explain: "We see only the points, not which component made them. Responsibilities are our soft guess for this hidden choice."
+
+      - q: "What happens to the log-likelihood during the EM algorithm?"
+        options:
+          - "It always decreases"
+          - "It never decreases, but it may stop at a local maximum"
+          - "It always reaches the global maximum"
+          - "It stays fixed after the E step"
+        answer: B
+        explain: "Each E and M step can only improve or keep the log-likelihood. Restarting from several guesses helps avoid poor local maxima."
+
+      - q: "A mixture has three components. Two weights are pi_1 = 0.5 and pi_2 = 0.3. What is pi_3?"
+        options:
+          - "0.8"
+          - "0.5"
+          - "0.3"
+          - "0.2"
+        answer: D
+        explain: "The weights must add up to 1, so pi_3 = 1 - 0.5 - 0.3 = 0.2."
 
   # ------------------------------------------------------------------ Part 5
   - slug: u3-p5
@@ -272,6 +452,51 @@ quizzes:
         answer: A
         explain: "With k = 1 the model matches every training point (train accuracy 1.000) but generalises worse, test 0.833 in the example."
 
+      - q: "In the worked example, for which value of k did the new point get class A?"
+        options:
+          - "k = 3"
+          - "k = 1"
+          - "k = 5"
+          - "All values of k"
+        answer: B
+        explain: "k = 1 gives A, but k = 3 and k = 5 give B. The answer can change with k."
+
+      - q: "What is the Chebyshev distance between (2, 1) and (6, 4)?"
+        options:
+          - "7"
+          - "3"
+          - "4"
+          - "5"
+        answer: C
+        explain: "Chebyshev is the largest single difference: max(|6 - 2|, |4 - 1|) = max(4, 3) = 4."
+
+      - q: "What is the curse of dimensionality for k-NN?"
+        options:
+          - "The data always gets smaller"
+          - "The distance becomes negative"
+          - "The value of k must be zero"
+          - "In many dimensions the nearest and farthest points are almost equally far, so neighbours lose meaning"
+        answer: D
+        explain: "When distances look alike, the nearest neighbours are no more similar to the query than any other point."
+
+      - q: "Which is a weakness of k-NN?"
+        options:
+          - "Prediction is slow and all training data must be stored"
+          - "It cannot make curved boundaries"
+          - "It needs a long training phase"
+          - "It can only predict two classes"
+        answer: A
+        explain: "k-NN does all its work at query time and keeps the full data set, so prediction is slow and memory use is large."
+
+      - q: "How should the value of k be chosen?"
+        options:
+          - "Always take k = 1"
+          - "By cross-validation on the training data"
+          - "Always take k equal to the number of features"
+          - "By looking at the test set labels only"
+        answer: B
+        explain: "Small k gives high variance and large k gives high bias. Cross-validation finds a good middle value."
+
   # ------------------------------------------------------------------ Part 6
   - slug: u3-p6
     title: "Part 6: Unsupervised learning and k-means"
@@ -322,3 +547,48 @@ quizzes:
           - "It makes k-means a supervised method"
         answer: C
         explain: "k-means only goes downhill, so bad starts can trap it. k-means++ picks each new centre far from the chosen ones."
+
+      - q: "In which order are the two steps repeated in Lloyd's k-means algorithm?"
+        options:
+          - "Move the centres to the mean, then choose K"
+          - "Compute the BIC, then assign points"
+          - "Assign each point to its nearest centre, then move each centre to the mean of its points"
+          - "Remove outliers, then compute entropy"
+        answer: C
+        explain: "After picking starting centres, k-means alternates the assign step and the update step until nothing changes."
+
+      - q: "In the worked example, SSE was 228.00 after pass 1 and 136.75 after pass 2. By how much did it fall?"
+        options:
+          - "91.25"
+          - "364.75"
+          - "136.75"
+          - "228.00"
+        answer: A
+        explain: "228.00 - 136.75 = 91.25. SSE never increases from pass to pass."
+
+      - q: "Why does k-means always stop?"
+        options:
+          - "Because K is always 2"
+          - "Because it uses a test set"
+          - "Because it removes one point each pass"
+          - "SSE never increases and there are only finitely many ways to group the points"
+        answer: D
+        explain: "An always-falling SSE cannot loop forever, but it may stop at a local minimum, not the best answer."
+
+      - q: "Which is a limit of k-means?"
+        options:
+          - "It cannot handle numeric data"
+          - "It needs K in advance and assumes roughly round clusters"
+          - "It needs labels for every point"
+          - "It only works with K = 2"
+        answer: B
+        explain: "k-means is also sensitive to outliers. A Gaussian mixture model is the soft-assignment alternative."
+
+      - q: "How is the silhouette score used to choose K?"
+        options:
+          - "Choose the K with the lowest silhouette score"
+          - "Choose K equal to the number of points"
+          - "Choose the K with the highest silhouette score"
+          - "Choose K where the score is exactly zero"
+        answer: C
+        explain: "A higher silhouette means points sit well inside their own cluster and far from other clusters."

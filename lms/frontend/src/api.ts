@@ -52,11 +52,37 @@ export interface PartSummary {
   title: string
   is_preview: boolean
 }
-export interface CourseSummary {
+export interface UniversityRef {
+  slug: string
+  name: string
+  short_name: string
+}
+export interface RegulationRef {
+  code: string
+  label: string
+}
+export interface BranchRef {
+  slug: string
+  name: string
+  short_name: string
+}
+/** Catalogue metadata on every course (any of it may be empty). */
+export interface CourseMeta {
+  university: UniversityRef | null
+  regulations: RegulationRef[]
+  branches: BranchRef[]
+  year: number | null
+  semester: number | null
+  subject_code: string | null
+  unit_count: number
+  part_count: number
+  quiz_count: number
+  has_preview: boolean
+}
+export interface CourseSummary extends CourseMeta {
   slug: string
   title: string
   description: string
-  part_count: number
   previews: PartSummary[]
 }
 export interface CourseOutline extends CourseSummary {
@@ -84,8 +110,84 @@ export interface Part {
   next: PartSummary | null
 }
 
-export async function listCourses(): Promise<CourseSummary[]> {
-  return (await request('/courses')).json()
+export interface CourseFilters {
+  university?: string | null
+  regulation?: string | null
+  branch?: string | null
+  year?: number | null
+  semester?: number | null
+  q?: string | null
+}
+
+/** Query string for the filters that are set, e.g. "?university=jntuh&year=3". */
+export function filterQuery(f: CourseFilters): string {
+  const p = new URLSearchParams()
+  for (const [k, v] of Object.entries(f)) {
+    if (v !== null && v !== undefined && String(v).trim() !== '') p.set(k, String(v).trim())
+  }
+  const s = p.toString()
+  return s ? `?${s}` : ''
+}
+
+export async function listCourses(filters: CourseFilters = {}): Promise<CourseSummary[]> {
+  return (await request(`/courses${filterQuery(filters)}`)).json()
+}
+
+// ---------------------------------------------------------------- catalogue and "my syllabus"
+export interface Regulation {
+  code: string
+  label: string
+  joined_year: number | null
+}
+export interface Branch {
+  slug: string
+  name: string
+  short_name: string
+}
+export interface University {
+  slug: string
+  name: string
+  short_name: string
+  regulations: Regulation[]
+  branches: Branch[]
+}
+export interface Matrix {
+  university: string
+  regulation: string | null
+  branches: { slug: string; short_name: string }[]
+  semesters: { key: string; label: string; year: number; semester: number }[]
+  cells: { branch: string; year: number; semester: number; count: number }[]
+}
+export interface SyllabusFields {
+  university: string | null
+  regulation: string | null
+  branch: string | null
+  joined_year: number | null
+  year: number | null
+  semester: number | null
+}
+
+export async function getCatalogue(): Promise<{ universities: University[] }> {
+  return (await request('/catalogue')).json()
+}
+export async function getMatrix(university: string, regulation: string | null): Promise<Matrix> {
+  return (await request(`/catalogue/matrix${filterQuery({ university, regulation })}`)).json()
+}
+export async function suggestRegulation(university: string, joinedYear: number): Promise<string | null> {
+  const r = await request(`/catalogue/suggest-regulation?university=${encodeURIComponent(university)}&joined_year=${joinedYear}`)
+  return (await r.json()).regulation
+}
+export async function getMySyllabus(): Promise<SyllabusFields> {
+  return (await request('/me/syllabus')).json()
+}
+export async function putMySyllabus(s: SyllabusFields): Promise<SyllabusFields> {
+  return (
+    await request('/me/syllabus', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(s),
+    })
+  ).json()
 }
 export async function getCourse(slug: string): Promise<CourseOutline> {
   return (await request(`/courses/${encodeURIComponent(slug)}`)).json()
@@ -105,6 +207,7 @@ export interface CourseProgress {
   resume: PartSummary | null
   quizzes_total: number
   quizzes_passed: number
+  last_seen_at: string | null
 }
 
 export async function getCourseProgress(course: string): Promise<CourseProgress> {

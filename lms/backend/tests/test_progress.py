@@ -117,5 +117,16 @@ async def test_all_courses_summary(client):
     assert rows[0]["completed"] == 1
 
 
+async def test_last_seen_at_tracks_latest_activity(client):
+    await signin(client, A)
+    fresh = (await client.get(f"{C}/progress")).json()
+    assert fresh["last_seen_at"] is None
+    first = (await mark(client, "syllabus")).json()["last_seen_at"]
+    assert first is not None
+    await client.get(f"{C}/parts/c01-introduction-part-1")
+    later = (await client.get("/api/progress")).json()[0]["last_seen_at"]
+    assert later is not None and later >= first
+
+
 async def test_course_row_untouched_helpers_import():
     assert Course  # keeps the import honest if models move

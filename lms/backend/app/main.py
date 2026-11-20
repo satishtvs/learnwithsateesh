@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.admin import router as admin_router
+from app.catalogue import me_router as syllabus_router
+from app.catalogue import router as catalogue_router
 from app.courses import router as courses_router
 from app.emailer import email_enabled
 from app.certificates import router as certificates_router
@@ -54,6 +56,8 @@ if settings.google_client_id:
     )
 
 
+api.include_router(catalogue_router)
+api.include_router(syllabus_router)
 api.include_router(courses_router)
 api.include_router(progress_router)
 api.include_router(certificates_router)

@@ -1,17 +1,80 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes } from './api'
+import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes, type PartSummary, type QuizSummary } from './api'
 import { useAuth } from './auth'
-import { PartRow, QuizRow } from './courses'
-import { groupRefs, partsWord } from './format'
-import { Cover, Icon, ProgressBar } from './ui'
+import { CourseMetaPills, QuizStatus } from './courses'
+import { groupRefs, partGroups, plural, shortTitle } from './format'
+import { CourseTile, Icon, Loading, ProgressBar } from './ui'
 
 // Taken from the instructor's own course slides ("About the instructor" slide).
 const INSTRUCTOR = {
   name: 'Sateesh Kumar Talupuri',
   role: 'Instructor',
   bio: 'Electronics Engineer with 28+ years of experience across firmware, mobile and cloud applications, and AI/ML. Former CTO and CEO at BlueSilica and CEO of DiagnoSmart. PGP in AI/ML from the University of Texas (Great Lakes) and a certified Project Management Professional (PMP).',
+}
+
+/** The quiz chip on a part row: "Quiz 8/10" when passed, "Not passed yet", "Not taken", or nothing without a quiz. */
+function QuizChip({ q, signedIn }: { q: QuizSummary | undefined; signedIn: boolean }) {
+  if (!q) return null
+  if (!signedIn) return <span className="chip">Quiz</span>
+  if (q.passed && q.best_percent !== null) {
+    const score = Math.round((q.best_percent * q.question_count) / 100)
+    return <span className="chip ok" title={`Best score ${q.best_percent}%`}><Icon name="check" size={12} /> Quiz {score}/{q.question_count}</span>
+  }
+  if (q.best_percent !== null) return <span className="chip warn" title={`Best ${q.best_percent}%, pass mark ${q.pass_percent}%`}>Not passed yet</span>
+  return <span className="chip">Not taken</span>
+}
+
+/** One unit's parts: status icon (done, current, locked for visitors), title and the quiz chip. */
+export function PartList({
+  course,
+  parts,
+  done,
+  current,
+  signedIn,
+  quizzes,
+  compact = false,
+}: {
+  course: string
+  parts: PartSummary[]
+  done: Set<string>
+  current: string | null
+  signedIn: boolean
+  quizzes?: Map<string, QuizSummary>
+  compact?: boolean
+}) {
+  return (
+    <ol className={`prows${compact ? ' compact' : ''}`}>
+      {parts.map((p) => {
+        const isDone = done.has(p.slug)
+        const isCur = p.slug === current
+        const locked = !signedIn && !p.is_preview
+        return (
+          <li key={p.slug}>
+            <Link
+              to={`/courses/${course}/parts/${p.slug}`}
+              className={`prow${isCur ? ' cur' : ''}${isDone ? ' done' : ''}`}
+              aria-current={isCur && compact ? 'page' : undefined}
+            >
+              <span className={`ic${isDone ? ' done' : isCur ? ' cur' : locked ? ' locked' : ''}`} aria-hidden="true">
+                <Icon name={isDone ? 'check' : locked ? 'lock' : 'play'} size={isDone ? 13 : 11} />
+              </span>
+              <span className="t">
+                {p.title}
+                {!compact && (
+                  <small>
+                    {isDone ? 'Completed' : isCur ? (signedIn ? 'Up next' : 'Now playing') : locked ? 'Free account needed' : p.is_preview && !signedIn ? 'Free preview, no account needed' : ''}
+                  </small>
+                )}
+              </span>
+              {!compact && <QuizChip q={quizzes?.get(p.slug)} signedIn={signedIn} />}
+            </Link>
+          </li>
+        )
+      })}
+    </ol>
+  )
 }
 
 export function CoursePage() {
@@ -33,21 +96,26 @@ export function CoursePage() {
     queryFn: () => listCourseQuizzes(slug),
     retry: false,
   })
-  if (isLoading) return <p className="muted">Loading…</p>
+  if (isLoading) return <Loading />
   if (error || !data) return <div className="empty"><h3>Course not found</h3><Link className="btn" to="/courses">All courses</Link></div>
 
   const signedIn = !!user
-  const done = new Set(progress.data?.completed_slugs ?? [])
-  const allParts = [...data.overview_parts, ...data.units.flatMap((c) => c.parts)]
+  const p = progress.data
+  const done = new Set(p?.completed_slugs ?? [])
+  const groups = partGroups(data)
+  const allParts = groups.flatMap((g) => g.parts)
   const freeParts = allParts.filter((l) => l.is_preview)
   const allQuizzes = quizzes.data ?? []
-  const unitCodes = new Set(data.units.map((c) => c.code))
-  const looseQuizzes = allQuizzes.filter((q) => !q.unit_code || !unitCodes.has(q.unit_code))
+  const quizBySlug = new Map(allQuizzes.map((q) => [q.slug, q]))
+  const partSlugs = new Set(allParts.map((x) => x.slug))
+  const otherQuizzes = allQuizzes.filter((q) => !partSlugs.has(q.slug))
   const textbooks = groupRefs([...new Set(data.units.map((c) => c.textbook_ref).filter(Boolean))] as string[])
   const firstFree = freeParts[0]
-  const resume = progress.data?.resume
-  const quizzesLeft = progress.data ? progress.data.quizzes_total - progress.data.quizzes_passed : 0
+  const resume = p?.resume
+  const current = signedIn ? (resume?.slug ?? null) : null
+  const quizzesLeft = p ? p.quizzes_total - p.quizzes_passed : 0
   const nextQuiz = allQuizzes.find((q) => !q.passed)
+  const title = shortTitle(data.title)
 
   async function claim() {
     setClaiming(true)
@@ -78,94 +146,91 @@ export function CoursePage() {
 
   return (
     <>
-      <nav className="crumbs" aria-label="Breadcrumb"><Link to="/courses">Courses</Link><Icon name="chevron" size={14} /><span>{data.title}</span></nav>
+      <nav className="crumbs" aria-label="Breadcrumb"><Link to="/courses">Courses</Link><Icon name="chevron" size={14} /><span>{title}</span></nav>
 
-      <section className="course-hero">
-        <div className="chips"><span className="chip on-dark">AI &amp; ML</span><span className="chip on-dark">B.Tech</span></div>
-        <h1>{data.title}</h1>
-        <p>{data.description}</p>
+      <section className="course-head">
+        <div className="chips">
+          <CourseMetaPills c={data} light />
+          {data.subject_code && <span className="chip on-dark">Subject code {data.subject_code}</span>}
+        </div>
+        <h1>{title}</h1>
+        <p className="ch-sub">{data.description}</p>
         <ul className="ch-meta">
-          <li><Icon name="play" size={15} /> {allParts.length} {partsWord(allParts.length)}</li>
-          <li><Icon name="courses" size={15} /> {data.units.length} {data.units.length === 1 ? 'unit' : 'units'}</li>
-          {allQuizzes.length > 0 && <li><Icon name="quiz" size={15} /> {allQuizzes.length} {allQuizzes.length === 1 ? 'quiz' : 'quizzes'}</li>}
-          <li><Icon name="sparkle" size={15} /> {freeParts.length} free to watch</li>
+          <li><Icon name="courses" size={15} /> {plural(data.units.length, 'unit')}</li>
+          <li><Icon name="play" size={15} /> {plural(allParts.length, 'part')}</li>
+          {allQuizzes.length > 0 && <li><Icon name="quiz" size={15} /> {plural(allQuizzes.length, 'quiz', 'quizzes')}</li>}
         </ul>
-        <div className="ch-instructor">
-          <span className="avatar" aria-hidden="true">ST</span>
-          <div><strong>{INSTRUCTOR.name}</strong><small>{INSTRUCTOR.role}</small></div>
+        {signedIn && p && p.total > 0 && (
+          <div className="ch-progress">
+            <ProgressBar percent={p.percent} label="Course progress" light />
+            <span>{p.completed} of {p.total} parts complete · {p.percent}%</span>
+          </div>
+        )}
+        <div className="cta">
+          {signedIn ? (
+            resume ? (
+              <Link className="btn accent" to={`/courses/${slug}/parts/${resume.slug}`}>
+                <Icon name="play" size={15} /> {p?.started ? `Resume: ${resume.title}` : 'Start the course'}
+              </Link>
+            ) : p && p.total > 0 ? (
+              <span className="ch-done"><Icon name="check" size={16} /> Every part complete</span>
+            ) : null
+          ) : (
+            <>
+              {firstFree && <Link className="btn accent" to={`/courses/${slug}/parts/${firstFree.slug}`}><Icon name="play" size={15} /> Watch a free part</Link>}
+              <Link className="btn ghost-light" to="/register" state={{ from: `/courses/${slug}` }}>Create a free account</Link>
+            </>
+          )}
         </div>
       </section>
 
       <div className="course-layout">
         <div className="course-main">
-          <section className="panel">
-            <h2>Overview</h2>
-            <h3>About this course</h3>
-            <p className="lead">{data.description}</p>
-            {data.units.length > 0 && (
-              <>
-                <h3>What you will cover</h3>
-                <ul className="covers">
-                  {data.units.map((c) => <li key={c.code}><Icon name="check" size={15} /><span>{c.title}{c.label && <small> · {c.label}</small>}</span></li>)}
-                </ul>
-              </>
-            )}
-            {textbooks.length > 0 && (
-              <>
-                <h3>Textbook references</h3>
-                <p className="muted">{textbooks.join(' · ')}</p>
-              </>
-            )}
-          </section>
+          <div className="section-row">
+            <h2 className="section-title">Course content</h2>
+            <span className="muted small">{plural(allParts.length, 'part')}{allQuizzes.length > 0 && ` · ${plural(allQuizzes.length, 'quiz', 'quizzes')}`}</span>
+          </div>
+          {groups.map((g) => {
+            const n = g.parts.length
+            const nDone = g.parts.filter((x) => done.has(x.slug)).length
+            return (
+              <section key={g.key} className="unit-card" id={`unit-${g.key}`} aria-labelledby={`uh-${g.key}`}>
+                <header className="uh">
+                  <h3 id={`uh-${g.key}`}>{g.name}{g.title && <span> · {g.title}</span>}</h3>
+                  <span className="muted small">
+                    {n === 0 ? 'Coming soon' : signedIn && nDone > 0 ? `${nDone} of ${n} done` : plural(n, 'part')}
+                  </span>
+                </header>
+                {n === 0 ? (
+                  <p className="muted small unit-empty">Parts for this unit are on the way.</p>
+                ) : (
+                  <PartList course={slug} parts={g.parts} done={done} current={current} signedIn={signedIn} quizzes={quizBySlug} />
+                )}
+              </section>
+            )
+          })}
 
-          <section className="panel">
-            <div className="section-row">
-              <h2>Course content</h2>
-              <span className="muted small">{allParts.length} {partsWord(allParts.length)}{allQuizzes.length > 0 && ` · ${allQuizzes.length} ${allQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}</span>
-            </div>
-            {data.overview_parts.length > 0 && (
-              <details className="acc" open>
-                <summary><span>Start here</span><span className="muted small">{data.overview_parts.length} {partsWord(data.overview_parts.length)}</span></summary>
-                <ul className="rows">
-                  {data.overview_parts.map((l) => <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} />)}
-                </ul>
-              </details>
-            )}
-            {data.units.map((ch, i) => {
-              const unitQuizzes = allQuizzes.filter((q) => q.unit_code === ch.code)
-              const count = ch.parts.length
-              return (
-                <details key={ch.code} className="acc" open={i === 0 && data.overview_parts.length === 0 && count > 0}>
-                  <summary>
-                    <span><span className="code">{ch.code}</span> {ch.title}</span>
-                    <span className="muted small">
-                      {count > 0 ? `${count} ${partsWord(count)}` : 'Coming soon'}
-                      {unitQuizzes.length > 0 && ` · ${unitQuizzes.length} ${unitQuizzes.length === 1 ? 'quiz' : 'quizzes'}`}
-                    </span>
-                  </summary>
-                  {count === 0 && unitQuizzes.length === 0 ? (
-                    <p className="muted small acc-empty">Parts for this unit are on the way.</p>
-                  ) : (
-                    <ul className="rows">
-                      {ch.parts.map((l) => <PartRow key={l.slug} course={slug} part={l} signedIn={signedIn} done={done.has(l.slug)} />)}
-                      {unitQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}
-                    </ul>
-                  )}
-                </details>
-              )
-            })}
-            {looseQuizzes.length > 0 && (
-              <details className="acc" open>
-                <summary><span>Quizzes</span><span className="muted small">{looseQuizzes.length}</span></summary>
-                <ul className="rows">{looseQuizzes.map((q) => <QuizRow key={q.slug} course={slug} q={q} />)}</ul>
-              </details>
-            )}
-          </section>
+          {otherQuizzes.length > 0 && (
+            <section className="unit-card" aria-labelledby="uh-quizzes">
+              <header className="uh"><h3 id="uh-quizzes">Unit quizzes</h3><span className="muted small">{otherQuizzes.length}</span></header>
+              <ol className="prows">
+                {otherQuizzes.map((q) => (
+                  <li key={q.slug}>
+                    <Link to={`/courses/${slug}/quizzes/${q.slug}`} className="prow">
+                      <span className="ic" aria-hidden="true"><Icon name="quiz" size={13} /></span>
+                      <span className="t">{q.title}<small>{q.question_count} questions · pass mark {q.pass_percent}%</small></span>
+                      <QuizStatus q={q} />
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
           <section className="panel">
             <h2>About the instructor</h2>
             <div className="instructor">
-              <span className="avatar-lg dark" aria-hidden="true">ST</span>
+              <span className="avatar lg" aria-hidden="true">ST</span>
               <div>
                 <h3>{INSTRUCTOR.name}</h3>
                 <p className="muted small">{INSTRUCTOR.role}</p>
@@ -175,80 +240,56 @@ export function CoursePage() {
           </section>
         </div>
 
-        <aside className="enroll-card" aria-label="Start this course">
-          <Cover seed={data.slug} icon="play" />
-          <div className="ec-body">
+        <aside className="side-card" aria-label="About this course">
+          <div className="sc-top">
+            <CourseTile title={data.title} size="sm" />
             <p className="price">Free <small>to learn</small></p>
+          </div>
 
-            {progress.data?.started && (
-              <div className="card-progress">
-                <ProgressBar percent={progress.data.percent} label="Course progress" />
-                <span>{progress.data.completed} of {progress.data.total} {partsWord(progress.data.total)} · {progress.data.percent}%</span>
-              </div>
-            )}
-            {signedIn ? (
-              resume ? (
-                <Link className="btn block" to={`/courses/${slug}/parts/${resume.slug}`}>
-                  {progress.data?.started ? 'Resume' : 'Start learning'}
-                </Link>
-              ) : progress.data && progress.data.total > 0 ? (
-                <>
-                  {quizzesLeft > 0 ? (
-                    <>
-                      <p className="note small">
-                        You have completed every part. Pass {quizzesLeft === 1 ? 'the remaining quiz' : `the ${quizzesLeft} remaining quizzes`} to
-                        earn your certificate ({progress.data.quizzes_passed} of {progress.data.quizzes_total} passed).
-                      </p>
-                      {nextQuiz && (
-                        <Link className="btn block" to={`/courses/${slug}/quizzes/${nextQuiz.slug}`}>
-                          <Icon name="quiz" size={16} /> Take the next quiz
-                        </Link>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <p className="note small">
-                        {progress.data.quizzes_total > 0 ? 'You have finished every part and passed every quiz. Well done!' : 'You have completed every part. Well done!'}
-                      </p>
-                      <button type="button" className="btn block" onClick={claim} disabled={claiming}>
-                        <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
-                      </button>
-                    </>
-                  )}
-                  {claimError && <p className="error small" role="alert">{claimError}</p>}
-                </>
-              ) : (
-                <p className="muted small">Parts are on the way.</p>
-              )
-            ) : (
+          {signedIn && p && p.total > 0 && !resume && (
+            quizzesLeft > 0 ? (
               <>
-                <Link className="btn block" to="/register" state={{ from: `/courses/${slug}` }}>Create a free account</Link>
-                {firstFree && (
-                  <Link className="btn ghost block" to={`/courses/${slug}/parts/${firstFree.slug}`}>Watch a free part</Link>
+                <p className="note small">
+                  You have completed every part. Pass {quizzesLeft === 1 ? 'the remaining quiz' : `the ${quizzesLeft} remaining quizzes`} to
+                  earn your certificate ({p.quizzes_passed} of {p.quizzes_total} passed).
+                </p>
+                {nextQuiz && (
+                  <Link className="btn block" to={`/courses/${slug}/quizzes/${nextQuiz.slug}`}>
+                    <Icon name="quiz" size={16} /> Take the next quiz
+                  </Link>
                 )}
               </>
-            )}
-            <button type="button" className="btn ghost block" onClick={share}>
-              <Icon name="share" size={15} /> {copied ? 'Link copied' : 'Share this course'}
-            </button>
+            ) : (
+              <>
+                <p className="note small">
+                  {p.quizzes_total > 0 ? 'You have finished every part and passed every quiz. Well done!' : 'You have completed every part. Well done!'}
+                </p>
+                <button type="button" className="btn block" onClick={claim} disabled={claiming}>
+                  <Icon name="award" size={16} /> {claiming ? 'Preparing…' : 'Get your certificate'}
+                </button>
+              </>
+            )
+          )}
+          {claimError && <p className="error small" role="alert">{claimError}</p>}
 
-            <h3>This course includes</h3>
-            <ul className="incl">
-              <li><Icon name="play" size={16} /> {allParts.length} video {partsWord(allParts.length)}</li>
-              {allQuizzes.length > 0 && <li><Icon name="quiz" size={16} /> {allQuizzes.length} practice {allQuizzes.length === 1 ? 'quiz' : 'quizzes'} with instant feedback</li>}
-              <li><Icon name="learning" size={16} /> Progress tracking and resume</li>
-              {freeParts.length > 0 && <li><Icon name="sparkle" size={16} /> {freeParts.length} free preview {partsWord(freeParts.length)}</li>}
-              <li><Icon name="award" size={16} /> Certificate when you finish every part{allQuizzes.length > 0 && ' and pass every quiz'}</li>
-            </ul>
-
-            <h3>Course features</h3>
-            <dl className="feat">
-              <div><dt>Units</dt><dd>{data.units.length}</dd></div>
-              <div><dt>Parts</dt><dd>{allParts.length}</dd></div>
-              <div><dt>Quizzes</dt><dd>{allQuizzes.length}</dd></div>
-              <div><dt>Free parts</dt><dd>{freeParts.length}</dd></div>
-            </dl>
-          </div>
+          <h3>What is included</h3>
+          <ul className="incl">
+            <li><Icon name="play" size={16} /> {plural(allParts.length, 'video part')}</li>
+            <li><Icon name="notes" size={16} /> Key points with every part</li>
+            {allQuizzes.length > 0 && <li><Icon name="quiz" size={16} /> {plural(allQuizzes.length, 'practice quiz', 'practice quizzes')} with explanations</li>}
+            {freeParts.length > 0 && <li><Icon name="sparkle" size={16} /> {plural(freeParts.length, 'free preview part')}, no account needed</li>}
+            <li><Icon name="learning" size={16} /> Progress tracking and resume</li>
+            <li><Icon name="award" size={16} /> Certificate when you finish every part{allQuizzes.length > 0 && ' and pass every quiz'}</li>
+          </ul>
+          {textbooks.length > 0 && (
+            <>
+              <h3>Textbooks</h3>
+              <p className="muted small">{textbooks.join(' · ')}</p>
+            </>
+          )}
+          <button type="button" className="btn ghost block" onClick={share}>
+            <Icon name="share" size={15} /> {copied ? 'Link copied' : 'Share this course'}
+          </button>
         </aside>
       </div>
     </>

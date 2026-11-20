@@ -25,6 +25,7 @@ class CourseProgress(BaseModel):
     resume: PartSummary | None  # where to continue; None when nothing is left
     quizzes_total: int = 0  # visible quizzes in the course
     quizzes_passed: int = 0  # of those, how many this user has passed at least once
+    last_seen_at: datetime | None = None  # when the user last opened or marked a part here (picks "most recent course")
 
 
 class CompletedBody(BaseModel):
@@ -69,6 +70,11 @@ async def quiz_counts(session: AsyncSession, user: User, course: Course) -> tupl
     return len(ids), passed
 
 
+def _aware(dt: datetime) -> datetime:
+    """SQLite hands back naive datetimes next to freshly set aware ones; treat naive as UTC so they compare."""
+    return dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+
+
 async def build_progress(session: AsyncSession, user: User, course: Course) -> CourseProgress:
     ordered = _ordered_parts(course)
     rows = []
@@ -103,6 +109,7 @@ async def build_progress(session: AsyncSession, user: User, course: Course) -> C
         resume=PartSummary.model_validate(resume) if resume else None,
         quizzes_total=quizzes_total,
         quizzes_passed=quizzes_passed,
+        last_seen_at=max((_aware(r.last_seen_at) for r in rows if r.last_seen_at is not None), default=None),
     )
 
 

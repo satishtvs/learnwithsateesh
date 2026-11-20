@@ -7,6 +7,7 @@ import re
 
 from sqlalchemy import select
 
+from app.catalogue_import import import_catalogue
 from app.db import async_session_maker
 from app.models import Unit, Course, Part
 from app.part_import import import_all_parts
@@ -87,6 +88,15 @@ async def seed(force_quizzes: bool = False) -> None:
         nl = await import_all_parts(s)
         await s.commit()
     print(f"imported parts: {nl} created (parts without a youtube_id are skipped)")
+
+    # Last, so that the courses created above get their catalogue metadata.
+    async with async_session_maker() as s:
+        nc = await import_catalogue(s)
+        await s.commit()
+    print(
+        f"imported catalogue: {nc['universities']} universities, {nc['regulations']} regulations, "
+        f"{nc['branches']} branches created; {nc['courses']} courses got metadata (existing values are kept)"
+    )
 
 
 if __name__ == "__main__":

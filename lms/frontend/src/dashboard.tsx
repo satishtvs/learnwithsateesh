@@ -1,18 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProgress, getMyAttempts, updateMe, type CourseProgress, type MyAttempt } from './api'
 import { useAuth } from './auth'
-import { ContinueLearning, LoginGate } from './courses'
-import { partsWord } from './format'
-import { Cover, Icon, ProgressBar, type IconName } from './ui'
+import { LoginGate } from './courses'
+import { initials, partsWord, shortTitle } from './format'
+import { SyllabusForm } from './syllabus-form'
+import { CourseTile, Icon, Loading, ProgressBar, type IconName } from './ui'
 
 const ROLE_LABEL: Record<string, string> = { student: 'Student', instructor: 'Instructor', admin: 'Administrator' }
 
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() || '?'
-}
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 
 function useProgress() {
@@ -20,6 +17,45 @@ function useProgress() {
 }
 function useAttempts() {
   return useQuery({ queryKey: ['my-attempts'], queryFn: () => getMyAttempts(200) })
+}
+
+/** A started course with its progress and a resume button. */
+function ProgressCard({ p }: { p: CourseProgress }) {
+  const finished = p.total > 0 && p.percent === 100
+  return (
+    <div className="card course-card static">
+      <CourseTile title={p.course_title} />
+      <div className="cc-body">
+        <h3>{shortTitle(p.course_title)}</h3>
+        <div className="card-progress">
+          <ProgressBar percent={p.percent} label={`${shortTitle(p.course_title)} progress`} />
+          <span>{p.completed} of {p.total} {partsWord(p.total)} · {p.percent}%</span>
+        </div>
+        {p.resume ? (
+          <Link className="btn small" to={`/courses/${p.course_slug}/parts/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
+        ) : (
+          <Link className="btn ghost small" to={`/courses/${p.course_slug}`}>{finished ? 'Review the course' : 'Open the course'}</Link>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ContinueLearning() {
+  const { data, isLoading } = useProgress()
+  const started = (data ?? []).filter((p) => p.started)
+  if (isLoading) return <Loading />
+  if (!started.length) {
+    return (
+      <div className="empty">
+        <Icon name="learning" size={28} />
+        <h3>You haven't started a course yet</h3>
+        <p>Pick a course and your progress will show up here.</p>
+        <Link className="btn" to="/courses">Browse courses</Link>
+      </div>
+    )
+  }
+  return <div className="grid">{started.map((p) => <ProgressCard key={p.course_slug} p={p} />)}</div>
 }
 
 const TABS = [
@@ -49,7 +85,7 @@ export function DashboardLayout() {
   return (
     <>
       <section className="profile-banner">
-        <span className="avatar-lg" aria-hidden="true">{initials(name)}</span>
+        <span className="avatar lg on-dark" aria-hidden="true">{initials(name)}</span>
         <div className="pb-text">
           <h1>{name}</h1>
           <span className="chip role">{ROLE_LABEL[user.role] ?? user.role}</span>
@@ -119,7 +155,7 @@ export function DashboardHome() {
           <h2 className="section-title">Continue learning</h2>
           <Link to="/dashboard/courses" className="more">View all</Link>
         </div>
-        <ContinueLearning empty />
+        <ContinueLearning />
       </section>
 
       <section className="panel">
@@ -170,23 +206,7 @@ export function EnrolledCourses() {
         </div>
       ) : (
         <div className="grid">
-          {shown.map((p) => (
-            <div key={p.course_slug} className="card static">
-              <Cover seed={p.course_slug} icon={done(p) ? 'award' : 'learning'} />
-              <div className="card-body">
-                <h3>{p.course_title}</h3>
-                <div className="card-progress">
-                  <ProgressBar percent={p.percent} label={`${p.course_title} progress`} />
-                  <span>{p.completed} of {p.total} {partsWord(p.total)} · {p.percent}%</span>
-                </div>
-                {p.resume ? (
-                  <Link className="btn small" to={`/courses/${p.course_slug}/parts/${p.resume.slug}`}>Resume: {p.resume.title}</Link>
-                ) : (
-                  <Link className="btn ghost small" to={`/courses/${p.course_slug}`}>Review course</Link>
-                )}
-              </div>
-            </div>
-          ))}
+          {shown.map((p) => <ProgressCard key={p.course_slug} p={p} />)}
         </div>
       )}
     </section>
@@ -215,9 +235,15 @@ export function QuizAttempts() {
 }
 
 export function ProfilePage() {
-  const { user, refresh } = useAuth()
+  const { user, refresh, signOut } = useAuth()
+  const nav = useNavigate()
+  const { hash } = useLocation()
   const [name, setName] = useState(user?.full_name ?? '')
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  // The Learn panel's "Change" link points at #my-syllabus.
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+  }, [hash])
   if (!user) return null
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -233,6 +259,15 @@ export function ProfilePage() {
   }
 
   return (
+    <>
+    <section className="panel" id="my-syllabus" aria-labelledby="syl-h">
+      <span className="eyebrow">Settings</span>
+      <h2 id="syl-h" className="h-display">My syllabus</h2>
+      <p className="muted small syl-intro">
+        Your syllabus shows in the Learn panel, pre-selects the course search, and sets which semester Home opens on.
+      </p>
+      <SyllabusForm withOtherRegs />
+    </section>
     <section className="panel">
       <h2>My profile</h2>
       <dl className="facts">
@@ -248,9 +283,19 @@ export function ProfilePage() {
         {state === 'error' && <p role="alert" className="error form-error">Could not save. Please try again.</p>}
         <div className="cta">
           <button className="btn" disabled={state === 'saving' || name.trim() === (user.full_name ?? '')}>{state === 'saving' ? 'Saving…' : 'Save name'}</button>
-          {state === 'saved' && <span className="saved muted small">Saved</span>}
+          {state === 'saved' && <span className="saved small">Saved</span>}
         </div>
       </form>
     </section>
+    <section className="panel signout">
+      <div>
+        <h2>Sign out</h2>
+        <p className="muted small">Your progress and syllabus stay saved in your account.</p>
+      </div>
+      <button type="button" className="btn ghost" onClick={async () => { await signOut(); nav('/') }}>
+        <Icon name="logout" size={16} /> Sign out
+      </button>
+    </section>
+    </>
   )
 }

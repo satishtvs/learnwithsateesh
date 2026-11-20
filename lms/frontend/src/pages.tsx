@@ -4,41 +4,11 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react
 import { ApiError, forgotPassword, getProviders, login, register, resetPassword, startGoogleLogin, verifyEmail } from './api'
 import { AuthField, AuthShell, OrDivider, PasswordField } from './auth-ui'
 import { useAuth } from './auth'
-import { Catalogue, ContinueLearning } from './courses'
-import { Landing } from './landing'
 
 /** Where to go after signing in: the page that sent us here, if it was an in-app path. */
 function useReturnTo(): string {
   const from = (useLocation().state as { from?: string } | null)?.from
   return from && from.startsWith('/') && !from.startsWith('//') ? from : '/'
-}
-
-export function Home() {
-  const { user } = useAuth()
-  const first = (user?.full_name || '').trim().split(/\s+/)[0]
-
-  if (user) {
-    return (
-      <>
-        <div className="page-head">
-          <div>
-            <h1>Welcome back{first ? `, ${first}` : ''}</h1>
-            <p className="sub">Continue a course or explore something new.</p>
-          </div>
-        </div>
-        <section className="block">
-          <h2 className="section-title">Continue learning</h2>
-          <ContinueLearning empty />
-        </section>
-        <section className="block">
-          <h2 className="section-title">All courses</h2>
-          <Catalogue />
-        </section>
-      </>
-    )
-  }
-
-  return <Landing />
 }
 
 // ---------------------------------------------------------------- sign-in screens

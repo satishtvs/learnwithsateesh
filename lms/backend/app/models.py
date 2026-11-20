@@ -2,7 +2,9 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi_users.db import SQLAlchemyBaseOAuthAccountTableUUID, SQLAlchemyBaseUserTableUUID
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON, Boolean, Column, DateTime, ForeignKey, Integer, SmallInteger, String, Table, Text, UniqueConstraint,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -19,7 +21,75 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     # "student" | "instructor" | "admin". Only changeable server-side / by an admin.
     role: Mapped[str] = mapped_column(String(20), default="student", server_default="student")
 
+    # "My syllabus": the student's default catalogue filter (all optional; see app/catalogue.py).
+    university_id: Mapped[int | None] = mapped_column(ForeignKey("university.id", ondelete="SET NULL"), nullable=True)
+    regulation_id: Mapped[int | None] = mapped_column(ForeignKey("regulation.id", ondelete="SET NULL"), nullable=True)
+    branch_id: Mapped[int | None] = mapped_column(ForeignKey("branch.id", ondelete="SET NULL"), nullable=True)
+    joined_year: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    year: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)  # current year of study, 1-4
+    semester: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)  # current semester, 1-2
+
     oauth_accounts: Mapped[list[OAuthAccount]] = relationship("OAuthAccount", lazy="joined")
+
+
+class University(Base):
+    __tablename__ = "university"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    slug: Mapped[str] = mapped_column(String(50), unique=True)  # "jntuh"
+    name: Mapped[str] = mapped_column(String(200))
+    short_name: Mapped[str] = mapped_column(String(50))  # "JNTUH"
+    position: Mapped[int] = mapped_column(Integer, default=0)
+
+    regulations: Mapped[list["Regulation"]] = relationship(
+        back_populates="university", order_by="Regulation.position"
+    )
+    branches: Mapped[list["Branch"]] = relationship(back_populates="university", order_by="Branch.position")
+
+
+class Regulation(Base):
+    """A syllabus version (R18, R22, ...). Not a browsing level: an attribute of courses and a filter."""
+
+    __tablename__ = "regulation"
+    __table_args__ = (UniqueConstraint("university_id", "code"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    university_id: Mapped[int] = mapped_column(ForeignKey("university.id", ondelete="CASCADE"))
+    code: Mapped[str] = mapped_column(String(20))  # "R22"
+    label: Mapped[str] = mapped_column(String(100))
+    joined_year: Mapped[int | None] = mapped_column(Integer, nullable=True)  # first batch it applies to
+    position: Mapped[int] = mapped_column(Integer, default=0)
+
+    university: Mapped[University] = relationship(back_populates="regulations")
+
+
+class Branch(Base):
+    __tablename__ = "branch"
+    __table_args__ = (UniqueConstraint("university_id", "slug"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    university_id: Mapped[int] = mapped_column(ForeignKey("university.id", ondelete="CASCADE"))
+    slug: Mapped[str] = mapped_column(String(50))  # "cse-aiml"
+    name: Mapped[str] = mapped_column(String(200))
+    short_name: Mapped[str] = mapped_column(String(50))  # "CSE (AI and ML)"
+    position: Mapped[int] = mapped_column(Integer, default=0)
+
+    university: Mapped[University] = relationship(back_populates="branches")
+
+
+course_branch = Table(
+    "course_branch",
+    Base.metadata,
+    Column("course_id", ForeignKey("course.id", ondelete="CASCADE"), primary_key=True),
+    Column("branch_id", ForeignKey("branch.id", ondelete="CASCADE"), primary_key=True),
+)
+
+course_regulation = Table(
+    "course_regulation",
+    Base.metadata,
+    Column("course_id", ForeignKey("course.id", ondelete="CASCADE"), primary_key=True),
+    Column("regulation_id", ForeignKey("regulation.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class Course(Base):
@@ -31,6 +101,17 @@ class Course(Base):
     description: Mapped[str] = mapped_column(Text, default="")
     published: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     position: Mapped[int] = mapped_column(Integer, default=0)
+    # Catalogue metadata (all optional). The same course may serve several regulations and branches.
+    university_id: Mapped[int | None] = mapped_column(
+        ForeignKey("university.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    year: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)  # 1-4
+    semester: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)  # 1-2
+    subject_code: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "AM502PC"
+
+    university: Mapped[University | None] = relationship()
+    regulations: Mapped[list[Regulation]] = relationship(secondary=course_regulation, order_by="Regulation.position")
+    branches: Mapped[list[Branch]] = relationship(secondary=course_branch, order_by="Branch.position")
 
     units: Mapped[list["Unit"]] = relationship(
         back_populates="course", order_by="Unit.position", cascade="all, delete-orphan"

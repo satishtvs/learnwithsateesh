@@ -68,6 +68,51 @@ quizzes:
         answer: B
         explain: "The between-class scatter has rank at most C - 1, so LDA gives at most C - 1 useful directions. For 4 classes that is 3."
 
+      - q: "Which problem is a direct result of having too many features?"
+        options:
+          - "Faster training with less noise"
+          - "A guarantee of higher accuracy"
+          - "The labels become unnecessary"
+          - "Slow training, extra noise and empty space between points"
+        answer: D
+        explain: "This is the curse of dimensionality. More features make the data sparse and distances less meaningful."
+
+      - q: "In the LDA example the class means are (2.5, 4.5) and (4.5, 1.5). What is the difference vector m2 - m1?"
+        options:
+          - "(2, -3)"
+          - "(-2, 3)"
+          - "(7, 6)"
+          - "(2, 3)"
+        answer: A
+        explain: "Subtract each coordinate: 4.5 - 2.5 = 2 and 1.5 - 4.5 = -3, so m2 - m1 = (2, -3)."
+
+      - q: "For two classes, the best LDA direction w is proportional to which expression?"
+        options:
+          - "S_B (m2 + m1)"
+          - "S_W^-1 (m2 - m1)"
+          - "S_W (m2 - m1)"
+          - "The sum of all the examples"
+        answer: B
+        explain: "We multiply the difference of the class means by the inverse of the within-class scatter. Only the direction matters, so w is then scaled to length one."
+
+      - q: "When does LDA fail because S_W cannot be inverted?"
+        options:
+          - "When there are only two classes"
+          - "When the data are centred"
+          - "When the classes have different means"
+          - "When there are more features than examples"
+        answer: D
+        explain: "With more features than examples, S_W is singular and has no inverse. Reducing features first, for example with PCA, is a common fix."
+
+      - q: "Why is the LDA direction w scaled to length one?"
+        options:
+          - "Because J becomes zero otherwise"
+          - "Because longer w gives a worse class separation"
+          - "Only the direction matters, so scaling makes w unique without changing the projection shape"
+          - "Because the labels must be between 0 and 1"
+        answer: C
+        explain: "Multiplying w by a number only stretches the projected values. In the example w = (0.6522, -0.7580), which has length one."
+
   # ------------------------------------------------------------------ Part 2
   - slug: u4-p2
     title: "Part 2: Principal component analysis"
@@ -118,6 +163,51 @@ quizzes:
           - "It converts the method into a supervised one"
         answer: A
         explain: "On the raw wine data the proline column (values in the hundreds) made PC1 hold 0.9981 of the variance. After standardising it was 0.362, a more honest picture."
+
+      - q: "What are the scores Z = X W in PCA?"
+        options:
+          - "The eigenvalues of the covariance matrix"
+          - "The data projected on the top k principal components"
+          - "The class labels of the examples"
+          - "The original features with noise added"
+        answer: B
+        explain: "W holds the top k eigenvectors as columns, so X W gives each example's coordinates along those components."
+
+      - q: "What does the sum of all the eigenvalues of the covariance matrix equal?"
+        options:
+          - "The number of examples n"
+          - "Always exactly one"
+          - "The largest eigenvalue squared"
+          - "The trace of C, which is the total variance of the data"
+        answer: D
+        explain: "The trace is the sum of the diagonal entries (the feature variances). In the example 10.9522 + 0.5478 = 11.5."
+
+      - q: "With eigenvalues 10.9522 and 0.5478, about what share of the variance does PC2 hold?"
+        options:
+          - "About 0.95"
+          - "About 0.50"
+          - "About 0.05"
+          - "About 0.20"
+        answer: C
+        explain: "0.5478 / 11.5 is about 0.0476, so PC2 holds only about 5 percent of the variance."
+
+      - q: "How do we usually choose the number of components k?"
+        options:
+          - "Always keep exactly two"
+          - "Keep every component with a negative eigenvalue"
+          - "Keep enough components to explain about 90 to 95 percent of the variance, or use the elbow of the scree plot"
+          - "Choose k equal to the number of classes"
+        answer: C
+        explain: "Explained variance and the scree plot elbow show where extra components add very little."
+
+      - q: "Why can PCA be worse than LDA for a classification task?"
+        options:
+          - "PCA always needs more classes than LDA"
+          - "PCA cannot compute eigenvectors"
+          - "PCA only works on one feature"
+          - "PCA ignores labels, so the top variance direction can mix the classes"
+        answer: D
+        explain: "PCA finds the direction of largest spread, which may not be the direction that separates the classes. LDA uses the labels directly."
 
   # ------------------------------------------------------------------ Part 3
   - slug: u4-p3
@@ -170,6 +260,51 @@ quizzes:
         answer: D
         explain: "PCA removes only second-order (correlation) relations, so its outputs were still mixtures. ICA uses non-Gaussianity and recovered the sources almost perfectly."
 
+      - q: "In factor analysis, what is assumed about the hidden factors f?"
+        options:
+          - "They are equal to the noise"
+          - "They must be Gaussian with variance 100"
+          - "They are the class labels"
+          - "They have mean zero and variance one"
+        answer: D
+        explain: "Factors are scaled to mean zero and variance one, and the noise is independent for each feature."
+
+      - q: "What is the main difference between PCA and factor analysis?"
+        options:
+          - "PCA uses a noise model; factor analysis does not"
+          - "Factor analysis needs class labels; PCA does not"
+          - "Factor analysis separates shared variance from noise unique to each feature; PCA explains total variance with no noise model"
+          - "They are exactly the same method"
+        answer: C
+        explain: "Factor analysis models noise for each feature through the diagonal matrix. It also allows rotation of the loadings, for example with varimax."
+
+      - q: "In the ICA model x = A s, we find W so that s = W x. How is W related to A?"
+        options:
+          - "W is the inverse of A"
+          - "W is the transpose of x"
+          - "W equals A multiplied by s"
+          - "W is the covariance of s"
+        answer: A
+        explain: "If x = A s, then multiplying by the inverse of A gives s = A^-1 x, so W = A^-1."
+
+      - q: "If A = [[1, 0.5], [0.5, 1]] and the sources are s = (2, 4), what are the mixtures x = A s?"
+        options:
+          - "(4, 5)"
+          - "(2, 4)"
+          - "(5, 4)"
+          - "(3, 6)"
+        answer: A
+        explain: "First mixture: 1 x 2 + 0.5 x 4 = 4. Second mixture: 0.5 x 2 + 1 x 4 = 5."
+
+      - q: "Which things stay unknown after running ICA?"
+        options:
+          - "Whether the sources exist"
+          - "Only the number of microphones"
+          - "The values of the recordings"
+          - "The order, the sign and the scale of the recovered sources"
+        answer: D
+        explain: "Many combinations of order, sign and scale give the same mixtures, so ICA cannot fix them."
+
   # ------------------------------------------------------------------ Part 4
   - slug: u4-p4
     title: "Part 4: Isomap, locally linear embedding and least squares optimisation"
@@ -220,6 +355,51 @@ quizzes:
           - "(I - W)^T (I - W) beta = 0"
         answer: B
         explain: "Setting the gradient of the sum of squared errors to zero gives the normal equation X^T X beta = X^T y. For the video's five points this gave intercept 0.05 and slope 1.99."
+
+      - q: "What is a manifold, as used in the swiss roll example?"
+        options:
+          - "A surface that looks flat when you zoom in"
+          - "A set of points with zero variance"
+          - "A straight line through the data mean"
+          - "A table of class labels"
+        answer: A
+        explain: "The swiss roll is a 2-D sheet rolled up in 3-D. Locally it looks flat, which is why unrolling it makes sense."
+
+      - q: "Which feature of LLE separates it from Isomap?"
+        options:
+          - "LLE needs class labels"
+          - "LLE uses shortest paths between all pairs"
+          - "LLE works only in one dimension"
+          - "LLE never computes long distances; it keeps only local neighbour weights"
+        answer: D
+        explain: "Isomap needs shortest paths between all pairs. LLE rebuilds each point from its neighbours and uses the same weights in low dimensions."
+
+      - q: "In LLE, which eigenvectors of (I - W)^T (I - W) give the embedding?"
+        options:
+          - "The largest ones only"
+          - "All of them"
+          - "The smallest ones, skipping the constant one"
+          - "The ones with negative eigenvalues"
+        answer: C
+        explain: "The constant eigenvector has eigenvalue zero and carries no information, so we skip it and take the next smallest."
+
+      - q: "Using the video's least squares fit (intercept 0.05, slope 1.99), what is the predicted y at x = 3?"
+        options:
+          - "About 6.02"
+          - "About 5.97"
+          - "About 2.04"
+          - "About 7.00"
+        answer: A
+        explain: "y = 0.05 + 1.99 x 3 = 0.05 + 5.97 = 6.02."
+
+      - q: "What does Levenberg-Marquardt add to the Gauss-Newton step?"
+        options:
+          - "A class label for each point"
+          - "A closed form normal equation"
+          - "A damping term lambda I"
+          - "A neighbour graph"
+        answer: C
+        explain: "For curved models there is no closed form. Levenberg-Marquardt adds lambda I to keep each step stable."
 
   # ------------------------------------------------------------------ Part 5
   - slug: u4-p5
@@ -272,6 +452,51 @@ quizzes:
         answer: A
         explain: "Mean = total / number of strings = 41 / 6, which is about 6.83. The old mean was 26 / 6, about 4.33."
 
+      - q: "Which list shows the basic genetic algorithm loop in the correct order?"
+        options:
+          - "Initialise, evaluate, select, crossover, mutate, replace, repeat"
+          - "Select, initialise, mutate, evaluate, stop"
+          - "Crossover, initialise, replace, select, evaluate"
+          - "Evaluate, replace, initialise, mutate, select"
+        answer: A
+        explain: "We start with a random population, score it, pick parents, mix and mutate them, form the new population and repeat until a stop rule is met."
+
+      - q: "When does roulette wheel selection work badly?"
+        options:
+          - "When fitness values are very different"
+          - "When all the fitness values are almost the same"
+          - "When the population has a single string"
+          - "When the chromosome is a bit string"
+        answer: B
+        explain: "If all fitness values are similar, every string has nearly the same chance, so selection gives almost no pressure."
+
+      - q: "A string has fitness 4 and the total fitness is 26. What is its chance of selection with roulette wheel selection?"
+        options:
+          - "About 4 percent"
+          - "About 26 percent"
+          - "About 30.8 percent"
+          - "About 15.4 percent"
+        answer: D
+        explain: "4 / 26 is about 0.154, which is 15.4 percent."
+
+      - q: "Why does a genetic algorithm give no guarantee of finding the best answer?"
+        options:
+          - "The population can become equal too early and settle on a good but not best answer"
+          - "Because fitness is not used"
+          - "Because it always uses a gradient"
+          - "Because it never changes the strings"
+        answer: A
+        explain: "This is premature convergence. The search uses random choices, so we get a good answer but cannot prove it is the best."
+
+      - q: "What is true about a good fitness function?"
+        options:
+          - "It must be differentiable everywhere"
+          - "It should give the same value for every string"
+          - "It is used only after the run has finished"
+          - "It is the only link to the problem, larger is better and it must be cheap to compute"
+        answer: D
+        explain: "Every candidate is scored each generation, so the function must be cheap. A badly designed one misleads the search."
+
   # ------------------------------------------------------------------ Part 6
   - slug: u4-p6
     title: "Part 6: Genetic operators and using genetic algorithms"
@@ -322,3 +547,48 @@ quizzes:
           - "Mutation cannot flip bits in this problem"
         answer: B
         explain: "A tour must visit each city exactly once. A permutation chromosome with order crossover and swap mutation keeps every child a valid tour."
+
+      - q: "Parent A is ten ones and parent B is ten zeros. With two-point crossover after bit 3 and after bit 7, and the middle taken from B, which child is produced?"
+        options:
+          - "1111000000"
+          - "0001111000"
+          - "1110000111"
+          - "0000111111"
+        answer: C
+        explain: "Bits 1 to 3 come from A (111), bits 4 to 7 from B (0000) and bits 8 to 10 from A (111)."
+
+      - q: "What happens if the mutation rate is far too high?"
+        options:
+          - "The population becomes identical quickly"
+          - "Crossover becomes impossible"
+          - "The search turns into a random walk"
+          - "The best fitness always rises"
+        answer: C
+        explain: "Too many random flips destroy good strings. Too little mutation gives premature convergence."
+
+      - q: "A chromosome has 20 bits and each bit flips with probability 0.05. On average, how many bits flip per string?"
+        options:
+          - "1"
+          - "0.05"
+          - "5"
+          - "20"
+        answer: A
+        explain: "Expected flips = 20 x 0.05 = 1."
+
+      - q: "In the knapsack example, how is the fitness of an overweight choice handled?"
+        options:
+          - "The string is made all zeros"
+          - "The weight limit is ignored"
+          - "The fitness is set to the weight"
+          - "A penalty per unit of overweight is subtracted from the total value"
+        answer: D
+        explain: "Fitness is value minus a penalty per unit of overweight. In the video the best value found was 286."
+
+      - q: "A 2-2-1 network for XOR is trained by a genetic algorithm. How many real numbers does the chromosome hold?"
+        options:
+          - "9"
+          - "5"
+          - "6"
+          - "3"
+        answer: A
+        explain: "There are 6 weights and 3 biases, giving 9 values. Back-propagation is faster when gradients exist, but a GA needs none."

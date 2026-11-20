@@ -68,6 +68,51 @@ quizzes:
         answer: B
         explain: "Without exploration the player never discovers the better lever. Epsilon-greedy with a small epsilon finds it and earns far more."
 
+      - q: "Which part of the loop does the agent control directly?"
+        options:
+          - "The reward it receives"
+          - "The next state chosen by the environment"
+          - "Its own choice of action"
+          - "The position of the ponds"
+        answer: C
+        explain: "The agent chooses only its action. The environment decides the reward and the new state."
+
+      - q: "With epsilon = 0.1 in epsilon-greedy, how often does the player try a random lever?"
+        options:
+          - "About 1 time in 10"
+          - "About 9 times in 10"
+          - "Never"
+          - "Every time"
+        answer: A
+        explain: "Epsilon is the probability of exploring. With 0.1 the player explores about 10 percent of the time and exploits the rest."
+
+      - q: "With gamma = 0.9, a path gives rewards -1, -1, -5 (the last is a pond). What is the return -1 + 0.9(-1) + 0.9^2(-5)?"
+        options:
+          - "-7.00"
+          - "-6.50"
+          - "-4.05"
+          - "-5.95"
+        answer: D
+        explain: "0.9^2 = 0.81, so the terms are -1, -0.9 and -4.05, which add up to -5.95."
+
+      - q: "Why is credit assignment hard in reinforcement learning?"
+        options:
+          - "Rewards are always negative"
+          - "The reward may arrive many steps after the action that earned it"
+          - "The agent has no actions"
+          - "Gamma is always 0"
+        answer: B
+        explain: "With a delayed reward the agent must work out which earlier actions were responsible for it."
+
+      - q: "Which is a real difference between reinforcement learning and supervised learning?"
+        options:
+          - "RL uses labelled examples"
+          - "RL never needs rewards"
+          - "The data the agent sees depends on the policy it follows"
+          - "RL has no states"
+        answer: C
+        explain: "In RL the agent's own actions decide which states it visits, so the data changes as the policy changes."
+
   # ------------------------------------------------------------------ Part 2
   - slug: u5-p2
     title: "Part 2: MDP, Bellman equation, Q-learning and Sarsa"
@@ -118,6 +163,51 @@ quizzes:
           - "Sarsa has no learning rate"
         answer: B
         explain: "Sarsa is on-policy: it learns the value of the behaviour it really follows, including exploratory moves. Q-learning is off-policy and uses the maximum."
+
+      - q: "What does Q(s, a) measure?"
+        options:
+          - "The reward of state s only"
+          - "The probability of reaching state s"
+          - "How many times action a was tried"
+          - "The expected return of taking action a in state s and then following the policy"
+        answer: D
+        explain: "Q is a value for a state-action pair, while V(s) is a value for the state alone."
+
+      - q: "A cell next to a cell of value 17 has step reward -1. With gamma = 0.9, what is its value by the Bellman equation?"
+        options:
+          - "15.3"
+          - "16.0"
+          - "14.3"
+          - "13.0"
+        answer: C
+        explain: "Value = -1 + 0.9 x 17 = -1 + 15.3 = 14.3."
+
+      - q: "When does value iteration stop sweeping the grid?"
+        options:
+          - "After exactly one sweep"
+          - "When the values stop changing"
+          - "When gamma reaches 1"
+          - "When the agent reaches the goal once"
+        answer: B
+        explain: "Each sweep applies the Bellman rule to every cell. Once nothing changes, the values have converged."
+
+      - q: "With alpha = 0.1, old Q = 5 and a target of 8, what is the new Q?"
+        options:
+          - "8.0"
+          - "5.0"
+          - "0.3"
+          - "5.3"
+        answer: D
+        explain: "New Q = 5 + 0.1 x (8 - 5) = 5.3. A small alpha moves Q only a little toward the target."
+
+      - q: "What does the optimal Bellman equation add to the plain one?"
+        options:
+          - "A maximum over actions"
+          - "A sum over all earlier states"
+          - "A random action"
+          - "A learning rate"
+        answer: A
+        explain: "V*(s) = max over a of (r + gamma V*(s')): the best action is chosen at each state."
 
   # ------------------------------------------------------------------ Part 3
   - slug: u5-p3
@@ -170,6 +260,51 @@ quizzes:
         answer: D
         explain: "Accept with probability min(1, ratio). Only ratios matter, so p need be known only up to a constant. A rejected step still records the old point."
 
+      - q: "If the number of samples N is made 4 times larger, the sampling error falls by about what factor?"
+        options:
+          - "It doubles"
+          - "It falls to one quarter"
+          - "It falls to about half"
+          - "It does not change"
+        answer: C
+        explain: "The error shrinks like 1 over the square root of N, and the square root of 4 is 2."
+
+      - q: "What is the main limitation of inverse transform sampling?"
+        options:
+          - "It is never exact"
+          - "It needs an inverse CDF that you can compute"
+          - "It needs a Markov chain"
+          - "It only gives whole numbers"
+        answer: B
+        explain: "The method solves F(x) = u, so it works only when F can be inverted easily."
+
+      - q: "In rejection sampling with M = 4, about how many of 1000 proposals are accepted?"
+        options:
+          - "250"
+          - "400"
+          - "750"
+          - "40"
+        answer: A
+        explain: "The acceptance rate is 1/M = 0.25, so about 250 of 1000 are accepted."
+
+      - q: "What goes wrong in Metropolis sampling if the proposal step is too large?"
+        options:
+          - "The chain moves too slowly but accepts everything"
+          - "The chain becomes exact"
+          - "Burn-in is no longer needed"
+          - "Most proposals are rejected, so the chain often stays put"
+        answer: D
+        explain: "Far-away proposals usually land where p is small, so they are rejected. Too small a step instead moves slowly."
+
+      - q: "What does Gibbs sampling do?"
+        options:
+          - "It accepts only half the proposals"
+          - "It rejects every proposal"
+          - "It updates one variable at a time from its conditional distribution and accepts every proposal"
+          - "It needs the inverse CDF"
+        answer: C
+        explain: "Each variable is drawn from p(variable | all the others), so no accept or reject step is needed."
+
   # ------------------------------------------------------------------ Part 4
   - slug: u5-p4
     title: "Part 4: Graphical models: Bayesian networks and Markov random fields"
@@ -220,6 +355,51 @@ quizzes:
           - "Conditional probability tables"
         answer: C
         explain: "MRF potentials are not probabilities, so the product of potentials must be divided by Z. Bayesian network tables are already normalised."
+
+      - q: "What does each node of a Bayesian network store?"
+        options:
+          - "A table P(node | parents)"
+          - "A potential for each clique"
+          - "The constant Z"
+          - "Only the observed value"
+        answer: A
+        explain: "The joint distribution is the product of these tables over all nodes."
+
+      - q: "In the chain A to B to C, what blocks the path between A and C?"
+        options:
+          - "Observing A"
+          - "Observing C"
+          - "Removing the arrow from A to B"
+          - "Observing the middle node B"
+        answer: D
+        explain: "Once B is known, A tells us nothing more about C. For a collider the opposite happens: observing the middle node opens the path."
+
+      - q: "Take P(rain) = 0.2, P(sprinkler | rain) = 0.01 and P(wet | rain, sprinkler) = 0.99. What is P(rain, sprinkler, wet)?"
+        options:
+          - "0.0198"
+          - "0.00198"
+          - "0.2010"
+          - "0.9900"
+        answer: B
+        explain: "Multiply the three table entries: 0.2 x 0.01 x 0.99 = 0.00198."
+
+      - q: "How does inference by enumeration work?"
+        options:
+          - "It picks the largest table entry"
+          - "It deletes all the unobserved nodes"
+          - "It adds the joint probabilities of all worlds that match the evidence, then divides"
+          - "It samples one world at random"
+        answer: C
+        explain: "Add the worlds that match the question and the evidence, add the worlds that match the evidence alone, then divide."
+
+      - q: "What does a Markov random field place on each clique?"
+        options:
+          - "A potential function"
+          - "An arrow"
+          - "A cluster label"
+          - "A reward"
+        answer: A
+        explain: "The potentials are multiplied together and divided by Z to give a probability."
 
   # ------------------------------------------------------------------ Part 5
   - slug: u5-p5
@@ -272,6 +452,51 @@ quizzes:
         answer: B
         explain: "Baum-Welch is an EM method: the likelihood rises or stays level each iteration, but a bad start can end in a local optimum."
 
+      - q: "Which three things define an HMM?"
+        options:
+          - "Only the transition matrix A"
+          - "Only the emission matrix B"
+          - "The start probabilities pi, transition matrix A and emission matrix B"
+          - "The observations alone"
+        answer: C
+        explain: "pi, A and B each have rows that sum to 1, and together they define the model."
+
+      - q: "Which of the three HMM problems does Baum-Welch solve?"
+        options:
+          - "Learning the parameters from observations"
+          - "Evaluating the likelihood of a sequence"
+          - "Decoding the best state path"
+          - "Sampling a new state"
+        answer: A
+        explain: "Evaluation uses the forward algorithm, decoding uses Viterbi, and learning uses Baum-Welch."
+
+      - q: "Day 1: alpha(Sunny) = 0.36, alpha(Rainy) = 0.04. Sunny to rainy is 0.3, rainy to rainy is 0.6, and rainy emits the day-2 observation with probability 0.5. What is alpha(day 2, Rainy)?"
+        options:
+          - "0.1320"
+          - "0.2680"
+          - "0.0400"
+          - "0.0660"
+        answer: D
+        explain: "(0.36 x 0.3 + 0.04 x 0.6) x 0.5 = 0.132 x 0.5 = 0.066."
+
+      - q: "Why is the forward algorithm better than adding up every hidden path by brute force?"
+        options:
+          - "It gives a different answer"
+          - "Its work grows in step with the sequence length, not exponentially"
+          - "It ignores the emission matrix"
+          - "It needs no transition matrix"
+        answer: B
+        explain: "The trellis reuses partial sums. In the example it matches the brute-force total over 16 paths, 0.011189."
+
+      - q: "A row of the transition matrix is 0.7 for staying in sunny and x for moving to rainy. What is x?"
+        options:
+          - "0.7"
+          - "0.4"
+          - "0.3"
+          - "0.1"
+        answer: C
+        explain: "Each row sums to 1, so x = 1 - 0.7 = 0.3."
+
   # ------------------------------------------------------------------ Part 6
   - slug: u5-p6
     title: "Part 6: Tracking: Kalman filter and particle filter"
@@ -322,3 +547,49 @@ quizzes:
           - "When you want an exact closed-form answer"
         answer: A
         explain: "The Kalman filter is fast and exact for linear Gaussian models. Particle filters work for any model but cost more computation."
+
+      - q: "What is the tracking problem?"
+        options:
+          - "Estimating a hidden state, such as position, from noisy measurements"
+          - "Labelling data with clusters"
+          - "Choosing the best action from rewards"
+          - "Sampling from a fixed distribution"
+        answer: A
+        explain: "The true state is hidden, so we combine a motion model with noisy measurements at each time step."
+
+      - q: "What happens to the uncertainty during the Kalman predict step?"
+        options:
+          - "It becomes zero"
+          - "It shrinks"
+          - "It grows"
+          - "It stays exactly the same"
+        answer: C
+        explain: "Predicting forward adds process noise, so we are less sure. The update step then shrinks the uncertainty again."
+
+      - q: "The estimate is 10, the measurement is 12 and K = 0.7241. What is the updated estimate 10 + K x (12 - 10)?"
+        options:
+          - "10.72"
+          - "11.45"
+          - "12.00"
+          - "11.00"
+        answer: B
+        explain: "10 + 0.7241 x 2 = 11.448, so it moves most of the way toward the measurement."
+
+      - q: "In the example, the Kalman estimate has RMSE 1.13 and the raw measurements have RMSE 1.96. What does this show?"
+        options:
+          - "The raw measurements are better"
+          - "Both are identical"
+          - "The filter adds noise"
+          - "The filter's estimate is closer to the truth than the noisy measurements"
+        answer: D
+        explain: "Blending the model with the measurements removes part of the noise, so the error is lower."
+
+      - q: "In the example, what happened when the particle filter used only N = 20 particles?"
+        options:
+          - "It became exact"
+          - "It no longer needed resampling"
+          - "Its accuracy got worse"
+          - "It turned into a Kalman filter"
+        answer: C
+        explain: "Too few particles cannot represent the belief well, so the estimate becomes less accurate."
+

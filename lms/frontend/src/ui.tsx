@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react'
+import { initialsOf } from './format'
 
 export type IconName =
-  | 'home' | 'courses' | 'learning' | 'quiz' | 'award' | 'live' | 'menu' | 'lock' | 'check'
-  | 'play' | 'user' | 'logout' | 'x' | 'chevron' | 'clock' | 'sparkle' | 'settings' | 'mail' | 'eye' | 'eyeOff' | 'grid' | 'share' | 'search' | 'arrow'
+  | 'home' | 'courses' | 'learning' | 'quiz' | 'award' | 'live' | 'menu' | 'lock' | 'check' | 'play' | 'user'
+  | 'logout' | 'x' | 'chevron' | 'chevronLeft' | 'clock' | 'sparkle' | 'settings' | 'mail' | 'eye' | 'eyeOff'
+  | 'grid' | 'share' | 'search' | 'arrow' | 'layers' | 'panel' | 'captions' | 'shield' | 'notes'
 
 const PATHS: Record<IconName, ReactNode> = {
   home: <><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v10h5v-6h4v6h5V10" /></>,
@@ -19,6 +21,7 @@ const PATHS: Record<IconName, ReactNode> = {
   logout: <><path d="M10 4H5v16h5" /><path d="m15 8 4 4-4 4" /><path d="M19 12H9" /></>,
   x: <path d="M6 6l12 12M18 6 6 18" />,
   chevron: <path d="m9 6 6 6-6 6" />,
+  chevronLeft: <path d="m15 6-6 6 6 6" />,
   clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
   sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />,
   share: <><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.6 10.6 6.8-4.2M8.6 13.4l6.8 4.2" /></>,
@@ -29,6 +32,11 @@ const PATHS: Record<IconName, ReactNode> = {
   eye: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
   eyeOff: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /><path d="M3 3l18 18" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" /></>,
+  layers: <><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 13 9 5 9-5" /></>,
+  panel: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>,
+  captions: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3" /></>,
+  shield: <><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6z" /><path d="m9 12 2 2 4-4" /></>,
+  notes: <><path d="M6 3h9l4 4v14H6z" /><path d="M9 11h7M9 15h7M9 7h4" /></>,
 }
 
 export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
@@ -50,10 +58,11 @@ export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
   )
 }
 
-export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
+export function PageHeader({ title, subtitle, eyebrow, children }: { title: string; subtitle?: string; eyebrow?: string; children?: ReactNode }) {
   return (
     <div className="page-head">
       <div>
+        {eyebrow && <span className="eyebrow">{eyebrow}</span>}
         <h1>{title}</h1>
         {subtitle && <p className="sub">{subtitle}</p>}
       </div>
@@ -62,40 +71,44 @@ export function PageHeader({ title, subtitle, children }: { title: string; subti
   )
 }
 
-export function ProgressBar({ percent, label }: { percent: number; label?: string }) {
+export function ProgressBar({ percent, label, light = false }: { percent: number; label?: string; light?: boolean }) {
   return (
-    <div className="progress" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={label ?? 'Progress'}>
+    <div className={`progress${light ? ' light' : ''}`} role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={label ?? 'Progress'}>
       <div className="bar"><div style={{ width: `${percent}%` }} /></div>
     </div>
   )
 }
 
-/** The logo has dark text, so dark mode gets its own light-text version. */
 export function Logo({ height }: { height: number }) {
+  return <img src="/logo.png" alt="Learn With Sateesh" height={height} />
+}
+
+export function Loading({ label = 'Loading…' }: { label?: string }) {
+  return <p className="muted loading" role="status">{label}</p>
+}
+
+/** Placeholder cards while a course grid loads. */
+export function SkeletonGrid({ count = 3 }: { count?: number }) {
   return (
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcSet="/logo-dark.png" />
-      <img src="/logo.png" alt="Learn With Sateesh" height={height} />
-    </picture>
+    <div className="grid" role="status" aria-label="Loading courses">
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className="card skeleton" aria-hidden="true"><div className="sk-tile" /><div className="sk-line" /><div className="sk-line short" /></div>
+      ))}
+    </div>
   )
 }
 
-const COVERS = [
-  ['#f97316', '#fbbf24'],
-  ['#1e2a44', '#3f5378'],
-  ['#0f766e', '#34d399'],
-  ['#c2410c', '#fb923c'],
-  ['#2b3b5e', '#f97316'],
-]
+/** The course tile: initials on a navy-to-orange gradient. */
+export function CourseTile({ title, size = 'md' }: { title: string; size?: 'sm' | 'md' | 'lg' }) {
+  return <div className={`tile ${size}`} aria-hidden="true">{initialsOf(title)}</div>
+}
 
-/** A deterministic gradient cover per course so cards are easy to tell apart. */
-export function Cover({ seed, icon = 'courses' }: { seed: string; icon?: IconName }) {
-  let h = 0
-  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0
-  const [a, b] = COVERS[h % COVERS.length]
+export function Switch({ checked, onChange, label, hint, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string; disabled?: boolean }) {
   return (
-    <div className="cover" style={{ background: `linear-gradient(135deg, ${a}, ${b})` }} aria-hidden="true">
-      <Icon name={icon} size={34} />
-    </div>
+    <label className={`switch${disabled ? ' disabled' : ''}`}>
+      <input type="checkbox" role="switch" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
+      <span className="track" aria-hidden="true" />
+      <span className="switch-label">{label}{hint && <small> {hint}</small>}</span>
+    </label>
   )
 }
