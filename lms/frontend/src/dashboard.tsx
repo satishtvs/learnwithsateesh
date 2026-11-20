@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getAllProgress, getMyAttempts, updateMe, type CourseProgress, type MyAttempt } from './api'
-import { useAuth } from './auth'
+import { isStaffUser, useAuth } from './auth'
 import { LoginGate } from './courses'
 import { initials, partsWord, shortTitle } from './format'
 import { SyllabusForm } from './syllabus-form'
@@ -71,6 +71,8 @@ export function DashboardLayout() {
   const { user, loading } = useAuth()
   const loc = useLocation()
   if (loading) return <p className="muted">Loading…</p>
+  // Instructors and admins have their own area; only the profile page is shared.
+  if (user && isStaffUser(user) && loc.pathname !== '/dashboard/profile') return <Navigate to="/admin" replace />
   if (!user) {
     return (
       <LoginGate
@@ -260,6 +262,7 @@ export function ProfilePage() {
 
   return (
     <>
+    {!isStaffUser(user) && (
     <section className="panel" id="my-syllabus" aria-labelledby="syl-h">
       <span className="eyebrow">Settings</span>
       <h2 id="syl-h" className="h-display">My syllabus</h2>
@@ -268,6 +271,7 @@ export function ProfilePage() {
       </p>
       <SyllabusForm withOtherRegs />
     </section>
+    )}
     <section className="panel">
       <h2>My profile</h2>
       <dl className="facts">

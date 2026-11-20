@@ -2,16 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Markdown from 'react-markdown'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ApiError, getCourse, getCourseProgress, getPart, getQuiz, setPartCompleted } from './api'
-import { useAuth } from './auth'
+import { isStaffUser, useAuth } from './auth'
 import { PartList } from './course-detail'
 import { LoginGate } from './courses'
 import { partGroups, shortTitle } from './format'
 import { QuizRunner } from './quiz'
-import { Icon, Loading, ProgressBar } from './ui'
+import { Icon, Loading, PreviewBanner, ProgressBar } from './ui'
 
 export function PartPage() {
   const { slug = '', partSlug = '' } = useParams()
   const { user, loading } = useAuth()
+  const staff = isStaffUser(user)
   const loc = useLocation()
   const qc = useQueryClient()
   const { data, error, isLoading } = useQuery({
@@ -25,7 +26,7 @@ export function PartPage() {
   const progress = useQuery({
     queryKey: ['progress', slug],
     queryFn: () => getCourseProgress(slug),
-    enabled: !!user,
+    enabled: !!user && !staff,
     retry: false,
   })
   const quizSlug = data?.quiz_slug ?? ''
@@ -83,6 +84,7 @@ export function PartPage() {
   return (
     <article className="part-page">
       {crumbs}
+      {staff && <PreviewBanner />}
       <h1 className="part-title">{data.title}</h1>
       <div className="video">
         <iframe
@@ -137,7 +139,7 @@ export function PartPage() {
       )}
 
       <section className={`donebar${data.completed ? ' is-done' : ''}`}>
-        {user ? (
+        {user && !staff ? (
           <>
             <div>
               <strong>{data.completed ? 'This part is complete.' : quizPending ? 'Pass the quiz to complete this part.' : 'Finished this part?'}</strong>
@@ -158,6 +160,8 @@ export function PartPage() {
               <Icon name="check" size={16} /> {data.completed ? 'Completed (undo)' : 'Mark as complete'}
             </button>
           </>
+        ) : staff ? (
+          <p className="muted small">Instructor preview: completion is not recorded for instructor accounts.</p>
         ) : (
           <p>
             Enjoying this? <Link to="/register" state={{ from: loc.pathname }}>Create a free account</Link> to track your

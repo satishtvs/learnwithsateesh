@@ -14,7 +14,7 @@ import {
 } from './api'
 import { useAuth } from './auth'
 import { LoginGate } from './courses'
-import { Icon, PageHeader } from './ui'
+import { Icon, Loading, PageHeader } from './ui'
 
 const fmtWhen = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
@@ -590,5 +590,60 @@ function QuestionEditor({ quizId, question, refresh, onDone }: { quizId: number;
         <button type="button" className="btn ghost" onClick={onDone}>Cancel</button>
       </div>
     </form>
+  )
+}
+
+// ---------------------------------------------------------------- learners
+function ago(iso: string | null): string {
+  if (!iso) return 'Not started'
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+  if (days <= 0) return 'Today'
+  if (days === 1) return 'Yesterday'
+  if (days < 30) return `${days} days ago`
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+export function AdminLearners() {
+  const [q, setQ] = useState('')
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['admin', 'learners', q],
+    queryFn: () => admin.learners(q),
+    placeholderData: (prev) => prev,
+  })
+  return (
+    <Gate>
+      <PageHeader title="Learners" subtitle="Students only, most recently active first. Instructor and admin accounts are not listed." />
+      <section className="panel">
+        <label className="field" style={{ maxWidth: 360 }}>
+          <span>Search by name or email</span>
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search learners" />
+        </label>
+        {isLoading ? <Loading /> : isError ? (
+          <p className="error" role="alert">Could not load learners.</p>
+        ) : !data || data.length === 0 ? (
+          <p className="muted block">{q ? 'No learner matches this search.' : 'No learners have signed up yet.'}</p>
+        ) : (
+          <div className="table-wrap block">
+            <table className="tbl">
+              <thead>
+                <tr><th>Learner</th><th>Last active</th><th>Parts done</th><th>Quizzes passed</th><th>Certificates</th></tr>
+              </thead>
+              <tbody>
+                {data.map((l) => (
+                  <tr key={l.id}>
+                    <td><strong>{l.name}</strong><br /><span className="muted small">{l.email}</span></td>
+                    <td>{ago(l.last_seen_at)}</td>
+                    <td>{l.parts_completed}</td>
+                    <td>{l.quizzes_passed}</td>
+                    <td>{l.certificates}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {data && data.length >= 200 && <p className="muted small">Showing the 200 most recent learners. Use search to find others.</p>}
+      </section>
+    </Gate>
   )
 }

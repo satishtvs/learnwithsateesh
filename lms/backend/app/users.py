@@ -1,7 +1,7 @@
 import uuid
 from collections.abc import AsyncGenerator
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi_users import BaseUserManager, FastAPIUsers, InvalidPasswordException, UUIDIDMixin
 from fastapi_users.authentication import AuthenticationBackend, CookieTransport, JWTStrategy
@@ -94,3 +94,15 @@ fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend, g
 current_active_user = fastapi_users.current_user(active=True, verified=settings.require_verified_email)
 # None when nobody is signed in (used for free-preview content).
 optional_user = fastapi_users.current_user(optional=True, active=True, verified=settings.require_verified_email)
+
+
+async def current_learner(user: User = Depends(current_active_user)) -> User:
+    """A signed-in student. Instructor and admin accounts can preview courses but never study: their progress,
+    quiz attempts and certificates would mix with the learners' numbers. They use a separate student account for that."""
+    if user.role in ("instructor", "admin"):
+        raise HTTPException(
+            403,
+            "Instructor and admin accounts can preview courses but not take them. "
+            "Use a separate student account to study, take quizzes and earn certificates.",
+        )
+    return user

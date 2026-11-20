@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { listCourses, type CourseProgress, type CourseSummary } from './api'
-import { useAuth } from './auth'
+import { isStaffUser, useAuth } from './auth'
 import { CourseGrid } from './courses'
 import { shortTitle } from './format'
 import { useAllProgress, useSemesterCourses, useSyllabus } from './state'
@@ -233,5 +233,6 @@ function StudentHome() {
 
 export function Home() {
   const { user } = useAuth()
+  if (isStaffUser(user)) return <Navigate to="/admin" replace />
   return user ? <StudentHome /> : <VisitorHome />
 }

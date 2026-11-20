@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.courses import PartSummary, _course_query, _ordered_parts
 from app.db import get_async_session
 from app.models import Course, Part, PartProgress, Quiz, QuizAttempt, User
-from app.users import current_active_user
+from app.users import current_active_user, current_learner
 
 router = APIRouter(tags=["progress"])
 
@@ -137,7 +137,7 @@ async def set_part_completed(
     part_slug: str,
     body: CompletedBody,
     session: AsyncSession = Depends(get_async_session),
-    user: User = Depends(current_active_user),
+    user: User = Depends(current_learner),
 ):
     course = (await session.execute(_course_query(Course.slug == slug))).scalar_one_or_none()
     if course is None:

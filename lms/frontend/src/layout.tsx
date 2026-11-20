@@ -28,9 +28,18 @@ function readCollapsed(): boolean {
   }
 }
 
-type Section = 'home' | 'courses' | 'dashboard' | 'quizzes' | 'live' | 'admin' | 'me' | null
+type Section = 'home' | 'courses' | 'dashboard' | 'quizzes' | 'live' | 'admin' | 'me' | 'overview' | 'learners' | 'adminlive' | null
 
-function sectionOf(pathname: string): Section {
+function sectionOf(pathname: string, staff = false): Section {
+  if (staff) {
+    // Instructors and admins: their own area, plus the learner pages as a preview.
+    if (pathname === '/admin/learners') return 'learners'
+    if (pathname === '/admin/live') return 'adminlive'
+    if (pathname.startsWith('/admin')) return 'overview'
+    if (pathname === '/dashboard/profile') return 'me'
+    if (pathname.startsWith('/courses') || pathname === '/quizzes') return 'courses'
+    return null
+  }
   if (pathname === '/') return 'home'
   if (pathname.startsWith('/admin')) return 'admin'
   if (pathname === '/dashboard/profile') return 'me'
@@ -50,6 +59,9 @@ const PANEL_ENTRY: Record<Exclude<Section, null>, { label: string; to: string; i
   live: { label: 'Live sessions', to: '/live', icon: 'live' },
   admin: { label: 'Manage content', to: '/admin', icon: 'settings' },
   me: { label: 'Me and settings', to: '/dashboard/profile', icon: 'user' },
+  overview: { label: 'Overview', to: '/admin', icon: 'grid' },
+  learners: { label: 'Learners', to: '/admin/learners', icon: 'learning' },
+  adminlive: { label: 'Live sessions', to: '/admin/live', icon: 'live' },
 }
 
 function RailLink({ to, label, icon, active, onActive }: { to: string; label: string; icon: IconName; active: boolean; onActive?: () => void }) {
@@ -88,7 +100,9 @@ export function Shell() {
   const [openAt, setOpenAt] = useState<string | null>(null)
   // Every rail icon has a panel (Courses: my syllabus + my semester; the others: one entry named after the icon).
   // Pages that belong to no icon (sign-in, legal pages) have none.
-  const hasPanel = sectionOf(pathname) !== null
+  const isStaff = user?.role === 'instructor' || user?.role === 'admin'
+  const section = sectionOf(pathname, isStaff)
+  const hasPanel = section !== null
   const open = hasPanel && (mode === 'inline' ? !collapsed : openAt === pathname)
   const panelRef = useRef<HTMLElement>(null)
   const toggleRef = useRef<HTMLButtonElement>(null)
@@ -125,11 +139,11 @@ export function Shell() {
     return () => window.removeEventListener('keydown', onKey)
   }, [floating])
 
-  const section = sectionOf(pathname)
-  const entry = PANEL_ENTRY[section ?? 'home']
+  // Students get the syllabus and semester tree under Courses; instructors only preview the learner pages.
+  const showTree = section === 'courses' && !isStaff
+  const entry = isStaff && section === 'courses' ? { ...PANEL_ENTRY.courses, label: 'Preview courses' } : PANEL_ENTRY[section ?? 'home']
   const name = user?.full_name || user?.email || ''
   const first = (user?.full_name || '').trim().split(/\s+/)[0] || name
-  const isStaff = user?.role === 'instructor' || user?.role === 'admin'
   const meTo = user ? '/dashboard/profile' : '/login'
 
   return (
@@ -142,12 +156,22 @@ export function Shell() {
           <img src="/icon-192.png" alt="" width={36} height={36} />
         </Link>
         <span className="rail-sep" aria-hidden="true" />
-        <RailLink to="/" label="Home" icon="home" active={section === 'home'} onActive={() => setOpen(!open)} />
-        <RailLink to="/courses" label="Courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
-        <RailLink to="/dashboard" label="Dashboard" icon="grid" active={section === 'dashboard'} onActive={() => setOpen(!open)} />
-        <RailLink to="/quizzes" label="Quizzes" icon="quiz" active={section === 'quizzes'} onActive={() => setOpen(!open)} />
-        <RailLink to="/live" label="Live sessions" icon="live" active={section === 'live'} onActive={() => setOpen(!open)} />
-        {isStaff && <RailLink to="/admin" label="Manage content" icon="settings" active={section === 'admin'} onActive={() => setOpen(!open)} />}
+        {isStaff ? (
+          <>
+            <RailLink to="/admin" label="Overview" icon="grid" active={section === 'overview'} onActive={() => setOpen(!open)} />
+            <RailLink to="/admin/learners" label="Learners" icon="learning" active={section === 'learners'} onActive={() => setOpen(!open)} />
+            <RailLink to="/admin/live" label="Live sessions" icon="live" active={section === 'adminlive'} onActive={() => setOpen(!open)} />
+            <RailLink to="/courses" label="Preview courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
+          </>
+        ) : (
+          <>
+            <RailLink to="/" label="Home" icon="home" active={section === 'home'} onActive={() => setOpen(!open)} />
+            <RailLink to="/courses" label="Courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
+            <RailLink to="/dashboard" label="Dashboard" icon="grid" active={section === 'dashboard'} onActive={() => setOpen(!open)} />
+            <RailLink to="/quizzes" label="Quizzes" icon="quiz" active={section === 'quizzes'} onActive={() => setOpen(!open)} />
+            <RailLink to="/live" label="Live sessions" icon="live" active={section === 'live'} onActive={() => setOpen(!open)} />
+          </>
+        )}
         <span className="rail-push" />
         {user ? (
           <Link to={meTo} className={`rail-item rail-me${section === 'me' ? ' active' : ''}`} aria-label={`Me: ${name}`} data-tip="Me and settings" aria-current={section === 'me' ? 'page' : undefined} onClick={(e) => { if (section === 'me') { e.preventDefault(); setOpen(!open) } }}>
@@ -170,13 +194,13 @@ export function Shell() {
         inert={!open}
       >
         <div className="lp-head">
-          <h2>{section === 'courses' && mode === 'sheet' ? 'My semester' : entry.label}</h2>
+          <h2>{showTree && mode === 'sheet' ? 'My semester' : entry.label}</h2>
           <button type="button" className="icon-btn lp-close" onClick={() => { setOpen(false); toggleRef.current?.focus() }} aria-label={mode === 'sheet' ? 'Close' : 'Hide the Learn panel'}>
             <Icon name={mode === 'sheet' ? 'x' : 'chevronLeft'} size={18} />
           </button>
         </div>
         <div className="lp-body">
-          {section === 'courses' ? (
+          {showTree ? (
             <>
               <SyllabusBox />
               <SemesterTree />
@@ -204,7 +228,7 @@ export function Shell() {
             aria-controls="learn-panel"
             onClick={() => setOpen(true)}
           >
-            <Icon name="layers" size={16} /> <span className="sem-label">{section === 'courses' ? 'My semester' : entry.label}</span>
+            <Icon name="layers" size={16} /> <span className="sem-label">{showTree ? 'My semester' : entry.label}</span>
           </button>
           <div className="top-right">
             {user ? (
@@ -235,12 +259,19 @@ export function Shell() {
       </div>
 
       <nav className="tabbar" aria-label="Main">
-        {([
-          ['/', 'Home', 'home', section === 'home'],
-          ['/courses', 'Courses', 'courses', section === 'courses'],
-          ['/quizzes', 'Quizzes', 'quiz', section === 'quizzes'],
-          [meTo, 'Me', 'user', section === 'me' || section === 'dashboard'],
-        ] as [string, string, IconName, boolean][]).map(([to, label, icon, active]) => (
+        {((isStaff
+          ? [
+              ['/admin', 'Overview', 'grid', section === 'overview'],
+              ['/admin/learners', 'Learners', 'learning', section === 'learners'],
+              ['/admin/live', 'Live', 'live', section === 'adminlive'],
+              [meTo, 'Me', 'user', section === 'me'],
+            ]
+          : [
+              ['/', 'Home', 'home', section === 'home'],
+              ['/courses', 'Courses', 'courses', section === 'courses'],
+              ['/quizzes', 'Quizzes', 'quiz', section === 'quizzes'],
+              [meTo, 'Me', 'user', section === 'me' || section === 'dashboard'],
+            ]) as [string, string, IconName, boolean][]).map(([to, label, icon, active]) => (
           <Link key={label} to={to} className={`tab${active ? ' active' : ''}`} aria-current={active ? 'page' : undefined}>
             <Icon name={icon} size={20} />
             <span>{label}</span>

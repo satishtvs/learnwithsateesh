@@ -398,7 +398,18 @@ export interface AdminOverview {
   recent_attempts: { learner: string; quiz_title: string; course_title: string; score: number; total: number; passed: boolean; created_at: string }[]
 }
 
+export interface AdminLearner {
+  id: string
+  name: string
+  email: string
+  last_seen_at: string | null
+  parts_completed: number
+  quizzes_passed: number
+  certificates: number
+}
+
 export const admin = {
+  learners: (q = '') => adminCall<AdminLearner[]>('GET', `/learners?q=${encodeURIComponent(q)}`),
   liveSessions: () => adminCall<AdminLiveSession[]>('GET', '/live-sessions'),
   saveLive: (id: number | undefined, b: LiveForm) =>
     id === undefined ? adminCall<AdminLiveSession>('POST', '/live-sessions', b) : adminCall<AdminLiveSession>('PUT', `/live-sessions/${id}`, b),

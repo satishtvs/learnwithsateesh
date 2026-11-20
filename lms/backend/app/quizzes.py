@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from app.db import get_async_session
 from app.models import Unit, Course, Quiz, QuizAttempt, User
-from app.users import current_active_user, optional_user
+from app.users import current_active_user, current_learner, optional_user
 
 router = APIRouter(prefix="/courses/{slug}/quizzes", tags=["quizzes"])
 
@@ -226,7 +226,7 @@ async def submit_attempt(
     quiz_slug: str,
     body: AttemptIn,
     session: AsyncSession = Depends(get_async_session),
-    user: User = Depends(current_active_user),
+    user: User = Depends(current_learner),
 ):
     _, quiz, _ = await _load_quiz(session, slug, quiz_slug)
     valid = {q.id: q for q in quiz.questions}

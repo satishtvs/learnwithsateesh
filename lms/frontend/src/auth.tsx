@@ -30,3 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export const useAuth = () => useContext(Ctx)
+
+/** Instructors and admins preview the learner pages; they do not study (their progress is never recorded). */
+export const isStaffUser = (u: User | null | undefined): boolean => u?.role === 'instructor' || u?.role === 'admin'

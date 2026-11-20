@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ApiError, getQuiz, listAllQuizzes, submitAttempt, type AttemptResult, type QuizDetail } from './api'
-import { useAuth } from './auth'
+import { isStaffUser, useAuth } from './auth'
 import { LoginGate, QuizStatus } from './courses'
 import { Icon, PageHeader } from './ui'
 
@@ -155,6 +155,7 @@ export function QuizRunner({
   onPassed?: () => void
 }) {
   const { user, loading } = useAuth()
+  const staff = isStaffUser(user)
   const loc = useLocation()
   const qc = useQueryClient()
   const [answers, setAnswers] = useState<Record<number, number>>({})
@@ -242,9 +243,10 @@ export function QuizRunner({
             </fieldset>
           ))}
           <div className="submit-bar">
+            {staff && <span className="muted small">Instructor preview: answers are not recorded.</span>}
             <span>{answered} of {total} answered{answered < total && ' · unanswered questions count as wrong'}</span>
             {submit.isError && <span role="alert" className="error">Could not submit. Try again.</span>}
-            <button type="submit" className="btn" disabled={submit.isPending || answered === 0}>
+            <button type="submit" className="btn" disabled={staff || submit.isPending || answered === 0} title={staff ? "Instructor preview: answers are not recorded" : undefined}>
               {submit.isPending ? 'Submitting…' : 'Submit answers'}
             </button>
           </div>

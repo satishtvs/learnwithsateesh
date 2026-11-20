@@ -112,3 +112,13 @@ export function Switch({ checked, onChange, label, hint, disabled }: { checked: 
     </label>
   )
 }
+
+/** Shown to instructors and admins on learner pages: they see what a student sees, but nothing is recorded. */
+export function PreviewBanner() {
+  return (
+    <p className="preview-banner" role="note">
+      <strong>Instructor preview.</strong> You see this page as a student does. Progress, quiz answers and certificates are not
+      recorded for instructor accounts. Use a separate student account to study.
+    </p>
+  )
+}

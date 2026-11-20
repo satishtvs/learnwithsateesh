@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { claimCertificate, getCourse, getCourseProgress, listCourseQuizzes, type PartSummary, type QuizSummary } from './api'
-import { useAuth } from './auth'
+import { isStaffUser, useAuth } from './auth'
 import { CourseMetaPills, QuizStatus } from './courses'
 import { groupRefs, partGroups, plural, shortTitle } from './format'
-import { CourseTile, Icon, Loading, ProgressBar } from './ui'
+import { CourseTile, Icon, Loading, PreviewBanner, ProgressBar } from './ui'
 
 // Taken from the instructor's own course slides ("About the instructor" slide).
 const INSTRUCTOR = {
@@ -80,6 +80,7 @@ export function PartList({
 export function CoursePage() {
   const { slug = '' } = useParams()
   const { user } = useAuth()
+  const staff = isStaffUser(user)
   const [copied, setCopied] = useState(false)
   const [claiming, setClaiming] = useState(false)
   const [claimError, setClaimError] = useState('')
@@ -88,7 +89,7 @@ export function CoursePage() {
   const progress = useQuery({
     queryKey: ['progress', slug],
     queryFn: () => getCourseProgress(slug),
-    enabled: !!user,
+    enabled: !!user && !staff,
     retry: false,
   })
   const quizzes = useQuery({
@@ -146,6 +147,7 @@ export function CoursePage() {
 
   return (
     <>
+      {staff && <PreviewBanner />}
       <nav className="crumbs" aria-label="Breadcrumb"><Link to="/courses">Courses</Link><Icon name="chevron" size={14} /><span>{title}</span></nav>
 
       <section className="course-head">

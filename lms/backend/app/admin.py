@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_async_session
-from app.models import Unit, Course, Part, PartProgress, Question, Quiz, QuizAttempt, User
+from app.models import Certificate, Unit, Course, Part, PartProgress, Question, Quiz, QuizAttempt, User
 from app.users import current_active_user
 
 
@@ -692,3 +692,75 @@ async def move_question(question_id: int, body: MoveIn, session: AsyncSession = 
     q = await get_or_404(session, Question, question_id, "Question")
     sibs = (await session.execute(select(Question).where(Question.quiz_id == q.quiz_id))).scalars().all()
     await move_within(session, list(sibs), question_id, body.direction)
+
+
+# ---------------------------------------------------------------- learners
+class LearnerRow(BaseModel):
+    id: str
+    name: str
+    email: str
+    last_seen_at: datetime | None
+    parts_completed: int
+    quizzes_passed: int
+    certificates: int
+
+
+@router.get("/learners", response_model=list[LearnerRow])
+async def learners(q: str = "", limit: int = 200, session: AsyncSession = Depends(get_async_session)):
+    """Students (not instructors or admins) with a one-line view of their progress, most recently active first."""
+    limit = max(1, min(limit, 500))
+    query = select(User).where(User.role == "student")
+    term = q.strip().lower()
+    if term:
+        like = f"%{term}%"
+        query = query.where(func.lower(User.email).like(like) | func.lower(func.coalesce(User.full_name, "")).like(like))
+    users = (await session.execute(query)).unique().scalars().all()
+    ids = [u.id for u in users]
+    if not ids:
+        return []
+
+    seen_done = {
+        r[0]: (r[1], r[2])
+        for r in (
+            await session.execute(
+                select(
+                    PartProgress.user_id,
+                    func.max(PartProgress.last_seen_at),
+                    func.count(PartProgress.completed_at),
+                ).where(PartProgress.user_id.in_(ids)).group_by(PartProgress.user_id)
+            )
+        ).all()
+    }
+    passed = dict(
+        (
+            await session.execute(
+                select(QuizAttempt.user_id, func.count(func.distinct(QuizAttempt.quiz_id)))
+                .where(QuizAttempt.user_id.in_(ids), QuizAttempt.passed.is_(True))
+                .group_by(QuizAttempt.user_id)
+            )
+        ).all()
+    )
+    certs = dict(
+        (
+            await session.execute(
+                select(Certificate.user_id, func.count()).where(Certificate.user_id.in_(ids)).group_by(Certificate.user_id)
+            )
+        ).all()
+    )
+    rows = [
+        LearnerRow(
+            id=str(u.id), name=(u.full_name or "").strip() or u.email.split("@")[0], email=u.email,
+            last_seen_at=seen_done.get(u.id, (None, 0))[0], parts_completed=seen_done.get(u.id, (None, 0))[1],
+            quizzes_passed=passed.get(u.id, 0), certificates=certs.get(u.id, 0),
+        )
+        for u in users
+    ]
+    far_past = datetime.min.replace(tzinfo=timezone.utc)
+    def _key(r: LearnerRow) -> datetime:
+        t = r.last_seen_at
+        if t is None:
+            return far_past
+        return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+    rows.sort(key=_key, reverse=True)
+    return rows[:limit]
