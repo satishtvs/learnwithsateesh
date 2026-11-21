@@ -35,12 +35,12 @@ units:
     label: "Unit - III"
     textbook_ref: "Marsland ch. 12-13, 7"
     parts:
-      - {slug: u3-p1, title: "Part 1: Decision trees, entropy and ID3", youtube_id: iVcQdsB3i38}
-      - {slug: u3-p2, title: "Part 2: CART, Gini impurity and pruning", youtube_id: hOZr9sAGqyw}
-      - {slug: u3-p3, title: "Part 3: Ensemble learning, bagging, random forests and boosting", youtube_id: l6Ukf7G4n4E}
-      - {slug: u3-p4, title: "Part 4: Basic statistics and Gaussian mixture models", youtube_id: d-wHDD6XmM0}
-      - {slug: u3-p5, title: "Part 5: Nearest neighbour methods", youtube_id: 0FaCRtFZgto}
-      - {slug: u3-p6, title: "Part 6: Unsupervised learning and k-means", youtube_id: 6Vc4vat1yWc}
+      - {slug: u3-p1, title: "Part 1: Decision trees, entropy and ID3", youtube_id: WGsLB8uWa9M}
+      - {slug: u3-p2, title: "Part 2: CART, Gini impurity and pruning", youtube_id: Gxc2HPQLiyM}
+      - {slug: u3-p3, title: "Part 3: Ensemble learning, bagging, random forests and boosting", youtube_id: 60M10bvHFWk}
+      - {slug: u3-p4, title: "Part 4: Basic statistics and Gaussian mixture models", youtube_id: 8D9LvudGofs}
+      - {slug: u3-p5, title: "Part 5: Nearest neighbour methods", youtube_id: L-AQUrpkftg}
+      - {slug: u3-p6, title: "Part 6: Unsupervised learning and k-means", youtube_id: blWYdvn4kB0}
   - code: U4
     title: "Dimensionality Reduction and Evolutionary Learning"
     label: "Unit - IV"
