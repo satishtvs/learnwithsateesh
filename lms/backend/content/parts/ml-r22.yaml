@@ -25,11 +25,11 @@ units:
     label: "Unit - II"
     textbook_ref: "Marsland ch. 4, 5, 8"
     parts:
-      - {slug: u2-p1, title: "Part 1: The multi-layer perceptron and going forwards", youtube_id: Plj6aTiUmcI}
-      - {slug: u2-p2, title: "Part 2: Back-propagation of error", youtube_id: oYYJxJhD5Rw}
-      - {slug: u2-p3, title: "Part 3: The multi-layer perceptron in practice", youtube_id: AjaNHD5bplw}
-      - {slug: u2-p4, title: "Part 4: Radial basis functions and splines", youtube_id: JMIE2k99_QE}
-      - {slug: u2-p5, title: "Part 5: Support vector machines", youtube_id: -LbNQU4k-WQ}
+      - {slug: u2-p1, title: "Part 1: The multi-layer perceptron and going forwards", youtube_id: w9WNbcCB9RE}
+      - {slug: u2-p2, title: "Part 2: Back-propagation of error", youtube_id: gOZWVHSwzYg}
+      - {slug: u2-p3, title: "Part 3: The multi-layer perceptron in practice", youtube_id: t7iLPVZvqo0}
+      - {slug: u2-p4, title: "Part 4: Radial basis functions and splines", youtube_id: xYm2mlrp4nw}
+      - {slug: u2-p5, title: "Part 5: Support vector machines", youtube_id: jTwweeBDP1g}
   - code: U3
     title: "Trees, Ensembles, Statistics and Unsupervised Learning"
     label: "Unit - III"
