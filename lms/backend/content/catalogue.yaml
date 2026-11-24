@@ -37,3 +37,10 @@ courses:
     branches: [cse-aiml]
     year: 3
     semester: 1
+  - slug: deep-learning-r22
+    university: jntuh
+    regulations: [R22]
+    branches: [cse-aiml]
+    year: 4
+    semester: 1
+    subject_code: AM701PC

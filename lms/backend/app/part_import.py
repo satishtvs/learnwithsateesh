@@ -17,6 +17,9 @@ from app.models import Unit, Course, Part
 CONTENT = Path(__file__).resolve().parent.parent / "content"
 PARTS_DIR = CONTENT / "parts"
 NOTES_DIR = CONTENT / "part_notes"
+# Courses whose notes live in content/part_notes/<course slug>__<part slug>.md (part slugs repeat across courses; the
+# older courses keep the bare <part slug>.md files).
+NAMESPACED_NOTES = {"deep-learning-r22"}
 YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
 
 
@@ -72,7 +75,7 @@ async def import_part_data(session: AsyncSession, data: dict, notes_dir: Path = 
         for le in chdata["parts"]:
             if not le.get("youtube_id") or le["slug"] in have:
                 continue
-            notes_file = notes_dir / f"{le['slug']}.md"
+            notes_file = notes_dir / (f"{course.slug}__{le['slug']}.md" if course.slug in NAMESPACED_NOTES else f"{le['slug']}.md")
             session.add(Part(
                 course_id=course.id, unit_id=unit.id, slug=le["slug"], title=le["title"].strip(),
                 youtube_id=str(le["youtube_id"]), position=pos, is_preview=bool(le.get("preview", False)),

@@ -1,0 +1,69 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I): the video parts.
+# Fill in `youtube_id` (the 11-character id from the YouTube link) once a video is uploaded, then run the seed.
+# Parts without an id are skipped; units are created together with their first part.
+# The course itself stays unpublished (hidden from students) until it is published in the instructor admin.
+# Ids are written by `python -m lws.package apply` (keys dl-u1-p1 ...); keep the `youtube_id: null` placeholders.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning (MIT Press)."
+
+units:
+  - code: U1
+    title: "Machine Learning Basics and Deep Feedforward Networks"
+    label: "Unit - I"
+    textbook_ref: "Goodfellow et al. ch. 5-6"
+    parts:
+      - {slug: u1-p1, title: "Part 1: What is a learning algorithm? Linear regression and gradient descent", youtube_id: HDqVq-qDQbg}
+      - {slug: u1-p2, title: "Part 2: Capacity, overfitting and underfitting", youtube_id: mLKjrfpzusw}
+      - {slug: u1-p3, title: "Part 3: Hyperparameters, validation sets and k-fold cross-validation", youtube_id: v0nKjymMAJo}
+      - {slug: u1-p4, title: "Part 4: Estimators, bias and variance", youtube_id: P6CdFtw-xOE}
+      - {slug: u1-p5, title: "Part 5: Maximum likelihood and Bayesian statistics", youtube_id: imr6f8S856Y}
+      - {slug: u1-p6, title: "Part 6: Logistic regression, SVM, kNN, PCA, SGD and the curse of dimensionality", youtube_id: K9jqKE57LIk}
+      - {slug: u1-p7, title: "Part 7: Deep feedforward networks: XOR, cost functions, output and hidden units", youtube_id: 3VHs_26MFb8}
+      - {slug: u1-p8, title: "Part 8: Architecture design and back-propagation", youtube_id: tjGNz3WZbQ0}
+  - code: U2
+    title: "Regularisation and Optimisation"
+    label: "Unit - II"
+    textbook_ref: "Goodfellow et al. ch. 7-8"
+    parts:
+      - {slug: u2-p1, title: "Part 1: Parameter norm penalties: L2 and L1 regularisation", youtube_id: null}
+      - {slug: u2-p2, title: "Part 2: Dataset augmentation, noise, multi-task learning and early stopping", youtube_id: null}
+      - {slug: u2-p3, title: "Part 3: Parameter tying, sparse representations, bagging and dropout", youtube_id: null}
+      - {slug: u2-p4, title: "Part 4: Adversarial training, tangent distance and tangent prop", youtube_id: null}
+      - {slug: u2-p5, title: "Part 5: Optimisation for training deep models: challenges", youtube_id: null}
+      - {slug: u2-p6, title: "Part 6: SGD, momentum, Nesterov and weight initialisation", youtube_id: null}
+      - {slug: u2-p7, title: "Part 7: AdaGrad, RMSProp and Adam", youtube_id: null}
+  - code: U3
+    title: "Convolutional Networks"
+    label: "Unit - III"
+    textbook_ref: "Goodfellow et al. ch. 9"
+    parts:
+      - {slug: u3-p1, title: "Part 1: The convolution operation and its motivation", youtube_id: null}
+      - {slug: u3-p2, title: "Part 2: Pooling; convolution and pooling as an infinitely strong prior", youtube_id: null}
+      - {slug: u3-p3, title: "Part 3: Variants of the basic convolution function", youtube_id: null}
+      - {slug: u3-p4, title: "Part 4: Structured outputs, data types and efficient convolution algorithms", youtube_id: null}
+      - {slug: u3-p5, title: "Part 5: Random or unsupervised features; a small CNN worked end to end", youtube_id: null}
+  - code: U4
+    title: "Recurrent and Recursive Nets"
+    label: "Unit - IV"
+    textbook_ref: "Goodfellow et al. ch. 10"
+    parts:
+      - {slug: u4-p1, title: "Part 1: Unfolding computational graphs; recurrent neural networks", youtube_id: null}
+      - {slug: u4-p2, title: "Part 2: Bidirectional RNNs and encoder-decoder sequence-to-sequence architectures", youtube_id: null}
+      - {slug: u4-p3, title: "Part 3: Deep recurrent networks and recursive neural networks", youtube_id: null}
+      - {slug: u4-p4, title: "Part 4: The challenge of long-term dependencies; echo state networks", youtube_id: null}
+      - {slug: u4-p5, title: "Part 5: Leaky units, multiple time scales, LSTM and other gated RNNs", youtube_id: null}
+      - {slug: u4-p6, title: "Part 6: Optimisation for long-term dependencies; explicit memory", youtube_id: null}
+  - code: U5
+    title: "Practical Methodology and Applications"
+    label: "Unit - V"
+    textbook_ref: "Goodfellow et al. ch. 11-12"
+    parts:
+      - {slug: u5-p1, title: "Part 1: Performance metrics and default baseline models", youtube_id: null}
+      - {slug: u5-p2, title: "Part 2: Gathering more data and selecting hyperparameters", youtube_id: null}
+      - {slug: u5-p3, title: "Part 3: Debugging strategies; multi-digit number recognition", youtube_id: null}
+      - {slug: u5-p4, title: "Part 4: Large-scale deep learning and computer vision", youtube_id: null}
+      - {slug: u5-p5, title: "Part 5: Speech recognition and natural language processing", youtube_id: null}
+      - {slug: u5-p6, title: "Part 6: Other applications; course summary and exam strategy", youtube_id: null}

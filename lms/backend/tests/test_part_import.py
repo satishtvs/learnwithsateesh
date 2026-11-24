@@ -93,3 +93,16 @@ async def test_notes_are_loaded_from_files(tmp_path):
 async def test_seed_import_with_shipped_file_creates_nothing_yet():
     async with async_session_maker() as s:
         assert await import_all_parts(s) == 0
+
+
+def test_shipped_deep_learning_file_is_valid_and_only_ready_units_have_videos():
+    data = parse_part_file(yaml.safe_load((PARTS_DIR / "dl-r22.yaml").read_text(encoding="utf-8")))
+    assert data["course"]["slug"] == "deep-learning-r22"
+    counts = {ch["code"]: len(ch["parts"]) for ch in data["units"]}
+    assert counts == {"U1": 8, "U2": 7, "U3": 5, "U4": 6, "U5": 6}
+    for ch in data["units"]:
+        assert [le["slug"] for le in ch["parts"]] == [f"u{ch['code'][1]}-p{i}" for i in range(1, counts[ch["code"]] + 1)]
+    # only units whose videos are uploaded carry ids; the rest import nothing and the course stays hidden
+    with_ids = {ch["code"] for ch in data["units"] if any(le.get("youtube_id") for le in ch["parts"])}
+    assert with_ids <= {"U1", "U2", "U3", "U4", "U5"}
+    assert all(le.get("youtube_id") for le in next(ch for ch in data["units"] if ch["code"] == "U1")["parts"])
