@@ -212,6 +212,30 @@ function ResumeCard() {
   )
 }
 
+/** Courses the student has started that are not part of the saved semester (e.g. studying a year ahead). */
+function OtherCourses() {
+  const { complete } = useSyllabus()
+  const semester = useSemesterCourses()
+  const all = useAllCourses()
+  const progress = useAllProgress()
+  if (!complete || !semester.data || !all.data || !progress.data) return null
+  const inSemester = new Set(semester.data.map((c) => c.slug))
+  const started = new Set(progress.data.filter((p) => p.started).map((p) => p.course_slug))
+  const others = all.data.filter((c) => started.has(c.slug) && !inSemester.has(c.slug))
+  if (!others.length) return null
+  return (
+    <section className="block" id="other-courses">
+      <div className="section-row">
+        <div>
+          <h2 className="section-title">Other courses you're following</h2>
+          <p className="muted small">From other semesters</p>
+        </div>
+      </div>
+      <CourseGrid courses={others} loading={false} />
+    </section>
+  )
+}
+
 function StudentHome() {
   const { user } = useAuth()
   const { complete, ready } = useSyllabus()
@@ -227,6 +251,7 @@ function StudentHome() {
       {ready && !complete && <SetupCard />}
       <ResumeCard />
       <SemesterSection />
+      <OtherCourses />
     </>
   )
 }
