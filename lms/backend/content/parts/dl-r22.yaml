@@ -28,13 +28,13 @@ units:
     label: "Unit - II"
     textbook_ref: "Goodfellow et al. ch. 7-8"
     parts:
-      - {slug: u2-p1, title: "Part 1: Parameter norm penalties: L2 and L1 regularisation", youtube_id: null}
-      - {slug: u2-p2, title: "Part 2: Dataset augmentation, noise, multi-task learning and early stopping", youtube_id: null}
-      - {slug: u2-p3, title: "Part 3: Parameter tying, sparse representations, bagging and dropout", youtube_id: null}
-      - {slug: u2-p4, title: "Part 4: Adversarial training, tangent distance and tangent prop", youtube_id: null}
-      - {slug: u2-p5, title: "Part 5: Optimisation for training deep models: challenges", youtube_id: null}
-      - {slug: u2-p6, title: "Part 6: SGD, momentum, Nesterov and weight initialisation", youtube_id: null}
-      - {slug: u2-p7, title: "Part 7: AdaGrad, RMSProp and Adam", youtube_id: null}
+      - {slug: u2-p1, title: "Part 1: Parameter norm penalties: L2 and L1 regularisation", youtube_id: G5W4YHlET_I}
+      - {slug: u2-p2, title: "Part 2: Dataset augmentation, noise, multi-task learning and early stopping", youtube_id: 0l_a3NDkovM}
+      - {slug: u2-p3, title: "Part 3: Parameter tying, sparse representations, bagging and dropout", youtube_id: fa66LoapcTg}
+      - {slug: u2-p4, title: "Part 4: Adversarial training, tangent distance and tangent prop", youtube_id: 5ylIeX2eyHg}
+      - {slug: u2-p5, title: "Part 5: Optimisation for training deep models: challenges", youtube_id: dJCxjvqyyL0}
+      - {slug: u2-p6, title: "Part 6: SGD, momentum, Nesterov and weight initialisation", youtube_id: bFhWyIjoqRE}
+      - {slug: u2-p7, title: "Part 7: AdaGrad, RMSProp and Adam", youtube_id: 9JOZ2r82Iv8}
   - code: U3
     title: "Convolutional Networks"
     label: "Unit - III"
