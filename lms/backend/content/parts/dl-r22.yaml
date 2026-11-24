@@ -40,22 +40,22 @@ units:
     label: "Unit - III"
     textbook_ref: "Goodfellow et al. ch. 9"
     parts:
-      - {slug: u3-p1, title: "Part 1: The convolution operation and its motivation", youtube_id: null}
-      - {slug: u3-p2, title: "Part 2: Pooling; convolution and pooling as an infinitely strong prior", youtube_id: null}
-      - {slug: u3-p3, title: "Part 3: Variants of the basic convolution function", youtube_id: null}
-      - {slug: u3-p4, title: "Part 4: Structured outputs, data types and efficient convolution algorithms", youtube_id: null}
-      - {slug: u3-p5, title: "Part 5: Random or unsupervised features; a small CNN worked end to end", youtube_id: null}
+      - {slug: u3-p1, title: "Part 1: The convolution operation and its motivation", youtube_id: QBEtA1KWJWU}
+      - {slug: u3-p2, title: "Part 2: Pooling; convolution and pooling as an infinitely strong prior", youtube_id: FtveCejrQ5s}
+      - {slug: u3-p3, title: "Part 3: Variants of the basic convolution function", youtube_id: v1P-ugzIpmI}
+      - {slug: u3-p4, title: "Part 4: Structured outputs, data types and efficient convolution algorithms", youtube_id: 9UwW6RjX2tg}
+      - {slug: u3-p5, title: "Part 5: Random or unsupervised features; a small CNN worked end to end", youtube_id: wWG10JrLHXA}
   - code: U4
     title: "Recurrent and Recursive Nets"
     label: "Unit - IV"
     textbook_ref: "Goodfellow et al. ch. 10"
     parts:
-      - {slug: u4-p1, title: "Part 1: Unfolding computational graphs; recurrent neural networks", youtube_id: null}
-      - {slug: u4-p2, title: "Part 2: Bidirectional RNNs and encoder-decoder sequence-to-sequence architectures", youtube_id: null}
-      - {slug: u4-p3, title: "Part 3: Deep recurrent networks and recursive neural networks", youtube_id: null}
-      - {slug: u4-p4, title: "Part 4: The challenge of long-term dependencies; echo state networks", youtube_id: null}
-      - {slug: u4-p5, title: "Part 5: Leaky units, multiple time scales, LSTM and other gated RNNs", youtube_id: null}
-      - {slug: u4-p6, title: "Part 6: Optimisation for long-term dependencies; explicit memory", youtube_id: null}
+      - {slug: u4-p1, title: "Part 1: Unfolding computational graphs; recurrent neural networks", youtube_id: ILEMuMxSA2o}
+      - {slug: u4-p2, title: "Part 2: Bidirectional RNNs and encoder-decoder sequence-to-sequence architectures", youtube_id: ZHKoajRvYpM}
+      - {slug: u4-p3, title: "Part 3: Deep recurrent networks and recursive neural networks", youtube_id: O7khzE__mVY}
+      - {slug: u4-p4, title: "Part 4: The challenge of long-term dependencies; echo state networks", youtube_id: igRmkVYbOeE}
+      - {slug: u4-p5, title: "Part 5: Leaky units, multiple time scales, LSTM and other gated RNNs", youtube_id: BqnugZYzUCM}
+      - {slug: u4-p6, title: "Part 6: Optimisation for long-term dependencies; explicit memory", youtube_id: 64IHAtYkOL0}
   - code: U5
     title: "Practical Methodology and Applications"
     label: "Unit - V"
