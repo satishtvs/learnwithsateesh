@@ -61,9 +61,9 @@ units:
     label: "Unit - V"
     textbook_ref: "Goodfellow et al. ch. 11-12"
     parts:
-      - {slug: u5-p1, title: "Part 1: Performance metrics and default baseline models", youtube_id: null}
-      - {slug: u5-p2, title: "Part 2: Gathering more data and selecting hyperparameters", youtube_id: null}
-      - {slug: u5-p3, title: "Part 3: Debugging strategies; multi-digit number recognition", youtube_id: null}
-      - {slug: u5-p4, title: "Part 4: Large-scale deep learning and computer vision", youtube_id: null}
-      - {slug: u5-p5, title: "Part 5: Speech recognition and natural language processing", youtube_id: null}
-      - {slug: u5-p6, title: "Part 6: Other applications; course summary and exam strategy", youtube_id: null}
+      - {slug: u5-p1, title: "Part 1: Performance metrics and default baseline models", youtube_id: 8Bj8HhTDwUk}
+      - {slug: u5-p2, title: "Part 2: Gathering more data and selecting hyperparameters", youtube_id: uBmoANvh6ak}
+      - {slug: u5-p3, title: "Part 3: Debugging strategies; multi-digit number recognition", youtube_id: UzGadPQAgzc}
+      - {slug: u5-p4, title: "Part 4: Large-scale deep learning and computer vision", youtube_id: _uUCJVAOavE}
+      - {slug: u5-p5, title: "Part 5: Speech recognition and natural language processing", youtube_id: 8ksOKokcCCI}
+      - {slug: u5-p6, title: "Part 6: Other applications; course summary and exam strategy", youtube_id: tNaf6FrfbHk}
