@@ -1,0 +1,783 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I), Unit I quizzes.
+# Questions are original; they follow the Unit I slides and narration (8 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning."
+  published: true
+unit:
+  code: U1
+  title: "Machine Learning Basics and Deep Feedforward Networks"
+  label: "Unit - I"
+  textbook_ref: "Goodfellow et al. ch. 5-6"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u1-p1
+    title: "Part 1: What is a learning algorithm? Linear regression and gradient descent"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A program is said to learn from experience E with respect to task T and performance measure P when:"
+        options:
+          - "Its code is rewritten by a programmer after each run"
+          - "It stores every example it has ever seen"
+          - "Its performance at T, measured by P, improves with E"
+          - "Its training set grows larger than its test set"
+        answer: C
+        explain: "Learning is defined by improvement: performance on the task, as measured by P, gets better as experience E increases."
+
+      - q: "In supervised learning, what does the dataset contain that unsupervised learning does not?"
+        options:
+          - "A label or target for every example"
+          - "More features per example"
+          - "A cost function"
+          - "A test set"
+        answer: A
+        explain: "Supervised learning learns from labelled examples. Unsupervised learning, such as k means, has only the inputs and looks for structure."
+
+      - q: "A design matrix X holds m examples with n features each. What are its dimensions?"
+        options:
+          - "n rows and m columns"
+          - "m rows and m columns"
+          - "n rows and n columns"
+          - "m rows and n columns"
+        answer: D
+        explain: "Each example is one row and each feature is one column, so X has m rows and n columns."
+
+      - q: "Why is the squared error used in the mean squared error cost instead of the plain error?"
+        options:
+          - "It makes the computation faster"
+          - "Positive and negative errors cannot cancel each other out"
+          - "It forces the weights to be positive"
+          - "It guarantees the training error becomes zero"
+        answer: B
+        explain: "Squaring makes every term nonnegative, so errors of opposite sign do not cancel when we average."
+
+      - q: "The normal equation w = inverse(X^T X) X^T y is not used to train deep networks mainly because:"
+        options:
+          - "It applies only to linear models and needs a costly matrix inverse for many features"
+          - "It always gives a worse cost than gradient descent"
+          - "It needs labels, which deep networks do not have"
+          - "It cannot be written in matrix form"
+        answer: A
+        explain: "A closed form exists only for linear models, and the inverse is slow when there are very many features. Gradient descent works for any differentiable model."
+
+      - q: "In gradient descent, what happens when the learning rate is too large?"
+        options:
+          - "The cost falls very slowly but surely"
+          - "The model ends at a different, better minimum"
+          - "The training error becomes exactly zero"
+          - "Each step overshoots the valley and the cost can grow without limit"
+        answer: D
+        explain: "Steps that are too big jump across the valley and land higher each time, which is divergence. A rate that is too small only wastes time."
+
+      - q: "The linear regression cost surface over w and b has a single bowl and one minimum. This property is called:"
+        options:
+          - "Saturation"
+          - "Convexity"
+          - "Regularisation"
+          - "Sparsity"
+        answer: B
+        explain: "A convex cost has no spurious valleys, so gradient descent cannot get stuck. Neural network costs lose this property."
+
+      - q: "According to the four-part recipe for a learning algorithm, what does a neural network change compared with linear regression?"
+        options:
+          - "The dataset only"
+          - "The optimisation procedure only"
+          - "The model, so the cost is no longer convex and gradient descent is needed"
+          - "Nothing, it uses the same model"
+        answer: C
+        explain: "The model becomes a multilayer network. The cost then has no closed-form minimum, so we train it with gradient descent."
+
+      - q: "In the student marks example, what is the experience E?"
+        options:
+          - "The dataset of six students with hours studied and marks"
+          - "Predicting marks from hours studied"
+          - "The error measured on new students"
+          - "The line w x + b"
+        answer: A
+        explain: "The task is predicting marks, the performance measure is error on unseen students, and the experience is the dataset of six students."
+
+      - q: "Which task asks the program to predict a number, such as the price of a house?"
+        options:
+          - "Classification"
+          - "Transcription"
+          - "Regression"
+          - "Anomaly detection"
+        answer: C
+        explain: "Regression outputs a real number, while classification outputs one of k labels."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u1-p2
+    title: "Part 2: Capacity, overfitting and underfitting"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which error do we truly care about when we deploy a model?"
+        options:
+          - "The training error"
+          - "The generalisation error on new examples"
+          - "The error on the first training example"
+          - "The error of the optimiser"
+        answer: B
+        explain: "The generalisation error measures performance on unseen data, which is what matters in use. We estimate it on a held-back test set."
+
+      - q: "What does the i.i.d. assumption say about the data?"
+        options:
+          - "Every example is a copy of the previous one"
+          - "Test examples are always easier than training examples"
+          - "The data contains no noise"
+          - "Examples are drawn independently from the same source"
+        answer: D
+        explain: "With independent, identically distributed examples, training and test data come from the same process, which makes the test error a fair estimate."
+
+      - q: "What is the capacity of a model?"
+        options:
+          - "Its ability to fit a wide variety of functions"
+          - "The number of training examples it can store"
+          - "The time it needs to train"
+          - "The size of its test set"
+        answer: A
+        explain: "Capacity describes how rich the hypothesis space is. Raising the polynomial degree or adding parameters usually raises it."
+
+      - q: "In the ten-point polynomial experiment, the degree 9 curve has zero training error but a high test error. This is:"
+        options:
+          - "Underfitting"
+          - "Convergence"
+          - "Overfitting"
+          - "Noise reduction"
+        answer: C
+        explain: "Overfitting means a large gap between training and test error. The curve passes through every point but swings wildly in between."
+
+      - q: "How does the training error change as polynomial degree increases, and what shape does the test error make?"
+        options:
+          - "Both errors only increase"
+          - "Training error falls steadily, test error is U shaped"
+          - "Training error rises, test error falls steadily"
+          - "Both errors form a U shape"
+        answer: B
+        explain: "More capacity can only lower the training error, but beyond the best degree the test error climbs again, giving the U shape."
+
+      - q: "Which remedy is NOT appropriate for overfitting?"
+        options:
+          - "Collect more training data"
+          - "Choose a simpler model"
+          - "Move to a model with far lower capacity than needed"
+          - "Add a penalty on large weights"
+        answer: C
+        explain: "Moving to a much lower capacity than needed would cause underfitting, which is a different failure. Data, simplicity and a penalty all help reduce overfitting."
+
+      - q: "What does the VC dimension of a classifier measure?"
+        options:
+          - "The largest number of points it can label in every possible way"
+          - "The number of layers it has"
+          - "The number of classes it can predict"
+          - "The learning rate it needs"
+        answer: A
+        explain: "A classifier shatters a set of points if it can realise every labelling. A line in a plane shatters three points, so its VC dimension is three."
+
+      - q: "The no free lunch theorem implies that:"
+        options:
+          - "Deep networks are always the best choice"
+          - "Training error is a perfect guide to test error"
+          - "No learning algorithm is best on average over all possible problems"
+          - "More data never helps"
+        answer: C
+        explain: "Averaged over every possible problem, all learners do equally well, so we pick models that suit the structure of our own problem."
+
+      - q: "What does a low training error alone prove about a model?"
+        options:
+          - "That its test error is also low"
+          - "Nothing certain, since a flexible model can push training error towards zero"
+          - "That it is underfitting"
+          - "That the data contains no noise"
+        answer: B
+        explain: "Only the error on unseen data tells us how well the model generalises."
+
+      - q: "A degree 9 polynomial is fitted with more and more training examples, from 10 up to 100. What happens to its test error?"
+        options:
+          - "It rises steadily"
+          - "It stays at the same value"
+          - "It becomes zero"
+          - "It falls close to the noise floor"
+        answer: D
+        explain: "With enough data the same flexible model stops overfitting, so more data is the most reliable cure."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u1-p3
+    title: "Part 3: Hyperparameters, validation sets and k-fold cross-validation"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which of these is a hyperparameter rather than a parameter?"
+        options:
+          - "The polynomial degree"
+          - "A weight learned by gradient descent"
+          - "A bias learned from the data"
+          - "The slope w of a fitted line"
+        answer: A
+        explain: "Hyperparameters such as degree, learning rate and weight decay are chosen by us before training. Weights and biases are learned."
+
+      - q: "Why can the training error not be used to choose the polynomial degree?"
+        options:
+          - "It is always the same for every degree"
+          - "It cannot be computed for polynomials"
+          - "A larger degree can only lower it, so it would always pick the largest degree"
+          - "It is measured on the test set"
+        answer: C
+        explain: "A bigger polynomial contains the smaller ones, so its training error is never higher. That says nothing about generalisation."
+
+      - q: "What is the job of the validation set?"
+        options:
+          - "To fit the weights by gradient descent"
+          - "To choose hyperparameters and compare models"
+          - "To give the final score exactly once"
+          - "To replace the training set"
+        answer: B
+        explain: "The training set fits parameters, the validation set guides design choices, and the test set is saved for the final honest score."
+
+      - q: "A 40-example pool is split 60, 20, 20. How many examples go to the validation set?"
+        options:
+          - "4"
+          - "24"
+          - "12"
+          - "8"
+        answer: D
+        explain: "Twenty percent of 40 is 8. The training set gets 24 and the test set gets 8."
+
+      - q: "In 5-fold cross-validation, how is each example used?"
+        options:
+          - "Only for training, never for validation"
+          - "For validation in every fold"
+          - "For validation exactly once and for training in the other folds"
+          - "Only in the test set"
+        answer: C
+        explain: "Each fold takes one turn as the validation set while the model trains on the other four, and the five errors are averaged."
+
+      - q: "Cross-validation gave mean errors of 1.26, 1.68, 0.42, 0.76 and 1.30 for degrees 1 to 5. Which degree is chosen?"
+        options:
+          - "Degree 1"
+          - "Degree 3"
+          - "Degree 4"
+          - "Degree 5"
+        answer: B
+        explain: "We choose the degree with the lowest mean validation error, which is 0.42 at degree 3."
+
+      - q: "Which of the following is an example of leakage?"
+        options:
+          - "Shuffling the data before splitting"
+          - "Fitting the model on the training set only"
+          - "Using a validation set to pick the learning rate"
+          - "Computing feature means on the whole dataset before splitting"
+        answer: D
+        explain: "Scaling statistics computed on all the data let test information influence training. They should be computed on the training data only."
+
+      - q: "For time series data, how should the validation split be made?"
+        options:
+          - "Train on earlier blocks and validate on the next block, without shuffling"
+          - "Shuffle all points and split at random"
+          - "Train on the future to predict the past"
+          - "Use only the first point"
+        answer: A
+        explain: "Order matters in time series, so training on the future to predict the past would leak information and fail in real use."
+
+      - q: "Why must the test set be used only once, at the very end?"
+        options:
+          - "It becomes too small to use again"
+          - "It would otherwise change the weights directly"
+          - "If its score changes a decision it becomes a validation set and the final score turns optimistic"
+          - "Using it twice doubles the training time"
+        answer: C
+        explain: "The test set gives an honest estimate only if it never takes part in any choice."
+
+      - q: "A plain random 5-fold split of 100 examples with 10 rare cases can leave a fold with no rare example. Which fix keeps the class mix in every fold?"
+        options:
+          - "A time series split"
+          - "Scaling on all the data"
+          - "Using one fold only"
+          - "A stratified split"
+        answer: D
+        explain: "Stratified splitting gives each fold the same class proportions, here two rare examples per fold."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u1-p4
+    title: "Part 4: Estimators, bias and variance"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is an estimator?"
+        options:
+          - "The true value of a parameter"
+          - "The number computed from one particular sample"
+          - "The size of the sample"
+          - "A rule that turns any sample into a guess for a parameter"
+        answer: D
+        explain: "The estimator is the rule, such as add and divide by the count. The number it gives for an actual sample is the estimate."
+
+      - q: "Five values are 12, 15, 11, 14 and 18 with mean 14. The sum of squared deviations is 30. What is the unbiased variance estimate?"
+        options:
+          - "6"
+          - "7.5"
+          - "30"
+          - "5"
+        answer: B
+        explain: "The unbiased version divides by n minus 1, so 30 / 4 = 7.5. Dividing by n gives the biased value 6."
+
+      - q: "What is the bias of an estimator?"
+        options:
+          - "How much the estimate changes from sample to sample"
+          - "The square root of the variance"
+          - "The average of its estimates over many samples minus the true value"
+          - "The number of samples used"
+        answer: C
+        explain: "Bias is the average miss. Variance, by contrast, describes how much the estimates spread."
+
+      - q: "The standard error of the sample mean is sigma divided by the square root of n. To halve it you must:"
+        options:
+          - "Collect four times as much data"
+          - "Collect twice as much data"
+          - "Collect half as much data"
+          - "Collect sixteen times as much data"
+        answer: A
+        explain: "Because of the square root, a four times larger sample halves the standard error."
+
+      - q: "Which statement about unbiased and consistent estimators is correct?"
+        options:
+          - "They mean exactly the same thing"
+          - "An unbiased estimator can be noisy and never improve with more data"
+          - "A consistent estimator must have zero bias for every n"
+          - "Both variance estimators are inconsistent"
+        answer: B
+        explain: "Using only the first sample value is unbiased but never improves. Consistency means the estimates converge to the truth as n grows."
+
+      - q: "The mean squared error of an estimator equals:"
+        options:
+          - "Bias plus variance"
+          - "Bias times variance"
+          - "Bias squared plus variance"
+          - "Variance squared minus bias"
+        answer: C
+        explain: "MSE = bias squared + variance, which lets us judge an estimator that has both kinds of error."
+
+      - q: "In the repeated-fit experiment, the stiff degree 1 model fits fresh datasets. What do the fits show?"
+        options:
+          - "Low variance but high bias, so it underfits"
+          - "High variance and low bias, so it overfits"
+          - "High bias and high variance"
+          - "Zero bias and zero variance"
+        answer: A
+        explain: "The red lines sit close together (small variance) but their average is far from the true curve (large bias)."
+
+      - q: "As polynomial degree increases, what happens to bias squared and variance?"
+        options:
+          - "Both rise"
+          - "Both fall"
+          - "Bias squared rises and variance falls"
+          - "Bias squared falls and variance rises"
+        answer: D
+        explain: "A flexible model can match the truth, so bias drops, but it reacts to the quirks of each training set, so variance grows. The total is lowest in between."
+
+      - q: "Why does the variance estimator that divides by n underestimate the true variance?"
+        options:
+          - "Deviations are measured from the sample mean, which sits closer to the data than the true mean"
+          - "It ignores the largest value"
+          - "It divides by the square root of n"
+          - "It uses the test set"
+        answer: A
+        explain: "On average it gives (n - 1) / n times the truth. Dividing by n - 1 removes the bias."
+
+      - q: "Half of the sample mean has a lower MSE (1.63) than the sample mean (2.47) in the example. What does this show?"
+        options:
+          - "Bias is always better than variance"
+          - "Unbiased is not automatically best, since a little bias can buy much less variance"
+          - "The sample mean is inconsistent"
+          - "MSE ignores variance"
+        answer: B
+        explain: "MSE is bias squared plus variance, so trading some bias for lower variance can reduce the total."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u1-p5
+    title: "Part 5: Maximum likelihood and Bayesian statistics"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the likelihood?"
+        options:
+          - "The probability of the parameter before seeing data"
+          - "The number of examples in the dataset"
+          - "The probability the model gives to the observed data, as a function of the parameter"
+          - "The error of the best possible model"
+        answer: C
+        explain: "Likelihood reads the probability of the data we actually saw as a function of the unknown parameter."
+
+      - q: "Ten coin flips give seven heads and three tails. What is the maximum likelihood estimate of p, the chance of heads?"
+        options:
+          - "0.5"
+          - "0.3"
+          - "0.64"
+          - "0.7"
+        answer: D
+        explain: "Setting the slope of the log likelihood to zero gives heads divided by flips, which is 7 / 10 = 0.7."
+
+      - q: "Why do we take the logarithm of the likelihood?"
+        options:
+          - "It turns a product into a sum and does not change the best parameter"
+          - "It makes the maximum larger"
+          - "It makes the likelihood convex in every case"
+          - "It removes the need for data"
+        answer: A
+        explain: "The log is increasing, so the maximiser stays put, and a sum of small terms avoids the tiny numbers a product of many probabilities would give."
+
+      - q: "If the target follows a Gaussian with mean w x + b and fixed spread, minimising the negative log likelihood is the same as minimising:"
+        options:
+          - "The absolute error"
+          - "The mean squared error"
+          - "The number of weights"
+          - "The learning rate"
+        answer: B
+        explain: "With a fixed spread, only the squared error term depends on w and b, so MLE under Gaussian noise equals least squares."
+
+      - q: "Which is a known weakness of maximum likelihood?"
+        options:
+          - "It is never consistent"
+          - "It cannot be used for coins"
+          - "It needs a prior"
+          - "It can be biased, and extreme when data are few"
+        answer: D
+        explain: "Two heads in a row give an estimate of p = 1, and the Gaussian variance MLE divides by n so it is biased."
+
+      - q: "In the Bayesian view, the posterior is:"
+        options:
+          - "The prior multiplied by the likelihood and rescaled to have area one"
+          - "The likelihood divided by the prior"
+          - "Equal to the prior regardless of the data"
+          - "The same as the maximum likelihood point"
+        answer: A
+        explain: "The prior holds our belief before data, the likelihood says how well each value explains the data, and their rescaled product is the updated belief."
+
+      - q: "A Gaussian prior on the weights centred at zero makes the MAP estimate equivalent to:"
+        options:
+          - "Adding more hidden layers"
+          - "Squared error plus a weight decay penalty lambda times w squared"
+          - "Removing the bias term"
+          - "Using cross-entropy instead of squared error"
+        answer: B
+        explain: "The log of a Gaussian prior is a negative constant times w squared, which becomes the weight decay penalty."
+
+      - q: "For the ten flips with a prior equal to one imaginary head and one imaginary tail, the MAP estimate is 0.667. How is it obtained?"
+        options:
+          - "7 / 10"
+          - "7 / 12"
+          - "9 / 14"
+          - "8 / 12"
+        answer: D
+        explain: "The prior adds two imaginary flips, so we get 8 heads out of 12 flips, which is 0.667. The posterior mean is 9 / 14, or 0.643."
+
+      - q: "As a coin is flipped 1000 times, the maximum likelihood estimates of p from five simulations do what?"
+        options:
+          - "Settle close to the true value, which shows consistency"
+          - "Spread further apart"
+          - "Always equal exactly 1"
+          - "Stay at the prior value"
+        answer: A
+        explain: "More data gives a steadier estimate, which is the variance of the estimator shrinking."
+
+      - q: "For six measurements, the maximum likelihood variance is 0.983 but the unbiased value is 1.18. Why do they differ?"
+        options:
+          - "The first uses a prior"
+          - "The second uses squared errors and the first does not"
+          - "The first divides the sum of squares by 6 and the second by 5"
+          - "They use different data"
+        answer: C
+        explain: "The MLE of a Gaussian variance divides by n, which is the biased version from Part 4."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u1-p6
+    title: "Part 6: Logistic regression, SVM, kNN, PCA, SGD and the curse of dimensionality"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Logistic regression computes a weighted sum of the features and then applies which function to read it as a probability?"
+        options:
+          - "The sigmoid function"
+          - "The Gaussian function"
+          - "The hinge function"
+          - "The identity function"
+        answer: A
+        explain: "The sigmoid squashes the score into a value between 0 and 1, read as the probability of class one."
+
+      - q: "Which line does a support vector machine choose?"
+        options:
+          - "The one that passes through the most points"
+          - "A random line separating the classes"
+          - "The one with the widest margin between the classes"
+          - "The line with the smallest weights"
+        answer: C
+        explain: "The SVM picks the widest-margin separator, and only the few support vectors on the margin decide it."
+
+      - q: "In k nearest neighbours, a very small k such as 1 gives:"
+        options:
+          - "A very smooth boundary and underfitting"
+          - "A jagged boundary that memorises noise, with perfect training accuracy"
+          - "No predictions at all"
+          - "The same result as PCA"
+        answer: B
+        explain: "With k = 1 every training point is classified correctly, but the boundary follows the noise and the test accuracy drops."
+
+      - q: "How is a decision tree grown?"
+        options:
+          - "By gradient descent on a smooth cost"
+          - "By assigning every point to its nearest centre"
+          - "By projecting data on the direction of largest variance"
+          - "Greedily, choosing at each node the split that makes the groups purest"
+        answer: D
+        explain: "At each node the tree tries the possible splits and keeps the one with the best purity, such as lowest Gini impurity or entropy."
+
+      - q: "What does PCA choose as the first principal component?"
+        options:
+          - "The direction of largest variance of the data"
+          - "The direction of smallest variance"
+          - "The direction of the first feature axis"
+          - "A random direction"
+        answer: A
+        explain: "Projecting on the direction of largest variance keeps the most information, so PCA picks it first. The next component is perpendicular."
+
+      - q: "What are the two repeated steps in the k means loop after choosing initial centres?"
+        options:
+          - "Compute a gradient and update the weights"
+          - "Split a node and prune a leaf"
+          - "Assign each point to its nearest centre, then move each centre to the mean of its points"
+          - "Fit a line and compute its margin"
+        answer: C
+        explain: "The assign and move loop lowers the total squared distance each round until nothing changes."
+
+      - q: "Why is a minibatch SGD step cheaper than a full batch step?"
+        options:
+          - "It ignores the cost function"
+          - "It estimates the gradient from a small random sample instead of all examples"
+          - "It uses a larger learning rate automatically"
+          - "It needs no labels"
+        answer: B
+        explain: "A gradient is an average, so a small random minibatch estimates it well at a fraction of the cost, with a slightly noisy direction."
+
+      - q: "If each of d input axes is cut into 4 bins, how many cells are there?"
+        options:
+          - "4 times d"
+          - "d to the power 4"
+          - "d times d"
+          - "4 to the power d"
+        answer: D
+        explain: "Cells grow as 4^d. In 8 dimensions there are 65,536 cells, so a few hundred points leave most of them empty. This is the curse of dimensionality."
+
+      - q: "Which of these algorithms is unsupervised?"
+        options:
+          - "Logistic regression"
+          - "k means"
+          - "Support vector machine"
+          - "Decision tree"
+        answer: B
+        explain: "k means and PCA use only the inputs and never the labels."
+
+      - q: "A box that holds 10 percent of evenly spread data needs an edge of 0.977 per axis in 100 dimensions. What does this show?"
+        options:
+          - "Data becomes denser in high dimensions"
+          - "Nearest neighbours work better in high dimensions"
+          - "Ten percent is too little data to use"
+          - "Such a neighbourhood covers almost the whole space, so nothing is local"
+        answer: D
+        explain: "In high dimensions the nearest neighbours are no longer near, which hurts methods like kNN."
+
+  # ------------------------------------------------------------------ Part 7
+  - slug: u1-p7
+    title: "Part 7: Deep feedforward networks: XOR, cost functions, output and hidden units"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does the best linear model give for all four XOR inputs?"
+        options:
+          - "The correct XOR values"
+          - "A constant prediction of 0.5, with mean squared error 0.25"
+          - "Predictions of 0 for every input"
+          - "A prediction of 1 for every input"
+        answer: B
+        explain: "Least squares gives weights 0 and bias 0.5, no better than guessing the average. XOR is not linearly separable."
+
+      - q: "In the two-unit ReLU network for XOR, why is the non-linearity essential?"
+        options:
+          - "It makes the weights positive"
+          - "It makes training faster"
+          - "Without it the whole network collapses into one linear model"
+          - "It removes the need for a hidden layer"
+        answer: C
+        explain: "Stacked linear layers combine into a single linear map, which cannot solve XOR. ReLU breaks that."
+
+      - q: "What is the central idea shown when the hidden layer moves the XOR points?"
+        options:
+          - "Hidden layers delete the hard examples"
+          - "Hidden layers add noise to the data"
+          - "Hidden layers always shrink the dataset"
+          - "Hidden layers learn a new representation in which the problem becomes easy"
+        answer: D
+        explain: "In the hidden space the points 01 and 10 land on the same spot and one straight line separates the classes."
+
+      - q: "Which is the correct order of the four-step loop of gradient-based learning?"
+        options:
+          - "Update, gradient, cost, forward pass"
+          - "Cost, update, forward pass, gradient"
+          - "Forward pass, cost, gradient, update"
+          - "Gradient, forward pass, update, cost"
+        answer: C
+        explain: "We compute the outputs, measure the cost, find the gradients by back-propagation, then move each weight against its gradient."
+
+      - q: "Why does the cost of a neural network usually have several valleys?"
+        options:
+          - "Because it is not convex, so the starting point decides which valley is reached"
+          - "Because the learning rate is too small"
+          - "Because the dataset is too large"
+          - "Because gradient descent adds noise on purpose"
+        answer: A
+        explain: "Neural network costs are not convex. That is why weights start at small random values and no best answer is promised."
+
+      - q: "Most deep learning costs such as cross-entropy are derived as:"
+        options:
+          - "The count of wrong answers"
+          - "The Euclidean distance between weights"
+          - "A penalty chosen at random"
+          - "Negative log likelihood, that is maximum likelihood"
+        answer: D
+        explain: "A Gaussian output with fixed spread gives squared error, and a Bernoulli or categorical output gives cross-entropy."
+
+      - q: "Why is cross-entropy preferred over squared error for a sigmoid output?"
+        options:
+          - "The logarithm cancels the flat saturated part, so a confident mistake still gets a strong gradient"
+          - "Squared error cannot be computed for probabilities"
+          - "Cross-entropy needs no labels"
+          - "Cross-entropy always has a lower value"
+        answer: A
+        explain: "With a score of minus 4 and target 1, cross-entropy gives a slope near 0.98 while squared error gives only about 0.035."
+
+      - q: "Which output unit is used for a multi-class problem, giving positive probabilities that add up to one?"
+        options:
+          - "Linear"
+          - "Softmax"
+          - "ReLU"
+          - "Tanh"
+        answer: B
+        explain: "Softmax takes the exponential of every score and divides by the sum of the exponentials."
+
+      - q: "Why is ReLU the default choice for hidden units?"
+        options:
+          - "It squashes inputs into a narrow range"
+          - "Its slope is 1 for positive inputs, so gradients flow well, and it is cheap to compute"
+          - "Its slope is always below 0.25"
+          - "It outputs probabilities"
+        answer: B
+        explain: "Sigmoid and tanh go flat and multiply small slopes in deep stacks, which slows learning."
+
+      - q: "What happens to softmax probabilities if the same number is added to every score?"
+        options:
+          - "They all become equal"
+          - "They no longer add up to one"
+          - "They all increase"
+          - "They do not change"
+        answer: D
+        explain: "The common factor cancels between numerator and denominator."
+
+  # ------------------------------------------------------------------ Part 8
+  - slug: u1-p8
+    title: "Part 8: Architecture design and back-propagation"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In architecture design, what are depth and width?"
+        options:
+          - "The learning rate and the batch size"
+          - "The number of inputs and the number of outputs"
+          - "The training error and the test error"
+          - "The number of layers and the number of units in each layer"
+        answer: D
+        explain: "Depth is how many layers the network has and width is how many units each layer has."
+
+      - q: "The universal approximation theorem says a network with one hidden layer and enough units can:"
+        options:
+          - "Always be trained quickly by gradient descent"
+          - "Never overfit"
+          - "Approximate any continuous function on a bounded region as closely as we like"
+          - "Generalise perfectly to new data"
+        answer: C
+        explain: "It states what is possible. It does not promise that enough units is a small number, that gradient descent finds the weights, or that the network generalises."
+
+      - q: "In the folding example, why does depth help?"
+        options:
+          - "Each new layer folds the function again, so the number of pieces doubles while units grow by only two"
+          - "Deep networks have fewer layers than wide ones"
+          - "Each layer removes half of the data"
+          - "Depth makes the cost convex"
+        answer: A
+        explain: "Five layers with 10 units give 32 pieces, while a single layer with 14 units gives at most 15."
+
+      - q: "For a = 3, b = -2, c = 5 with u = a b, v = u + c and L = v squared, what is the gradient of L with respect to a?"
+        options:
+          - "-6"
+          - "4"
+          - "-2"
+          - "1"
+        answer: B
+        explain: "Here v = -1, so dL/dv = 2v = -2. The sum passes it to u, and the product gives dL/da = b x (-2) = 4."
+
+      - q: "In the example where x feeds both p = x times x and q = 3 times x, how are the gradients arriving at x combined?"
+        options:
+          - "They are multiplied"
+          - "They are added"
+          - "The larger one is kept"
+          - "They are averaged"
+        answer: B
+        explain: "When a value is used twice, the gradients from both paths add. Here 4 + 3 = 7 at x = 2."
+
+      - q: "In back-propagation, the gradient of a weight equals:"
+        options:
+          - "The gradient at the node it feeds times the value it carries"
+          - "The learning rate times the loss"
+          - "The sum of all other weights"
+          - "The value of the output unit"
+        answer: A
+        explain: "This rule turns node gradients into parameter gradients, for example output weight gradient = gradient at output times hidden value."
+
+      - q: "Why is reverse mode differentiation preferred for training networks?"
+        options:
+          - "It needs no memory"
+          - "It needs one sweep per parameter"
+          - "One backward sweep gives the gradient for every parameter of a scalar loss"
+          - "It is only approximate"
+        answer: C
+        explain: "The loss is a single output with many parameters, so reverse mode needs one sweep while forward mode needs one per parameter."
+
+      - q: "What is the main price of back-propagation compared with finite differences?"
+        options:
+          - "It needs thousands of extra forward passes"
+          - "It cannot be checked for correctness"
+          - "It is far less accurate"
+          - "It must store forward values in memory until the backward pass"
+        answer: D
+        explain: "The backward pass costs only a few times a forward pass, but all forward values must be kept, so memory often limits the model size."
+
+      - q: "Why is gradient checking by finite differences done only on small networks?"
+        options:
+          - "It needs two forward passes for every parameter"
+          - "It only works with sigmoid units"
+          - "It cannot be computed without labels"
+          - "It changes the weights permanently"
+        answer: A
+        explain: "For a million parameters it would need two million extra forward passes."
+
+      - q: "Which method do frameworks such as PyTorch, TensorFlow and JAX apply automatically to compute gradients?"
+        options:
+          - "Symbolic differentiation"
+          - "Numerical differentiation"
+          - "Reverse mode automatic differentiation"
+          - "Forward mode automatic differentiation"
+        answer: C
+        explain: "They build the computational graph and sweep backward, so you never write derivatives by hand."

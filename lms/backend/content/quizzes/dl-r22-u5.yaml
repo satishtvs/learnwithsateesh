@@ -1,0 +1,592 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I), Unit V quizzes.
+# Questions are original; they follow the Unit V slides (6 parts), not the textbook wording.
+# Nothing is shown to students until a quiz has `status: approved`. `answer` is the letter of the correct option.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning."
+  published: true
+unit:
+  code: U5
+  title: "Practical Methodology and Applications"
+  label: "Unit - V"
+  textbook_ref: "Goodfellow et al. ch. 11-12"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u5-p1
+    title: "Part 1: Performance metrics and default baseline models"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In a confusion matrix, what is a false negative?"
+        options:
+          - "An example that really was positive but the model called negative"
+          - "An example that really was negative but the model called positive"
+          - "An example the model called negative that really was negative"
+          - "An example the model refused to answer"
+        answer: A
+        explain: "A false negative is a miss: a real positive that the model passed over."
+
+      - q: "Which formula gives precision?"
+        options:
+          - "true positives / (true positives + false negatives)"
+          - "true positives / (true positives + false positives)"
+          - "(true positives + true negatives) / all examples"
+          - "true negatives / (true negatives + false positives)"
+        answer: B
+        explain: "Precision asks what fraction of the flagged examples were really positive. The false negative version is recall."
+
+      - q: "A classifier flagged 89 examples and 73 of them were really positive. There are 100 real positives in all. What is its recall?"
+        options:
+          - "0.82"
+          - "0.89"
+          - "0.73"
+          - "0.73 divided by 0.82"
+        answer: C
+        explain: "Recall is true positives over all real positives, 73 / 100 = 0.73. The 0.82 figure is the precision, 73 / 89."
+
+      - q: "Why is the F score low whenever precision or recall is low?"
+        options:
+          - "It simply adds precision and recall together"
+          - "It is the same thing as accuracy"
+          - "It ignores false positives completely"
+          - "It is 2PR/(P+R), which stays close to the smaller of the two"
+        answer: D
+        explain: "The harmonic style combination is pulled toward the smaller value, so one weak number cannot be hidden by a strong one."
+
+      - q: "With only 2 percent of examples positive, a rule that always says negative scores 0.98 accuracy. What does this show?"
+        options:
+          - "Accuracy is the best metric for rare positives"
+          - "The rule has perfect recall"
+          - "The rule should be used as the final model"
+          - "Accuracy can mislead when classes are very unequal"
+        answer: D
+        explain: "The rule finds no positives at all, so its recall and F score are zero even though accuracy looks excellent."
+
+      - q: "A system answers only when it is confident and passes the rest to a person. What does coverage measure?"
+        options:
+          - "The fraction of its answers that are correct"
+          - "The fraction of examples that are really positive"
+          - "The fraction of examples the system actually answers"
+          - "The fraction of weights that are nonzero"
+        answer: C
+        explain: "Coverage is the share answered. Answering fewer, more confident cases usually raises accuracy on those answered."
+
+      - q: "For a default baseline on image input, which model does the part recommend?"
+        options:
+          - "A feedforward network with ReLU units"
+          - "A convolutional network"
+          - "A gated recurrent network such as an LSTM"
+          - "An unsupervised autoencoder only"
+        answer: B
+        explain: "Grid-like data such as images calls for a convolutional network. Vectors use a feedforward net and sequences a gated recurrent net."
+
+      - q: "Why does early stopping keep the weights from epoch 188 rather than epoch 400 in the example?"
+        options:
+          - "Validation loss was lowest at epoch 188 and rose afterward"
+          - "Training loss was lowest at epoch 188"
+          - "The learning rate was largest at epoch 188"
+          - "The network had the most units at epoch 188"
+        answer: A
+        explain: "Training loss kept falling, but validation loss started rising, which signals memorizing noise. Choose by validation loss."
+
+      - q: "What is a true positive?"
+        options:
+          - "An example the model called positive that really was positive"
+          - "An example the model called positive that really was negative"
+          - "An example the model called negative that really was positive"
+          - "An example the model called negative that really was negative"
+        answer: A
+        explain: "True positives are correct detections. The four counts together form the confusion matrix."
+
+      - q: "Which of these is a good default for a fixed-size vector input?"
+        options:
+          - "A convolutional network with large kernels"
+          - "A feedforward network with a few hidden layers of rectified linear units"
+          - "A bidirectional recursive network"
+          - "A single unsupervised autoencoder with no labels"
+        answer: B
+        explain: "Vectors use a feedforward ReLU network, trained with SGD with momentum or Adam, early stopping, and dropout or batch normalization."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u5-p2
+    title: "Part 2: Gathering more data and selecting hyperparameters"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What should you check first when deciding whether to gather more data?"
+        options:
+          - "Whether the test set is larger than the training set"
+          - "Whether the learning rate is a power of ten"
+          - "Whether the training error is already above your target"
+          - "Whether the model uses dropout"
+        answer: C
+        explain: "If training error is already too high, the model cannot fit even its own data, so more data will not help. Improve the model instead."
+
+      - q: "In a learning curve, a large gap between low training error and high validation error suggests what?"
+        options:
+          - "The model is too simple to fit the data"
+          - "The learning rate is too small"
+          - "The labels are perfectly clean"
+          - "The model overfits and more data or regularization could help"
+        answer: D
+        explain: "A big gap means the model memorized the small training set. More data, augmentation or regularization narrows it."
+
+      - q: "Which of these is a hyperparameter?"
+        options:
+          - "The dropout rate"
+          - "The weights of the first layer"
+          - "The bias of the output unit"
+          - "The activation of a hidden unit"
+        answer: A
+        explain: "Hyperparameters are settings the algorithm does not learn itself, such as dropout rate, learning rate and number of layers."
+
+      - q: "In the polynomial capacity experiment, which degree gave the lowest validation error?"
+        options:
+          - "Degree 1"
+          - "Degree 3"
+          - "Degree 12"
+          - "Degree 7"
+        answer: B
+        explain: "Validation error is U shaped in capacity and bottomed out at degree 3. Degree 12 had the lowest training error but overfit."
+
+      - q: "Which change lowers a network's effective capacity?"
+        options:
+          - "Adding more hidden units"
+          - "Using a stronger weight decay"
+          - "Adding more layers"
+          - "Training for many more epochs"
+        answer: B
+        explain: "A stronger penalty on large weights restrains the model. More units, depth or training time all raise capacity."
+
+      - q: "If you can tune only one hyperparameter, which does the part say to tune?"
+        options:
+          - "The learning rate"
+          - "The number of hidden units"
+          - "The batch normalization constant"
+          - "The dropout rate"
+        answer: A
+        explain: "The learning rate is described as the most important hyperparameter, and it shows up in training error, not just validation error."
+
+      - q: "Why is the learning rate usually searched on a log scale?"
+        options:
+          - "Logarithms make the loss convex"
+          - "It guarantees the loss never rises"
+          - "It removes the need for a validation set"
+          - "Useful values span several orders of magnitude"
+        answer: D
+        explain: "Values like 0.001, 0.003, 0.01 and 0.03 cover a wide useful range evenly on a log scale."
+
+      - q: "Why does random search usually beat grid search with the same number of trials?"
+        options:
+          - "Random search never needs a validation set"
+          - "A grid cannot use more than two settings"
+          - "Every trial tries a new value of each hyperparameter"
+          - "Random search always trains for longer"
+        answer: C
+        explain: "Nine grid trials test only three values of each setting, while nine random trials test nine, so an important setting is covered better."
+
+      - q: "What is data augmentation used for when more data cannot be collected?"
+        options:
+          - "Removing the validation set"
+          - "Raising the learning rate"
+          - "Making new training examples from old ones, for example by flipping or cropping"
+          - "Shrinking the test set"
+        answer: C
+        explain: "Augmentation, regularization, a smaller model and cleaner labels are the options when more real data is impossible."
+
+      - q: "What happens to a learning rate that is far too large, such as 0.28 where the stable limit is about 0.264?"
+        options:
+          - "The loss falls faster than ever"
+          - "The loss stays exactly constant"
+          - "The validation set becomes unnecessary"
+          - "The loss climbs instead of falling"
+        answer: D
+        explain: "Above the stability limit each step overshoots, and in the example the loss reached about 1865 after 30 steps."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u5-p3
+    title: "Part 3: Debugging strategies; multi-digit number recognition"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Why is debugging a learning system harder than debugging an ordinary program?"
+        options:
+          - "Learning systems have no source code"
+          - "A bug often just gives a slightly worse score instead of a crash"
+          - "Ordinary programs never have bugs in data"
+          - "Learning systems always give clearly wrong answers"
+        answer: B
+        explain: "A faulty gradient or bad data may only reduce accuracy a little, so the fault could be in the code, the data or the model."
+
+      - q: "What does adaptation mean in the debugging discussion?"
+        options:
+          - "Other weights adjust to compensate for a bug, hiding it"
+          - "The model adapts to a new language"
+          - "The learning rate adapts automatically"
+          - "The data adapts to the model"
+        answer: A
+        explain: "Training still runs and the loss still falls, only less far than it should, so the bug is easy to miss."
+
+      - q: "A network cannot even memorize ten training examples. What should you do?"
+        options:
+          - "Collect ten times more data"
+          - "Increase the dropout rate"
+          - "Report the result as final"
+          - "Look for a bug before tuning anything"
+        answer: D
+        explain: "Any network that can learn at all should memorize a tiny dataset, so failure points to a bug."
+
+      - q: "In a gradient check, how is the numerical slope for a weight w computed?"
+        options:
+          - "(loss at w + h plus loss at w - h) / 2"
+          - "loss at w divided by h"
+          - "(loss at w + h minus loss at w - h) / (2h)"
+          - "(loss at w + h minus loss at w) times h"
+        answer: C
+        explain: "The central difference needs only forward passes. It is then compared with the back-propagated value using the relative error."
+
+      - q: "In the gradient check on a network with the tanh derivative left out, what did the errors show?"
+        options:
+          - "All layers had exactly equal errors"
+          - "Only the output layer had errors"
+          - "The first two layers had large errors while the last layer stayed correct"
+          - "No layer showed any error"
+        answer: C
+        explain: "The check not only detected the bug but also located it, since errors grew in the layers where the missing factor mattered."
+
+      - q: "Activations in a deep tanh network shrink to nearly zero by layer five. What is the likely cause?"
+        options:
+          - "The weights were initialized too large"
+          - "The inputs were already normalized"
+          - "The batch size was too big"
+          - "The weights were initialized too small"
+        answer: D
+        explain: "Very small starting weights make the signal fade layer by layer. Too large a start saturates units at plus or minus one."
+
+      - q: "Why did the street view project fix accuracy at about 98 percent and then push coverage?"
+        options:
+          - "A wrong address is costly while a missing one can be added another way"
+          - "Coverage is easier to measure than accuracy"
+          - "Accuracy cannot be computed for strings"
+          - "Coverage must always equal accuracy"
+        answer: A
+        explain: "Rejecting doubtful photos raises accuracy but lowers coverage, so the team fixed the accuracy bar and maximized coverage."
+
+      - q: "Training and test error were close together and both poor in the street view baseline. This pointed to what?"
+        options:
+          - "Heavy overfitting"
+          - "Underfitting or a problem in the data"
+          - "A test set that was too small"
+          - "A perfect model"
+        answer: B
+        explain: "Overfitting shows a large gap between the errors. Close, high errors suggest underfitting or bad data, and looking at the pictures revealed the crop was too tight."
+
+      - q: "What does the first debugging strategy, visualizing the model in action, recommend?"
+        options:
+          - "Look at the model's outputs on real inputs, such as boxes drawn on images"
+          - "Rely only on a single accuracy number"
+          - "Delete the validation set"
+          - "Increase the batch size"
+        answer: A
+        explain: "A single score can hide nonsense that one glance at the output reveals."
+
+      - q: "When mistakes were sorted by confidence in the flipped-label test, what did the worst mistakes turn out to be?"
+        options:
+          - "Mostly examples of the easiest class"
+          - "Mostly examples whose labels had been wrongly flipped"
+          - "Random noise in the weights"
+          - "Examples that were never seen in training"
+        answer: B
+        explain: "Nineteen of the twenty worst mistakes were flipped labels, so the data was at fault, not the network."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u5-p4
+    title: "Part 4: Large-scale deep learning and computer vision"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Why are GPUs well suited to deep learning?"
+        options:
+          - "GPUs have a few very powerful cores with large caches"
+          - "GPUs never need data to be copied to them"
+          - "GPUs avoid matrix arithmetic entirely"
+          - "Each layer is a matrix product whose cells can be computed independently in parallel"
+        answer: D
+        explain: "No output cell of a matrix product needs another cell's answer, so thousands of simple cores can share the work."
+
+      - q: "What is data parallelism?"
+        options:
+          - "The model is cut into pieces placed on different devices"
+          - "Each worker trains a different task"
+          - "Each worker holds a full model copy and processes a share of the batch"
+          - "Only one worker computes gradients"
+        answer: C
+        explain: "Gradients from the workers are averaged so every copy applies the same update. Splitting the model itself is model parallelism."
+
+      - q: "Why does speed-up from adding workers level off, for example only 5.78 with 64 workers?"
+        options:
+          - "The workers compute wrong gradients"
+          - "Communication takes an ever larger share of each step"
+          - "Matrix products become non-parallel"
+          - "The batch is split unequally"
+        answer: B
+        explain: "Computing time shrinks but averaging gradients across devices does not, so communication dominated at 64 workers."
+
+      - q: "What is the drawback of asynchronous gradient descent?"
+        options:
+          - "Gradients are computed on stale weights that others have changed"
+          - "Workers must all wait for the slowest one"
+          - "It cannot use more than one worker"
+          - "It needs a larger test set"
+        answer: A
+        explain: "No one idles, but staleness hurts the loss, which grew as staleness grew from 0 to 32 in the simulation."
+
+      - q: "Which of these is a model compression idea?"
+        options:
+          - "Quantization, storing each weight in fewer bits"
+          - "Increasing the batch size"
+          - "Adding more hidden layers"
+          - "Raising the learning rate"
+        answer: A
+        explain: "Quantization, pruning, distillation and low-rank factors all make a trained network cheaper to run."
+
+      - q: "In the quantization test, what happened at only 2 bits?"
+        options:
+          - "Accuracy stayed at 92.5 percent"
+          - "Accuracy collapsed to about 57 percent"
+          - "Memory use doubled"
+          - "Accuracy improved slightly"
+        answer: B
+        explain: "Down to about 3 bits the loss was mild, but 2 bits leaves only three values and the network was no longer usable."
+
+      - q: "What does global contrast normalization do?"
+        options:
+          - "Subtracts a different mean at every local window"
+          - "Multiplies every pixel by 255"
+          - "Subtracts the mean of all pixels and divides by their standard deviation"
+          - "Flips the image horizontally"
+        answer: C
+        explain: "It acts on the whole image at once. Local contrast normalization uses a sliding window instead and also removes lighting differences between regions."
+
+      - q: "Why must augmentation preserve the label?"
+        options:
+          - "Labels cannot be stored with images"
+          - "Augmented images are never used for training"
+          - "Flips always change a cat into a dog"
+          - "A flipped letter L is not an L, and a large rotation turns a 6 into a 9"
+        answer: D
+        explain: "Augmentation should create new valid examples of the same class, so the transform must suit the task."
+
+      - q: "Which statement about CPUs and GPUs is correct?"
+        options:
+          - "A CPU has thousands of simple cores, while a GPU has a few powerful ones"
+          - "Both have exactly the same number of cores"
+          - "A GPU has thousands of simple cores, while a CPU has a few powerful ones"
+          - "A GPU shares main memory with no copying needed"
+        answer: C
+        explain: "A GPU suits one operation on a lot of data, and data must be copied to its own memory."
+
+      - q: "In the loops versus numpy test, roughly how much faster was the single numpy matrix product at size 100?"
+        options:
+          - "About two times"
+          - "About ten times"
+          - "It was slower"
+          - "About one thousand times"
+        answer: D
+        explain: "Optimized compiled code beat three nested Python loops by roughly 1000 times, so write a layer as one big matrix product."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u5-p5
+    title: "Part 5: Speech recognition and natural language processing"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In speech recognition, what is a frame?"
+        options:
+          - "A short overlapping slice of the signal, such as 25 ms"
+          - "A complete spoken sentence"
+          - "A single letter in the transcript"
+          - "A layer of the acoustic model"
+        answer: A
+        explain: "The signal is cut into frames that slide forward by about 10 ms, and each frame gets a spectrum."
+
+      - q: "What does a spectrogram show?"
+        options:
+          - "The word probabilities of a language model"
+          - "The weights of a convolutional filter"
+          - "Which frequencies are present at which time"
+          - "The attention scores of a decoder"
+        answer: C
+        explain: "Columns are frames and rows are frequency bins, so it is a picture an acoustic model can read."
+
+      - q: "In a bigram model, how is P(next word | previous word) estimated?"
+        options:
+          - "Count of the next word divided by the corpus size"
+          - "Count of the pair divided by the count of the previous word"
+          - "Count of the pair divided by the vocabulary size"
+          - "Count of the previous word divided by the count of the pair"
+        answer: B
+        explain: "For example, the appeared seven times as a previous word and cat followed it three times, so P(cat | the) = 3/7."
+
+      - q: "Why does a counting table for 3-word sequences fail with a 10,000 word vocabulary?"
+        options:
+          - "Trigrams cannot be counted by a computer"
+          - "Counts are always negative"
+          - "Vocabulary size does not affect trigram counts"
+          - "There are about a trillion possible trigrams and most are never seen"
+        answer: D
+        explain: "This is the curse of dimensionality for words, since even a billion-word text covers at most 0.1 percent of the possible trigrams."
+
+      - q: "What is the benefit of word embeddings in a neural language model?"
+        options:
+          - "Every word gets a one-hot vector of its own"
+          - "Similar words get similar vectors, so learning about one carries over to others"
+          - "Embeddings remove the output layer"
+          - "Embeddings make the vocabulary smaller"
+        answer: B
+        explain: "Cosine similarity between vectors such as cat and dog is high, which lets statistics be shared."
+
+      - q: "Which technique reduces the cost of a softmax over a huge vocabulary?"
+        options:
+          - "Adding more hidden layers before the output"
+          - "Using a larger vocabulary"
+          - "Computing the full sum twice"
+          - "Hierarchical softmax using a binary tree over the words"
+        answer: D
+        explain: "A tree reaches any of 100,000 words in about 17 binary choices instead of scoring all of them."
+
+      - q: "In neural machine translation, what problem does attention address?"
+        options:
+          - "A single fixed vector forgets the details of a long source sentence"
+          - "The decoder cannot produce words"
+          - "The encoder cannot read the source"
+          - "The softmax output sums to more than one"
+        answer: A
+        explain: "With attention, at each output step the decoder looks back at every source word and decides how much of each to use."
+
+      - q: "In an attention matrix, what is true of each row?"
+        options:
+          - "It is a one-hot vector"
+          - "It sums to the number of source words"
+          - "It is a softmax over the source words, so it sums to one"
+          - "It contains only negative scores"
+        answer: C
+        explain: "Each output word spreads a total weight of one across the source words, for instance dort putting 0.69 on sleeps."
+
+      - q: "What does perplexity of a sentence measure in a language model?"
+        options:
+          - "How surprised the model was, with lower meaning better"
+          - "How many words the sentence has"
+          - "The size of the vocabulary"
+          - "The number of hidden units used"
+        answer: A
+        explain: "It is the sentence probability raised to the power of minus one over the number of words."
+
+      - q: "In the short-list method, who supplies probabilities for rare words outside the list?"
+        options:
+          - "The attention matrix"
+          - "An n-gram model"
+          - "The acoustic model"
+          - "A second softmax over the same list"
+        answer: B
+        explain: "The network predicts only the most frequent words, so rare words use an n-gram model, which means the network gives no benefit there."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u5-p6
+    title: "Part 6: Other applications; course summary and exam strategy"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the main idea of matrix factorization in a recommender?"
+        options:
+          - "Every item is described by hand-written genre tags only"
+          - "Ratings are copied from the most popular item"
+          - "The ratings matrix is stored without any learning"
+          - "Each user and item gets small hidden-taste vectors whose dot product predicts the rating"
+        answer: D
+        explain: "Training fits the vectors to the known ratings and then fills the holes, with a small penalty on the size of the numbers."
+
+      - q: "What is the cold start problem?"
+        options:
+          - "The model trains too slowly at the start"
+          - "New users or items have no ratings, so no taste can be matched"
+          - "The GPU has not warmed up"
+          - "The learning rate begins at zero"
+        answer: B
+        explain: "A new item has nobody's rating and a new user has no history. Cures include asking a few questions and using item features."
+
+      - q: "What does the epsilon-greedy rule do?"
+        options:
+          - "It always picks the best estimate"
+          - "It always picks a random option"
+          - "With probability epsilon it picks a random option, otherwise the best estimate"
+          - "It picks the worst option to learn faster"
+        answer: C
+        explain: "It balances exploring and exploiting. Epsilon zero is purely greedy."
+
+      - q: "In the bandit experiment, which epsilon gave the best average reward?"
+        options:
+          - "0.1"
+          - "0"
+          - "0.01"
+          - "0.3"
+        answer: A
+        explain: "Epsilon 0 often locked onto a poor arm, while 0.3 explored too much. Epsilon 0.1 reached about 1.39."
+
+      - q: "How is a fact stored in a knowledge base?"
+        options:
+          - "As a single scalar rating"
+          - "As a triple of head, relation and tail"
+          - "As an image patch"
+          - "As a frame of audio"
+        answer: B
+        explain: "For example, Paris, capital of, France. Entities and relations are given embeddings to predict missing triples."
+
+      - q: "In the translation idea for scoring triples, how is a triple judged true?"
+        options:
+          - "The head and tail vectors are multiplied to one"
+          - "The relation vector has the largest length"
+          - "The tail vector equals the head vector"
+          - "Head vector plus relation vector lands close to the tail vector"
+        answer: D
+        explain: "With head (1,2) and relation (2,-1), the tail should be near (3,1). A far tail gives a large distance and a poor score."
+
+      - q: "How does the summary describe Unit II?"
+        options:
+          - "Regularization and optimization, including L1 versus L2, dropout and Adam"
+          - "Convolution, pooling, stride and padding"
+          - "Unfolded recurrent graphs and LSTM cells"
+          - "Metrics, hyperparameters and debugging"
+        answer: A
+        explain: "Unit II covers penalties, other regularizers, why training is hard, and optimizers such as SGD with momentum, RMSProp and Adam."
+
+      - q: "For a numerical problem in the exam, what does the strategy advise?"
+        options:
+          - "Give only the final number"
+          - "Skip the formula to save time"
+          - "Write the formula, substitute the numbers, show each step and check the answer for sense"
+          - "Write the answer in a table without steps"
+        answer: C
+        explain: "Showing the working earns marks even if the arithmetic slips, and a sense check catches mistakes."
+
+      - q: "How does content-based recommendation differ from collaborative filtering?"
+        options:
+          - "Content-based uses only other users' ratings"
+          - "Collaborative filtering needs a description of every item"
+          - "Content-based uses item features such as genre, while collaborative filtering uses only who rated what"
+          - "They are the same method with different names"
+        answer: C
+        explain: "Collaborative filtering finds users with similar taste, but fails for an item nobody has rated."
+
+      - q: "Which answer matches the exam advice for a theory question?"
+        options:
+          - "Write only a one-word answer"
+          - "Give just a diagram without labels"
+          - "Skip definitions and write only formulas"
+          - "Define, give the reason, compare in a small table, and end with an example"
+        answer: D
+        explain: "This layered structure shows understanding and covers what examiners usually look for."
+

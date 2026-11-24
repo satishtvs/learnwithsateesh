@@ -1,0 +1,687 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I), Unit II quizzes.
+# Questions are original; they follow the Unit II slides (7 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning."
+  published: true
+unit:
+  code: U2
+  title: "Regularisation and Optimisation"
+  label: "Unit - II"
+  textbook_ref: "Goodfellow et al. ch. 7-8"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u2-p1
+    title: "Part 1: Parameter norm penalties: L2 and L1 regularization"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which statement best describes regularization?"
+        options:
+          - "Any change to a learning algorithm meant to reduce generalization error but not training error"
+          - "Any change that makes the training error as small as possible"
+          - "Collecting a larger test set to measure error more accurately"
+          - "Replacing back-propagation with a faster gradient method"
+        answer: A
+        explain: "Regularization targets the gap between training and test performance. It may even leave the training error unchanged."
+
+      - q: "For one weight w, what is the gradient of the L2 penalty (alpha/2) x w^2?"
+        options:
+          - "alpha times the sign of w"
+          - "A constant equal to alpha"
+          - "alpha times w"
+          - "Zero for every weight"
+        answer: C
+        explain: "The derivative of (alpha/2) w^2 is alpha w, so the pull on a weight is proportional to its size. The L1 gradient is alpha times sign(w) instead."
+
+      - q: "Why is L2 regularization called weight decay? In one gradient step the weight is first multiplied by which factor?"
+        options:
+          - "1 + epsilon x alpha"
+          - "alpha divided by epsilon"
+          - "epsilon x alpha"
+          - "1 - epsilon x alpha"
+        answer: D
+        explain: "Each step shrinks the weight by the factor (1 - epsilon alpha), a number just below one, and then takes the usual downhill step. Only the data can push the weight back up."
+
+      - q: "Which penalty tends to set many weights exactly to zero, giving a sparse model?"
+        options:
+          - "L2, because it grows as the square of the weight"
+          - "L1, because it pushes every weight toward zero with a constant force"
+          - "Both, in equal measure"
+          - "Neither, since penalties only make weights smaller"
+        answer: B
+        explain: "L1 has a sharp corner at zero and a constant-size pull, so small weights reach zero exactly. L2 makes weights small but rarely exactly zero."
+
+      - q: "What happens to the network if the penalty strength alpha is made extremely large?"
+        options:
+          - "It memorizes the training set even more closely"
+          - "Its test error always reaches the noise floor"
+          - "Every weight is driven near zero, the output is almost flat and the model underfits"
+          - "Its training error becomes exactly zero"
+        answer: C
+        explain: "With a huge alpha the cheapest solution is almost all-zero weights, so the model cannot fit even the training data."
+
+      - q: "How should the strength alpha be chosen in practice?"
+        options:
+          - "By comparing the validation error for several values, usually powers of ten"
+          - "By choosing the value that gives the lowest test error"
+          - "By choosing the value that gives the lowest training error"
+          - "By always setting alpha equal to 1"
+        answer: A
+        explain: "Alpha is a hyperparameter, so it is tuned on a validation set. The test set must stay untouched until the end."
+
+      - q: "In the constrained view of regularization, what shape is the region of allowed weights for an L1 constraint in two dimensions?"
+        options:
+          - "A round ball"
+          - "A single straight line"
+          - "A single point at the origin"
+          - "A diamond with corners on the axes"
+        answer: D
+        explain: "The L1 region is a diamond. The best allowed point often lies at a corner, where one weight is zero, which is the geometric reason for sparsity."
+
+      - q: "When there are fewer examples than weights, X transpose X is singular. Why does adding alpha times the identity matrix help?"
+        options:
+          - "It creates extra training examples"
+          - "It lifts the zero eigenvalues so the matrix can be inverted and one small-weight solution is picked"
+          - "It removes the noise from the labels"
+          - "It makes the cost function non-differentiable"
+        answer: B
+        explain: "The zero eigenvalues mean a flat valley of equally good solutions. Adding alpha I makes every eigenvalue at least alpha, so the inverse exists."
+
+      - q: "Which prior beliefs on the weights correspond to the L2 and L1 penalties?"
+        options:
+          - "L2 is a Gaussian prior and L1 is a Laplace prior"
+          - "L2 is a Laplace prior and L1 is a Gaussian prior"
+          - "Both are Gaussian priors"
+          - "Both are uniform priors"
+        answer: A
+        explain: "From the Bayesian view, L2 matches a Gaussian prior on the weights and L1 matches a Laplace prior."
+
+      - q: "Why are the biases usually left out of the penalty?"
+        options:
+          - "Biases never receive a gradient"
+          - "Each bias controls only one unit, so penalizing it adds little"
+          - "Biases are always exactly zero"
+          - "A penalty cannot be applied to vectors"
+        answer: B
+        explain: "A bias affects a single unit, so it hardly contributes to overfitting. The weights are the ones that give the network its capacity."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u2-p2
+    title: "Part 2: Dataset augmentation, noise, multi-task learning and early stopping"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the basic rule of dataset augmentation?"
+        options:
+          - "Change the label but keep the input"
+          - "Change the input but keep the label"
+          - "Change both the input and the label"
+          - "Delete the examples that the model gets wrong"
+        answer: B
+        explain: "A shifted seven is still a seven, but to the network it is a new example. A transform must never change the true answer."
+
+      - q: "Which transform is unsafe for a handwritten digit classifier?"
+        options:
+          - "Shifting the image by one pixel"
+          - "Adding a little noise to the pixels"
+          - "Slightly changing the brightness"
+          - "Rotating a 6 by 180 degrees"
+        answer: D
+        explain: "A 6 turned upside down looks like a 9, so the label would be wrong. Small shifts, noise and brightness changes keep the label intact."
+
+      - q: "Averaged over random noise added to the features of a linear model, training with noise is equivalent to what?"
+        options:
+          - "An L2 penalty on the weights"
+          - "An L1 penalty on the weights"
+          - "Early stopping"
+          - "Dropping hidden units"
+        answer: A
+        explain: "The expected error becomes the ordinary error plus s^2 times the sum of squared weights, which is weight decay in disguise."
+
+      - q: "How does label smoothing change the training targets?"
+        options:
+          - "It gives every class the same target"
+          - "It adds extra classes to the problem"
+          - "The right class gets a target slightly below 1 and the small remainder is spread over the wrong classes"
+          - "It removes examples whose labels look wrong"
+        answer: C
+        explain: "With ten classes and epsilon 0.1 the right class gets 0.9 and each wrong class about 0.0111. This stops the scores from being pushed apart without end."
+
+      - q: "What kind of data does semi-supervised learning use?"
+        options:
+          - "Only labeled examples"
+          - "Only unlabeled examples"
+          - "The labeled examples counted twice"
+          - "Both labeled and unlabeled examples"
+        answer: D
+        explain: "A few labeled points give a rough boundary, and the unlabeled points show where the data clump so the boundary can pass through the gaps."
+
+      - q: "In multi-task learning with a shared trunk, which part is shared by all tasks?"
+        options:
+          - "The output head of each task"
+          - "The early layers that feed every head"
+          - "The labels of every task"
+          - "The validation set only"
+        answer: B
+        explain: "The shared layers receive gradient from every task, so they must learn features useful to all of them. Each task keeps its own small head."
+
+      - q: "In early stopping, which weights are returned at the end of training?"
+        options:
+          - "The final weights after the last step"
+          - "The weights from the very first step"
+          - "The saved copy from the step with the best validation error"
+          - "The weights with the lowest training error"
+        answer: C
+        explain: "A copy is kept whenever the validation error improves. When patience runs out, training stops and that saved copy is returned, not the last one."
+
+      - q: "Why does early stopping act like an L2 penalty?"
+        options:
+          - "Steep directions are learned in a few steps while flat directions stay small, as with L2 shrinkage"
+          - "It adds the squared weights to the cost"
+          - "It forces all weights to be exactly equal"
+          - "It doubles the amount of training data"
+        answer: A
+        explain: "Stopping early keeps the steep directions of the cost and shrinks the flat ones, which is also what an L2 penalty does."
+
+      - q: "A degree nine polynomial passes through all ten noisy points and swings wildly between them. What does this show?"
+        options:
+          - "Underfitting, because the model is too simple"
+          - "The model has too few parameters"
+          - "Overfitting, with zero training error but a large test error"
+          - "The model has reached the noise floor"
+        answer: C
+        explain: "Ten weights for ten points allow a perfect fit of the noise. The test error was 0.4753 against a noise floor of 0.0625."
+
+      - q: "What is the danger of self-training with unlabeled data?"
+        options:
+          - "It needs more labeled data than supervised learning"
+          - "It always lowers the training error to zero"
+          - "It cannot use the labeled data"
+          - "A badly wrong first model makes guesses that repeat its own mistakes"
+        answer: D
+        explain: "This confirmation effect is why the result should be checked on labeled validation data."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u2-p3
+    title: "Part 3: Parameter tying, sparse representations, bagging and dropout"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Two models solve similar tasks. What does the parameter tying penalty add to the cost?"
+        options:
+          - "The sum of the weights of model A"
+          - "The absolute value of the weights of model B"
+          - "A constant lambda times the squared distance between the parameters of A and those of B"
+          - "The product of the two learning rates"
+        answer: C
+        explain: "The penalty only pulls the two parameter sets together. The data decides how far they may still differ."
+
+      - q: "How does dropout differ from bagging?"
+        options:
+          - "The thinned networks of dropout share one set of parameters"
+          - "Dropout trains each member until it converges"
+          - "Dropout keeps k separate models in memory"
+          - "Dropout needs k forward passes at test time"
+        answer: A
+        explain: "Dropout is a single network that holds every thinned network inside it. Each thinned network gets only one small step, and a single pass with scaled weights is used at test time."
+
+      - q: "A 28 by 28 image uses a single shared 3 by 3 window of weights. How many weights does it need?"
+        options:
+          - "784"
+          - "9"
+          - "28"
+          - "614,656"
+        answer: B
+        explain: "The same nine weights are reused at every position. A separate weight for every link would need 614,656."
+
+      - q: "What does a sparse representation have mostly of?"
+        options:
+          - "Zero weights in the network"
+          - "Zero training examples"
+          - "Zero labels"
+          - "Zero values in the hidden code"
+        answer: D
+        explain: "A sparse representation has a hidden code that is mostly zeros, and it changes with each input. Sparse weights are the same for every input."
+
+      - q: "How does bootstrap resampling build a training set of m examples from m originals?"
+        options:
+          - "It draws m examples with replacement, so some repeat and some are left out"
+          - "It draws m examples without replacement"
+          - "It keeps only half of the examples"
+          - "It copies the original set unchanged"
+        answer: A
+        explain: "Because of replacement, on average only about 64.5 percent of the distinct examples appear in each resample."
+
+      - q: "How does bagging combine the members for a classification task?"
+        options:
+          - "By averaging all their weights into one model"
+          - "By keeping only the best member"
+          - "By a majority vote of the members"
+          - "By using the last member trained"
+        answer: C
+        explain: "For regression the predictions are averaged. For classification the members vote. This works because they make different mistakes."
+
+      - q: "If the errors of all the models in an ensemble are perfectly correlated, what does averaging achieve?"
+        options:
+          - "The error falls like 1/k"
+          - "The error becomes zero"
+          - "The error doubles"
+          - "No improvement at all"
+        answer: D
+        explain: "The expected error is v/k + ((k-1)/k) c. With perfect correlation c equals v, so the result is v. Diversity matters more than the number of members."
+
+      - q: "At test time, a dropout network trained with hidden keep probability 0.5 is used with what rule?"
+        options:
+          - "Drop half the units again and run once"
+          - "Multiply each weight by the keep probability and run a single pass"
+          - "Run 1000 thinned networks and average them"
+          - "Double every weight and run a single pass"
+        answer: B
+        explain: "This is the weight scaling rule. It approximates the ensemble average with the cost of one forward pass, and it is exact for a single softmax layer."
+
+      - q: "Which keep probabilities are typical for dropout?"
+        options:
+          - "About 0.8 for input units and 0.5 for hidden units"
+          - "About 0.5 for input units and 0.8 for hidden units"
+          - "1.0 for hidden units"
+          - "0.1 for all units"
+        answer: A
+        explain: "Output units are never dropped. At test time the weights are scaled by the keep probability."
+
+      - q: "Why does an L1 penalty give exact zeros for a single fitted value, while L2 does not?"
+        options:
+          - "L1 gives larger gradients for large values"
+          - "L1 moves every value toward zero by the same amount, so values inside a band land exactly on zero"
+          - "L2 removes values that are above a threshold"
+          - "L2 has a sharp corner at zero"
+        answer: B
+        explain: "L2 shrinks in proportion, so 0.3 becomes 0.2 and never zero. L1 subtracts a fixed amount, so small values reach zero."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u2-p4
+    title: "Part 4: Adversarial training, tangent distance and tangent prop"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is an adversarial example?"
+        options:
+          - "An input with random noise added, chosen by a coin toss"
+          - "An example taken from a different dataset"
+          - "An input with the wrong label in the training set"
+          - "An input changed by a tiny, carefully chosen amount that makes the network give a wrong answer"
+        answer: D
+        explain: "The change is so small that people would not notice it, but it is aimed in the harmful direction. Random noise almost never has the same effect."
+
+      - q: "The fast gradient sign method uses the gradient of the loss with respect to which quantity?"
+        options:
+          - "The weights"
+          - "The input"
+          - "The labels"
+          - "The learning rate"
+        answer: B
+        explain: "We take the sign of the gradient with respect to each input value and add epsilon times that sign to the input."
+
+      - q: "Why can a tiny shift of every input flip the prediction of a model with many inputs?"
+        options:
+          - "Many small changes, each aligned with the sign of its weight, add up across all the inputs"
+          - "The model ignores the size of its inputs"
+          - "Small shifts change the labels of the training data"
+          - "The shifts delete the hidden units"
+        answer: A
+        explain: "For a linear score the worst-case change is epsilon times the sum of absolute weights, which grows in proportion to the number of inputs."
+
+      - q: "In the adversarial training loop, how is the loss for each step formed?"
+        options:
+          - "Only from the shifted inputs"
+          - "Only from the clean inputs"
+          - "By averaging the loss on clean inputs and on shifted inputs"
+          - "By discarding the clean batch after crafting the attack"
+        answer: C
+        explain: "Each step crafts a fresh attack on the current network and mixes the two losses with weight one half each before the update."
+
+      - q: "What assumption underlies adversarial training and the tangent methods?"
+        options:
+          - "A good function is linear everywhere"
+          - "A good function is locally constant: a tiny change of the input should not change the answer"
+          - "A good function has the same weights in every layer"
+          - "A good function never uses unlabeled data"
+        answer: B
+        explain: "Each method asks the model to stay stable near the data, either against worst-case shifts or along harmless directions."
+
+      - q: "In tangent distance, what is the distance from a test example measured to?"
+        options:
+          - "The stored prototype point only"
+          - "The mean of all training examples"
+          - "The decision boundary of the classifier"
+          - "The tangent line through the prototype"
+        answer: D
+        explain: "Replacing the prototype with its tangent line lets a rotated seven match a stored seven much more closely than before, while the distance to a one stays large."
+
+      - q: "What does the tangent prop penalty measure?"
+        options:
+          - "The squared slope of the output along each tangent vector"
+          - "The sum of the squared weights"
+          - "The number of labeled examples"
+          - "The variance of the noise added to the inputs"
+        answer: A
+        explain: "It sums the square of the dot product between the input gradient of the output and each tangent vector, so the output stays flat along changes that should not matter."
+
+      - q: "How does the manifold tangent classifier obtain its tangent vectors?"
+        options:
+          - "Someone must supply them by hand"
+          - "They are chosen at random"
+          - "They are learned from unlabeled data, using the Jacobian of a contractive autoencoder"
+          - "They are copied from the class labels"
+        answer: C
+        explain: "A contractive autoencoder learns the manifold, the strongest directions of its encoder Jacobian give the tangents, and a classifier is then trained with tangent prop."
+
+      - q: "Why does a crafted push hurt accuracy more than random noise of the same size?"
+        options:
+          - "Random noise is always larger"
+          - "Crafted shifts change the labels of the test data"
+          - "Every crafted shift pushes in the harmful direction, while random signs partly cancel"
+          - "Random noise is applied to the weights instead of the inputs"
+        answer: C
+        explain: "At size 0.10 the accuracy was 0.970 under random noise but 0.915 under the crafted push."
+
+      - q: "What protection does adversarial training give?"
+        options:
+          - "Complete protection against every possible attack"
+          - "No protection, only a better clean accuracy"
+          - "Protection only for unlabeled data"
+          - "Partial protection against the kind of attack it practiced"
+        answer: D
+        explain: "It closes part of the gap, not all of it, and it costs one more forward and backward pass per step."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u2-p5
+    title: "Part 5: Optimization for training deep models: challenges"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the empirical risk?"
+        options:
+          - "The expected loss over the true data distribution"
+          - "The average loss over the training examples"
+          - "The largest loss on any single example"
+          - "The error on the test set"
+        answer: B
+        explain: "The true risk cannot be reached, so we minimize the average loss on the training set instead. This is empirical risk minimization."
+
+      - q: "Why do we minimize a surrogate loss instead of the zero-one loss?"
+        options:
+          - "The zero-one loss is flat almost everywhere, so gradient descent has no slope to follow"
+          - "The zero-one loss is always negative"
+          - "The surrogate loss ignores the labels"
+          - "The zero-one loss cannot be computed on a computer"
+        answer: A
+        explain: "The logistic and hinge losses have a slope and reward a larger margin. We minimize them and then report the real error."
+
+      - q: "How does a learning algorithm often finish differently from a pure optimizer?"
+        options:
+          - "It always runs until the training loss is exactly zero"
+          - "It ignores the validation set"
+          - "It restarts from random weights at the end"
+          - "It stops early, before the minimum, and keeps the parameters from the best validation point"
+        answer: D
+        explain: "The validation loss can start to rise while the training loss keeps falling, so a learner stops at the best validation point."
+
+      - q: "How does the error of a minibatch gradient change with the batch size?"
+        options:
+          - "It falls in proportion to the batch size"
+          - "It does not depend on the batch size"
+          - "It falls like one over the square root of the batch size"
+          - "It rises as the batch grows"
+        answer: C
+        explain: "A thousand times more work buys only about 34 times less error, which is why small minibatches are efficient."
+
+      - q: "What is the condition number of the cost surface?"
+        options:
+          - "The ratio of the steepest curvature to the flattest curvature"
+          - "The number of local minima"
+          - "The value of the learning rate"
+          - "The size of the minibatch"
+        answer: A
+        explain: "A large condition number makes gradient descent zig-zag across steep walls while creeping along the flat valley floor."
+
+      - q: "In a network with millions of parameters, a point where the slope is zero is almost always what?"
+        options:
+          - "A bad local minimum"
+          - "The global minimum"
+          - "A saddle point"
+          - "A cliff"
+        answer: C
+        explain: "For all curvatures to be positive is very unlikely in high dimensions. A saddle always has a direction that leads downhill."
+
+      - q: "Which remedy is used against exploding gradients at a cliff?"
+        options:
+          - "A larger learning rate"
+          - "Gradient norm clipping"
+          - "Removing the shuffling of examples"
+          - "Adding more layers"
+        answer: B
+        explain: "If the gradient is longer than a threshold it is rescaled to the threshold, keeping its direction, so the step can no longer be huge."
+
+      - q: "A weight of 0.9 is multiplied through 50 steps of a long network. What does the gradient become?"
+        options:
+          - "About 117, so it explodes"
+          - "Exactly 1"
+          - "Still 0.9"
+          - "About 0.005, so it vanishes"
+        answer: D
+        explain: "0.9 raised to the power 50 is about 0.0052, so early steps learn almost nothing. A weight of 1.1 would explode instead."
+
+      - q: "Why are many local minima of a neural network not a worry?"
+        options:
+          - "Gradient descent never stops at a minimum"
+          - "The cost at a minimum is always zero"
+          - "Many are copies of the same solution, such as swapped units or flipped signs, with the same cost"
+          - "Local minima do not exist in networks"
+        answer: B
+        explain: "One layer of five tanh units has 3,840 equivalent copies of each minimum. Only minima with a much higher cost are a concern."
+
+      - q: "What is an epoch in minibatch training?"
+        options:
+          - "One full pass through the training examples"
+          - "One update using a single minibatch"
+          - "One forward pass of a single example"
+          - "One change of the learning rate"
+        answer: A
+        explain: "The examples are shuffled, split into minibatches and used one after another. After the pass they are shuffled again."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u2-p6
+    title: "Part 6: SGD, momentum, Nesterov and weight initialization"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Why must the learning rate of SGD decay over training?"
+        options:
+          - "The gradient becomes exactly zero after one epoch"
+          - "Larger steps are always unstable at the start"
+          - "Minibatch noise does not shrink near the minimum, so a constant step keeps hovering around it"
+          - "The loss function changes after every epoch"
+        answer: C
+        explain: "Even at the best weights each example pulls its own way. Lowering the step lets the weights settle closer to the minimum."
+
+      - q: "Which pair of lines is the momentum update?"
+        options:
+          - "w = w - epsilon x g, with no other state"
+          - "v = beta x v + epsilon x g, then w = v"
+          - "w = beta x w, then w = w - g"
+          - "v = beta x v - epsilon x g, then w = w + v"
+        answer: D
+        explain: "The velocity keeps a fraction beta of its old value and subtracts the new gradient step, and then the weights move by the velocity. With beta = 0 it is plain gradient descent."
+
+      - q: "If the gradient stays the same, momentum with beta = 0.9 makes the step about how many times the plain step?"
+        options:
+          - "2 times"
+          - "10 times"
+          - "100 times"
+          - "0.9 times"
+        answer: B
+        explain: "The velocity grows to epsilon g divided by (1 - beta), which is ten times epsilon g for beta = 0.9."
+
+      - q: "What is the difference between Nesterov momentum and ordinary momentum?"
+        options:
+          - "Nesterov measures the gradient at the look-ahead point, after the velocity is applied"
+          - "Nesterov uses no velocity at all"
+          - "Nesterov uses a separate learning rate for each weight"
+          - "Nesterov uses the whole dataset for every step"
+        answer: A
+        explain: "If the step is about to overshoot, the slope at the look-ahead point already points back, so the overshoot is corrected one step early."
+
+      - q: "Why is it a mistake to initialize every weight to the same value, even zero?"
+        options:
+          - "The loss becomes infinite"
+          - "The gradients become too large"
+          - "The network cannot use biases"
+          - "Hidden units with equal weights get equal gradients and stay identical forever"
+        answer: D
+        explain: "Equal units compute the same function and make the same updates, so they act as a single unit. Random initialization breaks this symmetry."
+
+      - q: "To keep the signal size constant from layer to layer, what variance should the weights have for a layer with n inputs (fan in)?"
+        options:
+          - "1/n"
+          - "n"
+          - "2n"
+          - "1, regardless of n"
+        answer: A
+        explain: "The variance of a neuron sum is n times the weight variance times the input variance. Setting this equal to the input variance gives a weight variance of 1/n."
+
+      - q: "Which initialization is recommended for ReLU units?"
+        options:
+          - "Variance 1/fan in"
+          - "Variance 2/fan in (He)"
+          - "Variance 2/(fan in + fan out) (Xavier)"
+          - "One fixed small number such as 0.01"
+        answer: B
+        explain: "ReLU zeroes half of the signal at every layer, so the factor of two restores it. The Xavier rule loses signal with ReLU."
+
+      - q: "How are hidden biases usually initialized?"
+        options:
+          - "To large positive numbers"
+          - "To random draws with the same spread as the weights"
+          - "To zero"
+          - "To the value 1 for every unit"
+        answer: C
+        explain: "The random weights already break the symmetry. Some people use a small positive bias such as 0.1 for ReLU units so they start active."
+
+      - q: "For a valley whose largest curvature is 100, plain gradient descent is stable only for a step below what value?"
+        options:
+          - "1/100"
+          - "100"
+          - "2 divided by the largest curvature, here 0.02"
+          - "0.5"
+        answer: C
+        explain: "Larger steps overshoot across the valley more each time, and the cost explodes."
+
+      - q: "What happened when a deep tanh network was started with tiny weights, spread 0.01?"
+        options:
+          - "It trained fastest of all"
+          - "The loss exploded at once"
+          - "The loss reached zero in a few epochs"
+          - "The loss stayed at about its starting value because the signal faded"
+        answer: D
+        explain: "With a spread of 0.01 the loss stayed at 0.503 for 100 epochs. Xavier weights trained well."
+
+  # ------------------------------------------------------------------ Part 7
+  - slug: u2-p7
+    title: "Part 7: Adaptive learning rates: AdaGrad, RMSProp and Adam"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What weakness do SGD, momentum and Nesterov momentum all share?"
+        options:
+          - "They cannot use minibatches"
+          - "They need labels for every example"
+          - "They cannot be combined with initialization"
+          - "They use one learning rate for every parameter"
+        answer: D
+        explain: "In a stretched bowl, the steep direction wants a small rate and the shallow direction a large one, and no single number satisfies both."
+
+      - q: "In AdaGrad, each parameter's step is divided by what?"
+        options:
+          - "The sum of its gradients so far"
+          - "The batch size"
+          - "The square root of the sum of its squared gradients so far"
+          - "The largest gradient it has seen"
+        answer: C
+        explain: "The running total r adds the square of each gradient, and the step is the rate times the gradient over the square root of r plus a tiny constant."
+
+      - q: "What does RMSProp change compared with AdaGrad?"
+        options:
+          - "It adds a bias correction to the step"
+          - "It replaces the running sum of squared gradients with an exponentially weighted moving average"
+          - "It removes the square root from the step"
+          - "It uses the labels to scale the step"
+        answer: B
+        explain: "AdaGrad's total only grows, so its rate keeps falling. RMSProp forgets old gradients, so the effective rate can recover."
+
+      - q: "What is the first moment in Adam?"
+        options:
+          - "A moving average of the gradient, like momentum"
+          - "A moving average of the squared gradient"
+          - "The current value of the loss"
+          - "The number of steps taken so far"
+        answer: A
+        explain: "With beta1 = 0.9, m is a moving average of g. The second moment, with beta2 = 0.999, averages the squared gradient."
+
+      - q: "Why does Adam apply a bias correction?"
+        options:
+          - "To reduce the memory used"
+          - "To increase the batch size"
+          - "Because the moments start at zero, early averages are too small and the first steps would be too large"
+          - "To avoid sign changes in the gradient"
+        answer: C
+        explain: "Dividing by 1 - beta^t restores the right scale from the first step. The effect fades as t grows."
+
+      - q: "Which are the usual default settings for Adam?"
+        options:
+          - "Rate 0.001, beta1 = 0.9, beta2 = 0.999"
+          - "Rate 0.1, beta1 = 0.5, beta2 = 0.5"
+          - "Rate 1, beta1 = 0.9, beta2 = 0.9"
+          - "Rate 0.001, beta1 = 0.999, beta2 = 0.9"
+        answer: A
+        explain: "Adam keeps a short memory for the gradient and a long memory for the squared gradient. A rate of 0.001 is the standard starting point."
+
+      - q: "What does the textbook say about choosing among optimization algorithms?"
+        options:
+          - "Adam is always the best choice"
+          - "AdaGrad is best for every deep network"
+          - "No algorithm works on deep networks"
+          - "There is no consensus. Adam is a strong default when time is short, and SGD with momentum often gives the best final accuracy if you can tune it"
+        answer: D
+        explain: "The ranking depends on the problem, so tune the rates and compare on a validation set."
+
+      - q: "In the hand-worked AdaGrad example with rate 1, why did both parameters move by exactly 1 in the first step?"
+        options:
+          - "Both gradients were equal"
+          - "Each gradient was divided by the square root of its own squared value, which has size 1"
+          - "Momentum added the missing amount"
+          - "The gradients were clipped to length 1"
+        answer: B
+        explain: "In the first step r equals g squared, so g divided by the square root of r has size 1 for every parameter, and the gap between the steep and shallow directions disappears."
+
+      - q: "In RMSProp with decay rate rho = 0.9, roughly how many past steps does the average remember?"
+        options:
+          - "About ten steps"
+          - "About one step"
+          - "About one thousand steps"
+          - "All steps equally"
+        answer: A
+        explain: "The weight on a gradient seen k steps ago is 0.1 times 0.9^k, so the memory is about ten steps."
+
+      - q: "What can happen to the effective learning rate of AdaGrad over time?"
+        options:
+          - "It can only rise"
+          - "It can only fall, because the total of squared gradients only grows"
+          - "It stays exactly constant"
+          - "It alternates between rising and falling"
+        answer: B
+        explain: "This is why AdaGrad can stop making progress in a deep network. RMSProp forgets old gradients so the rate can recover."

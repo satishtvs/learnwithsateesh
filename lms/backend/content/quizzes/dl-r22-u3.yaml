@@ -1,0 +1,490 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I), Unit III quizzes.
+# Questions are original; they follow the Unit III slides (5 parts), not the textbook wording.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning."
+  published: true
+unit:
+  code: U3
+  title: "Convolutional Networks"
+  label: "Unit - III"
+  textbook_ref: "Goodfellow et al. ch. 9"
+
+quizzes:
+  - slug: u3-p1
+    title: "Part 1: The convolution operation and its motivation"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What makes a network a convolutional network?"
+        options:
+          - "It uses convolution in place of general matrix multiplication in at least one layer"
+          - "It has no weights to learn"
+          - "It can only be applied to text"
+          - "It uses pooling in every layer"
+        answer: A
+        explain: "By definition, a convolutional network uses convolution instead of general matrix multiplication in at least one layer. Pooling is common but is not part of the definition."
+
+      - q: "A 5 x 5 image is convolved with a 3 x 3 kernel, with no padding and a stride of 1. What is the size of the output?"
+        options:
+          - "5 x 5"
+          - "4 x 4"
+          - "3 x 3"
+          - "2 x 2"
+        answer: C
+        explain: "The output size is input minus kernel plus 1, so 5 - 3 + 1 = 3 in each direction, giving 3 x 3."
+
+      - q: "How does true convolution differ from cross-correlation?"
+        options:
+          - "Cross-correlation flips the kernel and convolution does not"
+          - "Convolution flips the kernel before sliding it and cross-correlation does not"
+          - "Convolution needs no kernel at all"
+          - "Cross-correlation always gives a larger output"
+        answer: B
+        explain: "True convolution flips the kernel, while cross-correlation slides it as it is. Most libraries compute cross-correlation and still call it convolution."
+
+      - q: "A fully connected layer links 7 inputs to 5 outputs. If each output instead sees only 3 neighbouring inputs through a kernel of width 3, how many links are there?"
+        options:
+          - "35"
+          - "21"
+          - "10"
+          - "15"
+        answer: D
+        explain: "Each of the 5 outputs has 3 links, so there are 15 links instead of 35. This is the saving from sparse interactions."
+
+      - q: "Why can libraries skip the kernel flip without harming learning?"
+        options:
+          - "The kernel values are learned from data, so the network can learn the flipped kernel if it is needed"
+          - "The flip makes the output much smaller"
+          - "The flip is only needed for color images"
+          - "The flip changes the number of weights"
+        answer: A
+        explain: "Kernel weights come from gradient descent, so a flipped kernel is just another set of weights the network can learn. Skipping the flip loses nothing."
+
+      - q: "What does equivariance to translation mean for a convolution layer?"
+        options:
+          - "The output never changes when the input changes"
+          - "The output is always the same size as the kernel"
+          - "Shifting the input shifts the output feature map by the same amount"
+          - "The kernel moves to a new position after every image"
+        answer: C
+        explain: "If the input pattern moves, the feature map moves in the same way. This holds because the same kernel is used at every position."
+
+      - q: "With a kernel of width 3, a unit in the first layer sees 3 inputs. How many inputs does a unit in the fourth layer indirectly see?"
+        options:
+          - "4"
+          - "6"
+          - "12"
+          - "9"
+        answer: D
+        explain: "Each extra layer adds kernel width minus 1, which is 2 inputs here: 3, 5, 7, 9. Deeper units therefore see a wide region even though each layer uses sparse links."
+
+      - q: "What is a feature map in the textbook's terms?"
+        options:
+          - "The small grid of weights that slides over the image"
+          - "The output of a convolution, recording where the kernel found its pattern"
+          - "The set of all training images"
+          - "The loss computed for each pixel"
+        answer: B
+        explain: "The kernel is the grid of weights and the output is the feature map. The map shows how strongly the pattern appears at each position."
+
+      - q: "In the noisy sensor example, what does a weighted average of a few recent readings achieve?"
+        options:
+          - "It removes all error exactly"
+          - "Random errors partly cancel, so the spread of the error falls"
+          - "It makes the readings twice as noisy"
+          - "It turns the signal into a periodic wave"
+        answer: B
+        explain: "Averaging neighbours lets random errors partly cancel. This weighted average slid along the signal is a convolution."
+
+      - q: "An 8 x 8 image feeds a fully connected layer with an output of the same size, 64 values. How many weights does it need?"
+        options:
+          - "64"
+          - "512"
+          - "4096"
+          - "9"
+        answer: C
+        explain: "Every one of 64 inputs links to every one of 64 outputs, so 64 x 64 = 4096 weights. One shared 3 x 3 kernel needs only 9."
+
+  - slug: u3-p2
+    title: "Part 2: Pooling; convolution and pooling as an infinitely strong prior"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A 2 x 2 window holds the values 7, 9, 9 and 9. What does average pooling output?"
+        options:
+          - "9"
+          - "8.5"
+          - "9.5"
+          - "7"
+        answer: B
+        explain: "The values add up to 34 and 34 / 4 = 8.5. Max pooling would return 9."
+
+      - q: "In a typical convolutional layer, which stage applies a nonlinear function such as ReLU?"
+        options:
+          - "The pooling stage"
+          - "The convolution stage"
+          - "The flattening stage"
+          - "The detector stage"
+        answer: D
+        explain: "The convolution stage gives linear responses, the detector stage passes each through a nonlinearity such as ReLU, and the pooling stage then summarizes nearby outputs."
+
+      - q: "A strong feature response moves by one position when the input shifts. What does max pooling over a small window do to the pooled output?"
+        options:
+          - "It changes fewer of the values, so the strong response is still there"
+          - "It makes every value zero"
+          - "It makes the output change more than the detector row"
+          - "It removes the feature completely"
+        answer: A
+        explain: "Pooling makes the output nearly invariant to small shifts. In the example only two of six pooled values changed, while three of eight detector values did."
+
+      - q: "What is the trade-off of using a larger pooling window?"
+        options:
+          - "It adds more weights to train"
+          - "It always lowers the accuracy to chance"
+          - "It gives more invariance to shifts but keeps less information about place"
+          - "It removes the need for a convolution layer"
+        answer: C
+        explain: "Larger regions steady the output under shifts, but the exact position of the feature is lost. Pooling over the whole map gives zero change and no place information."
+
+      - q: "For which task does pooling over the whole feature map hurt the most?"
+        options:
+          - "Deciding whether a picture contains a bar, cross or L shape anywhere"
+          - "Deciding whether a digit is a seven"
+          - "Deciding whether a cross is in the left or right half"
+          - "Removing noise from a picture"
+        answer: C
+        explain: "If the answer is the position, throwing the place away is a disaster. In the example the whole-map pooling model underfit the position task."
+
+      - q: "An 8 x 8 picture is convolved with a 3 x 3 kernel with no padding, giving a 6 x 6 map. After 2 x 2 pooling with a stride of 2, how many values remain?"
+        options:
+          - "9"
+          - "36"
+          - "18"
+          - "16"
+        answer: A
+        explain: "The 6 x 6 map is cut into non-overlapping 2 x 2 windows, giving 3 x 3 = 9 values. The next layer then needs four times fewer weights."
+
+      - q: "What does an infinitely strong prior on the weights mean?"
+        options:
+          - "The weights start at very large values"
+          - "The weights are all learned very quickly"
+          - "The weights are chosen at random and never used"
+          - "Some weight values are given zero probability, so they are ruled out for ever"
+        answer: D
+        explain: "An infinitely strong prior assigns zero probability to some weight values. Convolution forces weights outside a small window to be zero and others to be equal."
+
+      - q: "Seen as a dense layer, a convolution layer has which structure?"
+        options:
+          - "Every weight is free to take any value"
+          - "Weights are zero outside a small window and identical across positions"
+          - "Weights are the same for every input and output"
+          - "Weights are learned only for the last position"
+        answer: B
+        explain: "The convolution matrix has forced zeros outside a small window and the same few values repeated along the diagonal. Training can tune only those few free values."
+
+      - q: "Which kind of pooling is by far the most common choice?"
+        options:
+          - "Max pooling"
+          - "Average pooling"
+          - "L2 pooling"
+          - "Weighted pooling with trained weights"
+        answer: A
+        explain: "Max pooling returns the largest value in the window and is the most common. None of the pooling types has weights to learn."
+
+      - q: "Max pooling is applied across the outputs of three detectors: a vertical line, a horizontal line and a diagonal line. What does the pooled unit mean?"
+        options:
+          - "A line that is vertical only"
+          - "The total number of bright pixels"
+          - "A unit that is always zero"
+          - "A line at any of these angles"
+        answer: D
+        explain: "Each picture strongly activates its own detector, so the maximum is large for every orientation. The pooled unit stands for a line at any of these angles, as in maxout units."
+
+  - slug: u3-p3
+    title: "Part 3: Variants of the basic convolution function"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does the stride of a convolution control?"
+        options:
+          - "The number of kernels in the layer"
+          - "The number of zeros added at the border"
+          - "How many pixels the window moves between two outputs"
+          - "The size of the kernel"
+        answer: C
+        explain: "A stride of s means the window jumps s pixels between outputs, so a larger stride gives a smaller output."
+
+      - q: "What is a convolution with a stride, compared with an ordinary convolution?"
+        options:
+          - "An ordinary convolution followed by downsampling, but computed without the discarded outputs"
+          - "A convolution with a different kernel"
+          - "A pooling layer with trained weights"
+          - "A convolution that has no bias"
+        answer: A
+        explain: "Keeping every second output of a stride-1 convolution gives exactly the same numbers as a direct stride-2 convolution, which needs fewer multiplications."
+
+      - q: "An input has length 8, the kernel has width 3, the stride is 2 and there is no padding. What is the output length?"
+        options:
+          - "6"
+          - "2"
+          - "4"
+          - "3"
+        answer: D
+        explain: "The output length is floor((n + 2p - k) / s) + 1 = floor(5 / 2) + 1 = 2 + 1 = 3."
+
+      - q: "What does same padding do for a kernel of odd width?"
+        options:
+          - "It makes the output longer than the input"
+          - "It keeps the output the same length as the input"
+          - "It removes the border pixels"
+          - "It doubles the number of weights"
+        answer: B
+        explain: "Same padding adds (k - 1) / 2 zeros on each side, which is 1 for k = 3, so the output length equals the input length and many layers can be stacked."
+
+      - q: "What is the main drawback of valid padding?"
+        options:
+          - "It needs more weights than other options"
+          - "Each layer shrinks the signal by kernel width minus 1, which limits depth"
+          - "It adds zeros that are not in the image"
+          - "It cannot be used with a stride"
+        answer: B
+        explain: "With no padding, every layer shortens the output, so deep stacks soon run out of positions. The edge values also count less."
+
+      - q: "A 6 x 6 output with 4 channels uses a 3 x 3 kernel plus a bias for each channel. How many parameters does the unshared (locally connected) layer need?"
+        options:
+          - "40"
+          - "160"
+          - "360"
+          - "1440"
+        answer: D
+        explain: "Each kernel has 9 weights plus 1 bias, so 10 numbers per channel and 40 per position. With 36 positions that gives 36 x 40 = 1440. The tied layer needs only 40."
+
+      - q: "When would we prefer an unshared layer over a tied one?"
+        options:
+          - "When the feature location matters, for example eyes in the upper half of an aligned face"
+          - "When the image is very large and memory is scarce"
+          - "When we want the layer to be equivariant to shifts"
+          - "When the same pattern may appear anywhere"
+        answer: A
+        explain: "Unshared weights make sense when a feature need not appear everywhere. The price is more parameters and the loss of equivariance."
+
+      - q: "A layer has 3 input channels, 4 kernels of size 3 x 3 (each spanning all input channels) and one bias per kernel. How many parameters does it have?"
+        options:
+          - "36"
+          - "108"
+          - "112"
+          - "27"
+        answer: C
+        explain: "Each kernel has 3 x 3 x 3 = 27 weights, so 4 kernels have 108 weights, plus 4 biases gives 112. The count does not depend on the image size."
+
+      - q: "An input has length 8, the kernel has width 3, the stride is 1 and one zero is added on each side. What is the output length?"
+        options:
+          - "8"
+          - "6"
+          - "10"
+          - "7"
+        answer: A
+        explain: "floor((8 + 2 - 3) / 1) + 1 = 7 + 1 = 8, so the output has the same length as the input."
+
+      - q: "What does a tiled convolution layer do?"
+        options:
+          - "It uses one kernel at every position"
+          - "It gives every position its own separate kernel"
+          - "It adds zeros around the input"
+          - "It cycles through a small set of kernels along the positions"
+        answer: D
+        explain: "A tiled layer keeps a few kernels and rotates through them. One kernel gives ordinary convolution and one per position gives an unshared layer."
+
+  - slug: u3-p4
+    title: "Part 4: Structured outputs, data types and efficient convolution algorithms"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is a structured output in a convolutional network?"
+        options:
+          - "A single number for the whole image"
+          - "A list of the kernel weights"
+          - "A table of the training losses"
+          - "An array of answers, such as one class label for every pixel"
+        answer: D
+        explain: "A structured output keeps the height and width and gives an answer for every position, for example a mask that marks which pixels belong to a shape."
+
+      - q: "A color image of 224 x 224 pixels with 3 channels is convolved with one 3 x 3 kernel spanning all channels, with no padding. What is the size of the output map?"
+        options:
+          - "224 x 224"
+          - "222 x 222"
+          - "226 x 226"
+          - "221 x 221"
+        answer: B
+        explain: "The output is 224 - 3 + 1 = 222 in each direction. The kernel spans all 3 channels and still gives one single map."
+
+      - q: "Why can a convolution layer work on inputs of different sizes while a fully connected layer cannot?"
+        options:
+          - "The same kernel is simply applied to as many positions as the input has, whereas a dense layer has one weight per input value"
+          - "Convolution layers ignore the edges of the image"
+          - "Convolution layers resize every image first"
+          - "Dense layers have no weights"
+        answer: A
+        explain: "A kernel can slide over any input size and the output has the input size. A dense layer's weight matrix is tied to a fixed number of inputs."
+
+      - q: "A separable 7 x 7 kernel is the outer product of a column and a row. About how many multiplications per output do the two short passes need, compared with 49 for the full kernel?"
+        options:
+          - "49"
+          - "21"
+          - "14"
+          - "7"
+        answer: C
+        explain: "Two passes need k + k = 7 + 7 = 14 multiplications per output instead of k x k = 49. The saving grows with the kernel width."
+
+      - q: "According to the convolution theorem, convolution in the signal domain equals what in the frequency domain?"
+        options:
+          - "Multiplying the transforms frequency by frequency"
+          - "Adding the transforms"
+          - "Dividing one transform by the other"
+          - "Taking the maximum of the transforms"
+        answer: A
+        explain: "The Fourier route is to pad, transform both, multiply per frequency and invert. Zero padding first avoids the result wrapping around."
+
+      - q: "For which situation is the Fourier route most useful?"
+        options:
+          - "Very small kernels such as 3 x 3"
+          - "Kernels that are an outer product of two vectors"
+          - "Large kernels and long signals"
+          - "Images with only one pixel"
+        answer: C
+        explain: "Direct computation suits small kernels with no set-up cost. The Fourier cost does not depend on the kernel width, so it wins for large kernels and long signals."
+
+      - q: "How can the pixel labels from a first pass be improved in a second pass?"
+        options:
+          - "By deleting the pixels with low probability"
+          - "By feeding the predicted labels back as extra input channels and running the same kernels again"
+          - "By training with a larger learning rate"
+          - "By using a smaller image"
+        answer: B
+        explain: "Feeding labels back lets each pixel see how its neighbours were labelled, so the answers become more consistent."
+
+      - q: "One second of audio has 16000 samples. A kernel of width 3 is applied with no padding. How many outputs does one filter give?"
+        options:
+          - "16003"
+          - "16000"
+          - "15999"
+          - "15998"
+        answer: D
+        explain: "The rule is length minus kernel width plus 1, so 16000 - 3 + 1 = 15998."
+
+      - q: "Why is the output of a structured-output network often on a slightly smaller grid than the input?"
+        options:
+          - "The sigmoid removes the border pixels"
+          - "Strides or pooling in the network shrink the output"
+          - "The labels are always halved"
+          - "The kernel is flipped"
+        answer: B
+        explain: "Strides and pooling reduce the size of the maps, so the predicted label grid can be a little smaller than the input."
+
+      - q: "Why are both signals padded with zeros before multiplying their Fourier transforms to compute a convolution?"
+        options:
+          - "To make the transforms faster to compute by hand"
+          - "To flip the kernel"
+          - "To give the full output length so the result does not wrap around"
+          - "To remove the noise from the signal"
+        answer: C
+        explain: "Both signals are padded to the signal length plus kernel length minus 1. Without it the result wraps around and the first values are wrong."
+
+  - slug: u3-p5
+    title: "Part 5: Random or unsupervised features; a small CNN worked end to end"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is trained when a network uses random, frozen convolution kernels?"
+        options:
+          - "Only the final dense layer"
+          - "Only the pooling layer"
+          - "Every layer through back propagation"
+          - "Nothing at all"
+        answer: A
+        explain: "Random kernels are drawn once and frozen, so only the final layer is trained. That leaves one simple linear problem."
+
+      - q: "Which is a practical use of random kernels mentioned in the lesson?"
+        options:
+          - "Replacing the need for any labels"
+          - "Making the network deeper without extra weights"
+          - "Ranking several architectures by training only the last layer"
+          - "Removing the need for pooling"
+        answer: C
+        explain: "Training only the last layer is cheap, so it can rank candidate designs before the best one is trained fully. Random kernels also give a cheap baseline."
+
+      - q: "In greedy layer-wise unsupervised pretraining, what happens after the first layer has been trained?"
+        options:
+          - "It is discarded"
+          - "It is frozen and its outputs are used to train the second layer"
+          - "It is trained again with labels immediately"
+          - "It is replaced by a pooling layer"
+        answer: B
+        explain: "Layers are solved one at a time: train a layer without labels, freeze it, then train the next layer on its outputs. Finally, the whole network is fine-tuned with labels."
+
+      - q: "In the comparison with the visual cortex, which brain cells correspond to pooling?"
+        options:
+          - "Simple cells"
+          - "Retinal cells"
+          - "Motor neurons"
+          - "Complex cells"
+        answer: D
+        explain: "Simple cells react to a small patch of the visual field, like a convolution unit. Complex cells stay active when the pattern moves a little, like pooling."
+
+      - q: "In the small network, four 3 x 3 kernels are used on a 1-channel image, each with one bias. How many convolution parameters are there?"
+        options:
+          - "9"
+          - "27"
+          - "36"
+          - "40"
+        answer: D
+        explain: "Four kernels with 9 weights each give 36 weights, plus 4 biases makes 40 parameters."
+
+      - q: "An 8 x 8 image passes through 3 x 3 convolution with no padding, then 2 x 2 max pooling with a stride of 2. What size is each feature map after pooling?"
+        options:
+          - "6 x 6"
+          - "3 x 3"
+          - "4 x 4"
+          - "2 x 2"
+        answer: B
+        explain: "The convolution gives 8 - 3 + 1 = 6, so a 6 x 6 map. Pooling halves it to 3 x 3, and four maps flatten to 36 numbers."
+
+      - q: "With softmax and cross-entropy loss, what is the gradient of the loss on the scores?"
+        options:
+          - "The scores minus the loss"
+          - "The true answer divided by the probabilities"
+          - "The probabilities minus the true answer"
+          - "The probabilities multiplied by the true answer"
+        answer: C
+        explain: "For softmax with cross-entropy, the gradient on the scores is simply the predicted probabilities minus the one-hot true answer."
+
+      - q: "When back propagating through a max pooling layer, which positions receive gradient?"
+        options:
+          - "Only the winner of each pooling block"
+          - "Every position in the block equally"
+          - "Only the positions that were zero"
+          - "None of them"
+        answer: A
+        explain: "Max pooling passes the gradient only to the position that gave the largest value in each block. The ReLU then passes it only where the convolution output was positive."
+
+      - q: "What is the order of operations in the classic convolutional block described in the lesson?"
+        options:
+          - "Pooling, convolution, nonlinearity"
+          - "Convolution, nonlinearity, pooling"
+          - "Nonlinearity, pooling, convolution"
+          - "Softmax, convolution, pooling"
+        answer: B
+        explain: "A block finds local patterns with shared kernels, applies a nonlinearity such as ReLU, then pools. Real networks repeat the block and finish with dense layers and softmax."
+
+      - q: "How did 64 random kernels compare with 4 trained kernels on the tiny image task?"
+        options:
+          - "Random kernels were far worse and could not beat raw pixels"
+          - "Random kernels needed fewer trained parameters"
+          - "They nearly matched, but needed many more trained parameters in the dense layer"
+          - "Both gave exactly the same accuracy"
+        answer: C
+        explain: "Sixty-four random kernels almost matched four trained ones, but the dense layer then had 1731 trained parameters instead of 111."
+

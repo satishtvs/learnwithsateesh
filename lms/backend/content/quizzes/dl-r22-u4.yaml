@@ -1,0 +1,591 @@
+# Deep Learning (JNTUH R22 CSE-AIML, IV-I), Unit IV quizzes.
+# Questions are original; they follow the Unit IV slides (6 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: deep-learning-r22
+  title: "Deep Learning: JNTUH R22 B.Tech CSE (AI&ML), IV-I"
+  description: "Unit-wise video parts and quizzes for Deep Learning (AM701PC), following Goodfellow, Bengio and Courville, Deep Learning."
+  published: true
+unit:
+  code: U4
+  title: "Recurrent and Recursive Nets"
+  label: "Unit - IV"
+  textbook_ref: "Goodfellow et al. ch. 10"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u4-p1
+    title: "Part 1: Unfolding computational graphs; recurrent neural networks"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does unfolding a recurrence such as s(t) = f(s(t - 1); theta) achieve?"
+        options:
+          - "It writes the computation as a graph with no loop, one copy of f per time step"
+          - "It adds a new set of parameters for every time step"
+          - "It removes the dependence of each state on the previous state"
+          - "It converts the sequence into a fixed-size image"
+        answer: A
+        explain: "Unfolding writes s(3) = f(f(f(s(0)))), a loop-free chain that reuses the same f and theta. Ordinary back-propagation can then be applied to it."
+
+      - q: "Why can a recurrent network handle sequences of any length with a fixed number of parameters?"
+        options:
+          - "It pads every sequence to the same length first"
+          - "It learns a separate weight set for each position"
+          - "It reuses the same weights at every time step, so the count does not depend on length"
+          - "It ignores the earlier inputs and reads only the last one"
+        answer: C
+        explain: "Parameter sharing across time means a longer sequence only adds more copies of the same step, not more weights."
+
+      - q: "A recurrent network has 2 inputs, 2 hidden units and 1 output. How many parameters does it have in total (U, W, b, V and c)?"
+        options:
+          - "7"
+          - "9"
+          - "11"
+          - "13"
+        answer: D
+        explain: "U is 2 x 2 = 4, W is 2 x 2 = 4, hidden bias is 2, V is 1 x 2 = 2 and c is 1, giving 4 + 4 + 2 + 2 + 1 = 13."
+
+      - q: "Which of the three recurrent design patterns reads a whole sequence and gives a single output at the end, for example to classify a sentence?"
+        options:
+          - "Output at every step with hidden-to-hidden recurrence"
+          - "Hidden recurrence with one summary output at the end"
+          - "Output at every step with recurrence only from output to hidden"
+          - "A feedforward network with a fixed input size"
+        answer: B
+        explain: "The third pattern keeps the recurrent hidden connections, reads the entire sequence, and answers once, which suits sequence classification."
+
+      - q: "What is teacher forcing?"
+        options:
+          - "Feeding the network's own previous output as the next input during training"
+          - "Stopping training early when the loss stops improving"
+          - "Forcing the hidden state to zero at every step"
+          - "Feeding the true previous symbol as the input at each step while training"
+        answer: D
+        explain: "With teacher forcing each step starts from a correct context. Free running, where the network's own output is fed back, is used to generate new sequences."
+
+      - q: "In the first pattern, a(t) = b + W h(t - 1) + U x(t) and h(t) = tanh(a(t)). What does the matrix W connect?"
+        options:
+          - "The previous hidden state to the current pre-activation"
+          - "The current input to the hidden state"
+          - "The hidden state to the output"
+          - "The output to the loss"
+        answer: A
+        explain: "W is the hidden-to-hidden (recurrent) weight matrix. U carries the input into the hidden state and V carries the hidden state to the output."
+
+      - q: "In the running example the symbols a, b, a, c repeat. Why can a network that sees only the current symbol do no better than a coin flip at every a?"
+        options:
+          - "The symbol a never appears twice in a row"
+          - "What follows a depends on the symbol before it, which that network cannot remember"
+          - "The network has too many hidden units"
+          - "The softmax output cannot represent three classes"
+        answer: B
+        explain: "After a comes b if the earlier symbol was c, and c if it was b. Without memory of the earlier symbol, b and c look equally likely."
+
+      - q: "What does back-propagation through time do?"
+        options:
+          - "It trains each time step with its own separate set of weights"
+          - "It runs the network backwards to generate earlier inputs"
+          - "It unfolds the network and applies ordinary back-propagation, adding each step's contribution to one shared gradient"
+          - "It removes the loss from all but the last time step"
+        answer: C
+        explain: "Forward pass left to right storing hidden states, then a backward pass right to left. Because the weights are shared, every step adds to the same gradient before one update."
+
+      - q: "In free running mode, what is used as the input at each step?"
+        options:
+          - "The true previous symbol from the training data"
+          - "The network's own output from the previous step"
+          - "A zero vector"
+          - "The loss from the previous step"
+        answer: B
+        explain: "Free running feeds back the network's own last output, which is how new sequences are generated. One early mistake then changes every later input."
+
+      - q: "In the unfolded graph for f(s) = 0.5 s + 1 starting from s0 = 0, what is s2?"
+        options:
+          - "1.0"
+          - "1.75"
+          - "1.5"
+          - "2.0"
+        answer: C
+        explain: "s1 = 0.5 x 0 + 1 = 1 and s2 = 0.5 x 1 + 1 = 1.5. The same f is applied at every step, and the values settle toward 2."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u4-p2
+    title: "Part 2: Bidirectional RNNs and encoder-decoder sequence-to-sequence architectures"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "How does a bidirectional RNN produce its output at each position?"
+        options:
+          - "It averages the outputs of the previous three steps"
+          - "It joins the state of a forward chain and the state of a backward chain into one vector for the output layer"
+          - "It runs one chain twice with the same weights"
+          - "It uses only the backward chain and discards the forward one"
+        answer: B
+        explain: "The forward state summarizes everything up to this step and the backward state summarizes everything from this step to the end. The two are joined before the output layer."
+
+      - q: "For which task is a bidirectional layer unsuitable?"
+        options:
+          - "Tagging the words of a complete sentence"
+          - "Recognizing handwriting from a scanned page"
+          - "Labeling every position of a stored protein sequence"
+          - "Predicting the next word as the user types"
+        answer: D
+        explain: "The backward chain must start at the end of the input. In live prediction the end does not exist yet, and the future is exactly what must be guessed."
+
+      - q: "In the digit test, a forward-only network reached 75 percent while the bidirectional network reached 100 percent. Why was 75 percent the best a forward-only network could do?"
+        options:
+          - "It never sees the next digit, so it cannot tell whether the next digit is larger than the current one"
+          - "It had too few training steps"
+          - "Its gradients were exploding"
+          - "It had no output layer"
+        answer: A
+        explain: "Knowing only the current digit, the best possible accuracy is 75 percent on average. The backward state supplies the next digit, so the bidirectional network can compare the two."
+
+      - q: "In an encoder-decoder architecture, what is the context vector C?"
+        options:
+          - "The set of all decoder outputs"
+          - "The loss computed over the whole sequence"
+          - "The final state of the encoder, a fixed-size summary of the input"
+          - "A random vector used to start the decoder"
+        answer: C
+        explain: "The encoder reads the input one symbol at a time and its last state becomes C. The decoder starts from C and writes the output."
+
+      - q: "Why does the decoder have a special END symbol?"
+        options:
+          - "Writing END stops the decoder, so the output length is decided by the decoder itself"
+          - "It marks the start of the encoder input"
+          - "It is the symbol used to reset the hidden state"
+          - "It forces the output to be the same length as the input"
+        answer: A
+        explain: "Because the decoder keeps writing until it produces END, the output can be any length, independent of the input length."
+
+      - q: "What weakness of the basic encoder-decoder appears when inputs get long?"
+        options:
+          - "The decoder cannot use a softmax"
+          - "The encoder cannot be trained by gradient descent"
+          - "The output length is forced to equal the input length"
+          - "All the input must be squeezed into one fixed-size vector, so information is lost"
+        answer: D
+        explain: "A short and a long input get the same size context vector. In the experiment a context of 8 numbers failed beyond length 6 or so, while 32 numbers held longer."
+
+      - q: "What is the core idea of attention, as motivated in this part?"
+        options:
+          - "Make the context vector smaller"
+          - "Keep all encoder states and give the decoder a weighted mix of them at each output step"
+          - "Train the encoder and decoder with different loss functions"
+          - "Replace the decoder with a bidirectional layer"
+        answer: B
+        explain: "Instead of one fixed C, the decoder scores which input positions matter at each step and uses a weighted mix as its context, so the context changes every step."
+
+      - q: "During training of the decoder with teacher forcing, what is fed in as the previous symbol?"
+        options:
+          - "The decoder's own previous guess"
+          - "A random symbol"
+          - "The true previous symbol from the target"
+          - "The final encoder state only"
+        answer: C
+        explain: "Teacher forcing feeds the true previous target symbol. The price is a mismatch at test time, when the decoder sees its own guesses instead."
+
+      - q: "Which is a typical use of bidirectional layers?"
+        options:
+          - "Speech recognition on a recorded audio file"
+          - "Reading a live sensor stream and answering after each reading"
+          - "Predicting the next typed character"
+          - "Generating text one word at a time with no input"
+        answer: A
+        explain: "A sound is clearer once the following sounds are heard, and a recording has an end for the backward chain to start from. The other tasks need live or future-free prediction."
+
+      - q: "Roughly how does the cost of a bidirectional layer compare with a forward-only layer?"
+        options:
+          - "About half"
+          - "The same"
+          - "About ten times"
+          - "About twice, since there are two chains"
+        answer: D
+        explain: "The bidirectional layer runs a forward chain and a backward chain, and back-propagation through time covers both, so the computation is about doubled."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u4-p3
+    title: "Part 3: Deep recurrent networks and recursive neural networks"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which list gives the three ways of adding depth to a recurrent network described in this part?"
+        options:
+          - "More training data, more epochs, a larger learning rate"
+          - "Pooling layers, convolution layers, fully connected layers"
+          - "A deep hidden-to-hidden transition, deep input and output layers, and skip connections across time"
+          - "Bidirectional layers, attention, and an END symbol"
+        answer: C
+        explain: "A deeper transition computes the new state through a small multi-layer network, deep input and output layers surround a one-layer memory, and skip links jump over several time steps."
+
+      - q: "Why are skip connections across time helpful?"
+        options:
+          - "They create a shorter path between distant time steps, so gradients shrink less"
+          - "They remove the need for parameter sharing"
+          - "They make the hidden state larger"
+          - "They allow the network to read the future"
+        answer: A
+        explain: "An extra link that jumps s steps shortens the route. With 12 steps and a skip of 4, the shortest path is 3 edges instead of 12."
+
+      - q: "Over 12 time steps, what is the number of edges on the shortest path from step 0 to step 12 when there are skip links of length 4 as well as ordinary links?"
+        options:
+          - "12"
+          - "6"
+          - "4"
+          - "3"
+        answer: D
+        explain: "Three jumps of four reach step 12, so the shortest path has 3 edges, compared with 12 for the plain chain."
+
+      - q: "A stacked network has 10 inputs and 32 hidden units in layer 1. How many weights and biases are in layer 1 (input weights, recurrent weights and biases)?"
+        options:
+          - "320"
+          - "1,376"
+          - "2,080"
+          - "1,024"
+        answer: B
+        explain: "Input weights 10 x 32 = 320, recurrent weights 32 x 32 = 1,024 and 32 biases give 1,376."
+
+      - q: "What is a recursive neural network?"
+        options:
+          - "A recurrent network with a loop in its graph"
+          - "A network that calls itself until the loss is zero"
+          - "A network that uses a separate set of weights at each depth"
+          - "A network that applies the same weights over a tree, combining children into parents bottom up"
+        answer: D
+        explain: "A recursive network generalizes the chain of a recurrent network to a tree. One shared rule combines every pair of children, from the leaves up to the root."
+
+      - q: "For a balanced tree over 64 elements, what are the depths of the tree and of the chain (a recurrent network)?"
+        options:
+          - "Tree 6, chain 63"
+          - "Tree 8, chain 32"
+          - "Tree 32, chain 64"
+          - "Tree 63, chain 6"
+        answer: A
+        explain: "A chain over n elements has n - 1 compositions, 63 here. A balanced tree has about log2 n levels, which is 6."
+
+      - q: "What is a drawback of always pairing neighboring elements to form a balanced tree?"
+        options:
+          - "The depth becomes n - 1"
+          - "It needs a separate weight matrix for each level"
+          - "It ignores the meaning of the content, since the structure is not chosen from the data"
+          - "It cannot be trained with back-propagation"
+        answer: C
+        explain: "A balanced tree guarantees log n depth, but the pairing has nothing to do with the sentence. A parse supplies a meaningful tree, and a learned tree picks merges by score."
+
+      - q: "How does depth through time differ from depth through layers in a recurrent network?"
+        options:
+          - "Depth through time is chosen by the designer and uses new weights at each step"
+          - "Depth through time comes from unrolling with the same weights, while depth through layers is stacked by choice and each layer can have its own weights"
+          - "Depth through layers comes from the length of the input"
+          - "They are two names for the same thing"
+        answer: B
+        explain: "A long input already makes a long unrolled graph with repeated weights, which makes gradients travel far. Extra layers make each step more expressive."
+
+      - q: "In a stacked recurrent network, what does each layer above the first read as its input?"
+        options:
+          - "The state of the layer below it at the same time step"
+          - "The raw input sequence"
+          - "Only the output of the top layer"
+          - "The state of the same layer two steps earlier"
+        answer: A
+        explain: "The bottom layer reads the input, each higher layer reads the layer below, and every layer also passes its own state to the next time step. The top layer feeds the output."
+
+      - q: "In the recursive network example, how many times is the same weight matrix W used to compose four words into a root?"
+        options:
+          - "Once"
+          - "Two times"
+          - "Three times"
+          - "Four times"
+        answer: C
+        explain: "Two pairs are combined first, then the two phrases, giving three compositions with one shared W and a tree depth of two."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u4-p4
+    title: "Part 4: The challenge of long-term dependencies; echo state networks"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A recurrent matrix has spectral radius below 1. What happens to a gradient sent back through many time steps?"
+        options:
+          - "It explodes"
+          - "It stays exactly the same"
+          - "It is replaced by noise"
+          - "It vanishes, shrinking roughly like rho to the power t"
+        answer: D
+        explain: "The gradient is multiplied by roughly the same matrix at every step, so its size changes like rho^t. With rho below 1 it shrinks toward zero."
+
+      - q: "With the scalar recurrence h(t) = w h(t - 1) and w = 1.1, roughly what is the factor w^100 after 100 steps?"
+        options:
+          - "About 0.00003"
+          - "About 13,781, so the gradient explodes"
+          - "Exactly 1"
+          - "About 0.35"
+        answer: B
+        explain: "1.1 to the power 100 is about 13,781. A 10 percent change in the weight turns a vanishing signal into an exploding one."
+
+      - q: "Which statement describes how a vanishing gradient usually shows up during training?"
+        options:
+          - "The loss stalls and looks like slow learning, so it is hard to notice"
+          - "The loss suddenly turns into not a number"
+          - "The weights jump to very large values"
+          - "The training loss becomes exactly zero"
+        answer: A
+        explain: "Exploding gradients are easy to see because numbers blow up. Vanishing gradients just remove the learning signal from early steps."
+
+      - q: "For a symmetric recurrent matrix W = Q diag(lambda) Q^T, what is W^t?"
+        options:
+          - "t times W"
+          - "Q diag(t lambda) Q^T"
+          - "Q diag(lambda^t) Q^T, so the largest eigenvalue magnitude dominates"
+          - "The identity matrix for large t"
+        answer: C
+        explain: "Powers of W only raise each eigenvalue to the power t. The eigenvalue with the largest magnitude, the spectral radius, decides whether the result grows or shrinks."
+
+      - q: "In an echo state network, which weights are trained?"
+        options:
+          - "The input weights only"
+          - "Only the linear readout"
+          - "The recurrent weights only"
+          - "All the weights, using back-propagation through time"
+        answer: B
+        explain: "The recurrent and input weights are random and fixed. Only the readout from the reservoir states to the output is learned."
+
+      - q: "How is the readout of an echo state network usually found?"
+        options:
+          - "By running thousands of epochs of back-propagation through time"
+          - "By random search"
+          - "By copying the weights of the reservoir"
+          - "By solving a least squares (ridge regression) problem on the collected reservoir states"
+        answer: D
+        explain: "The states are collected while the inputs run through the fixed reservoir, and Wout = (X^T X + cI)^-1 X^T Y gives the readout in one linear solve, with no vanishing gradient."
+
+      - q: "Why is the recurrent matrix of an echo state network scaled to a spectral radius near 1?"
+        options:
+          - "To give the reservoir a longer memory without letting the states blow up"
+          - "To make the readout nonlinear"
+          - "To reduce the number of units needed to zero"
+          - "To remove the need for random initialization"
+        answer: A
+        explain: "A radius near 1 lets past inputs echo for longer. In the example, radius 0.5 recalled input from fewer steps back than radius 1.0, though a smaller radius suits tasks that look back only a few steps."
+
+      - q: "Which of these is a limitation of echo state networks mentioned in this part?"
+        options:
+          - "Training needs back-propagation through time"
+          - "They suffer from vanishing gradients"
+          - "Their memory is finite, so they are weak when memory must be long and exact"
+          - "They cannot be used with a tanh activation"
+        answer: C
+        explain: "Having no gradient through time avoids vanishing, but the reservoir memory still fades after some steps (about twenty in the example), and the recurrent weights are random, not learned."
+
+      - q: "With the scalar recurrence and w = 1.0, what happens to the gradient factor w^t as t grows?"
+        options:
+          - "It vanishes"
+          - "It stays at exactly 1, but this is a knife edge"
+          - "It explodes"
+          - "It oscillates between positive and negative values"
+        answer: B
+        explain: "The factor stays at 1, but any small change in w above or below 1 sends it to explode or vanish, so this balance is not reliable in practice."
+
+      - q: "Which of these is NOT one of the reasons the textbook gives for why long-term memory is hard to learn?"
+        options:
+          - "Long links carry exponentially smaller gradients than short links"
+          - "Small fluctuations from short links can drown the signal"
+          - "Storing a memory stably needs a spectral radius below 1, so it fades"
+          - "The sigmoid function cannot take negative inputs"
+        answer: D
+        explain: "The sigmoid accepts any real input. The real reasons are tiny long-link gradients, noise from short links, very long training times, and the fading of stable memories."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u4-p5
+    title: "Part 5: Leaky units, multiple time scales, LSTM and other gated RNNs"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A leaky unit updates as mu(t) = alpha mu(t - 1) + (1 - alpha) v(t). What does an alpha close to 1 give?"
+        options:
+          - "A unit that follows the input closely and forgets quickly"
+          - "A unit that ignores its old value completely"
+          - "A unit with a long memory that changes slowly"
+          - "A unit whose output is always zero"
+        answer: C
+        explain: "A large alpha keeps most of the old value and mixes in only a little new input, so information lasts many steps. A small alpha forgets fast."
+
+      - q: "After 20 steps, how much weight remains on an old input for a leaky unit with alpha = 0.99?"
+        options:
+          - "About 0.82, more than four fifths"
+          - "About 0.12"
+          - "About 0.000001"
+          - "Exactly zero"
+        answer: A
+        explain: "The remaining weight is alpha to the power 20, and 0.99^20 is about 0.8179. For alpha = 0.9 it is about 0.12 and for alpha = 0.5 about one in a million."
+
+      - q: "What does the forget gate of an LSTM control?"
+        options:
+          - "How much of the new candidate is written to the cell"
+          - "How much of the cell is shown as the output"
+          - "How large the input vector is"
+          - "How much of the old cell state is kept"
+        answer: D
+        explain: "The forget gate multiplies the old cell. The input gate controls how much of the candidate is written, and the output gate controls how much of the cell is shown."
+
+      - q: "Which equation gives the new LSTM cell state?"
+        options:
+          - "c = o times tanh(h)"
+          - "c = f times old c, plus i times g"
+          - "c = sigmoid(W x + U h + b)"
+          - "c = f times i times g"
+        answer: B
+        explain: "The cell is updated by addition: what survives the forget gate plus what the input gate lets in from the candidate. This additive path is central to why LSTMs keep gradients alive."
+
+      - q: "How many gates does a GRU have, and what are they?"
+        options:
+          - "Two: the update gate and the reset gate"
+          - "Three: forget, input and output"
+          - "One: the forget gate"
+          - "Four: forget, input, output and reset"
+        answer: A
+        explain: "The GRU has no separate cell state. The update gate decides how much of the old state to keep and the reset gate decides how much of it the candidate may see."
+
+      - q: "For a layer with the same sizes, how do the parameter counts of an LSTM and a plain RNN compare?"
+        options:
+          - "They are equal"
+          - "The LSTM has twice as many"
+          - "The LSTM has exactly four times as many, because it has four weight blocks"
+          - "The LSTM has one more than the plain RNN"
+        answer: C
+        explain: "The forget, input, output and candidate computations each have the form n(n + d) + n. A GRU has three such blocks, so it has three times the plain RNN count."
+
+      - q: "Why do gated cells ease the vanishing gradient problem?"
+        options:
+          - "They use a larger learning rate"
+          - "They remove the activation function"
+          - "They make the input gate always open"
+          - "The memory path is additive, so with a forget gate near 1 the gradient factor stays close to 1"
+        answer: D
+        explain: "The derivative of the new cell with respect to the old cell is f, not a matrix raised to a high power. A large forget bias keeps f near 1, so the gradient survives many steps."
+
+      - q: "When might you prefer a GRU over an LSTM?"
+        options:
+          - "When you must have a separate cell state"
+          - "When you have less data or time and want fewer parameters with often similar accuracy"
+          - "When the dependencies are only one step long"
+          - "When you want three gates"
+        answer: B
+        explain: "A GRU is lighter and faster and is often about as good, while an LSTM can be slightly more expressive. Neither always wins, so it is worth trying both."
+
+      - q: "What does the input gate of an LSTM control?"
+        options:
+          - "How much of the old cell is kept"
+          - "How much of the cell is shown as the new hidden value"
+          - "How much of the new candidate is written into the cell"
+          - "How many time steps the cell remembers"
+        answer: C
+        explain: "The input gate scales the candidate g before it is added to the cell. A closed input gate also protects the cell from irrelevant input."
+
+      - q: "In the GRU, the new state is u times the old state plus (1 - u) times the candidate. What does a large update gate u mean?"
+        options:
+          - "Most of the new candidate is used"
+          - "The state is reset to zero"
+          - "The candidate sees none of the input"
+          - "Most of the old state is kept"
+        answer: D
+        explain: "With u near 1 the old state is mostly kept. In the worked step, u = 0.668 kept about two thirds of the old state, so the new state landed closer to the old value."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u4-p6
+    title: "Part 6: Optimization for long-term dependencies; explicit memory"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the main difference between clipping by value and clipping by norm?"
+        options:
+          - "Clipping by value rescales the whole vector, and clipping by norm cuts each number"
+          - "Clipping by norm rescales the whole gradient if its length exceeds the threshold, keeping its direction"
+          - "Clipping by norm can change the direction, and clipping by value cannot"
+          - "Only clipping by value is cheap to compute"
+        answer: B
+        explain: "Clip by norm applies the same factor to every component, so the direction is kept. Clip by value cuts each component on its own, which can change the direction (in the example, from 6 to 45 degrees)."
+
+      - q: "Which problem does gradient clipping cure?"
+        options:
+          - "Vanishing gradients"
+          - "Overfitting"
+          - "Slow data loading"
+          - "Exploding gradients, but not vanishing ones"
+        answer: D
+        explain: "Clipping only cuts rare huge steps. It does nothing to restore a gradient that has shrunk to almost zero, which needs a better cell design such as gating."
+
+      - q: "In the clipping example, the raw gradient had length about 120,942 and the threshold was 5. After clipping by value, why did the arrow turn to 45 degrees?"
+        options:
+          - "Both components were cut to 5, so their ratio changed"
+          - "The learning rate was changed"
+          - "The gradient was rotated on purpose"
+          - "Only the larger component was kept"
+        answer: A
+        explain: "Both numbers (about 120,273 and 12,707) became 5, so the vector points along the diagonal. Clipping by norm kept the 6 degree direction and shrank only the length."
+
+      - q: "What does the information-flow regularizer encourage?"
+        options:
+          - "Larger weights in the output layer"
+          - "A smaller hidden state"
+          - "The gradient to keep a steady size as it flows back in time, with a ratio of consecutive sizes near 1"
+          - "Fewer time steps in the sequence"
+        answer: C
+        explain: "The penalty adds up (ratio - 1) squared over the steps, so gradient descent nudges the recurrent weights toward a ratio of 1, where the gradient neither vanishes nor explodes."
+
+      - q: "How does a second-order optimization method differ from plain gradient descent?"
+        options:
+          - "It also uses the curvature of the loss, taking small steps where it is steep and large steps where it is flat"
+          - "It uses only the sign of the gradient"
+          - "It needs no gradient at all"
+          - "It is cheaper per step because it avoids derivatives"
+        answer: A
+        explain: "Second-order methods use a matrix of second derivatives, which makes each step costly, but they handle narrow ravines much better than first-order zigzagging."
+
+      - q: "What is an advantage of an explicit memory such as the one in a neural Turing machine over a hidden state?"
+        options:
+          - "It needs no controller"
+          - "It removes the need for training"
+          - "It makes the hidden state smaller than the input"
+          - "Its size is not tied to the weights, so a bigger memory adds no parameters"
+        answer: D
+        explain: "A hidden state grows with the weight matrix. In the example, 128 slots of 20 numbers stored 2,560 values, ten times more than the 256 in the gated layer, with no extra controller parameters."
+
+      - q: "Why do the read and write heads of a neural Turing machine use soft attention over all slots instead of picking one slot?"
+        options:
+          - "Soft attention uses less memory"
+          - "A hard choice has no gradient, while smooth weights let back-propagation learn where to look"
+          - "Soft attention guarantees the correct slot is always chosen"
+          - "Hard choices are not possible in hardware"
+        answer: B
+        explain: "Because the weights over the slots are smooth and sum to one, the whole machine is differentiable and can be trained end to end by gradient descent."
+
+      - q: "In content-based addressing, how are the weights on memory slots obtained?"
+        options:
+          - "By moving one slot to the left or right at each step"
+          - "By giving every slot the same weight"
+          - "By comparing a key with each slot, for example with cosine similarity, then applying a softmax"
+          - "By selecting the slot with the lowest index"
+        answer: C
+        explain: "Slots whose content looks like the key get large weights. A higher sharpness makes the softmax closer to a hard choice. Location-based addressing is the one that shifts along the slots."
+
+      - q: "How does a write head change a memory slot?"
+        options:
+          - "It erases part of the old content and then adds new content, both scaled by the slot weight"
+          - "It overwrites every slot with the same vector"
+          - "It deletes the slot completely"
+          - "It copies the controller's weights into the slot"
+        answer: A
+        explain: "Each slot keeps (1 - weight x erase) of its old content and then receives weight x add. A slot with weight near zero is left almost unchanged."
+
+      - q: "Why is a good starting scale for the recurrent matrix, with spectral radius close to 1, helpful?"
+        options:
+          - "It makes the loss zero at the start"
+          - "Signals and gradients neither blow up nor die in the first steps"
+          - "It removes the need for gradient clipping forever"
+          - "It makes the network bidirectional"
+        answer: B
+        explain: "This borrows the echo state idea from Part 4. It helps early training, but no single trick is enough, so real systems combine initialization, clipping, momentum and gated cells."
