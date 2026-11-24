@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getCourse, type CourseOutline, type CourseProgress, type CourseSummary, type PartSummary } from './api'
+import { getCourse, listCourses, type CourseOutline, type CourseProgress, type CourseSummary, type PartSummary } from './api'
 import { useAuth } from './auth'
 import { partGroups, shortTitle } from './format'
 import { useAllProgress, useChangeSyllabusLink, useRouteCourse, useSemesterCourses, useSyllabus } from './state'
@@ -141,12 +141,18 @@ export function SemesterTree() {
     .filter((c) => bySlug.get(c.slug)?.last_seen_at)
     .sort((a, b) => (bySlug.get(b.slug)!.last_seen_at! > bySlug.get(a.slug)!.last_seen_at! ? 1 : -1))[0]
   const activeSlug = route?.slug ?? recent?.slug ?? courses[0]?.slug ?? null
+  // Courses of other semesters the student has started ("other courses I'm following").
+  const allCourses = useQuery({ queryKey: ['courses', {}], queryFn: () => listCourses(), enabled: complete })
+  const others = complete && semester.data
+    ? (allCourses.data ?? []).filter((c) => bySlug.get(c.slug)?.started && !courses.some((s) => s.slug === c.slug))
+    : []
   const viewingOther = route && !courses.some((c) => c.slug === route.slug)
-  const routeCourse = useQuery({ queryKey: ['course', route?.slug], queryFn: () => getCourse(route!.slug), enabled: !!viewingOther, retry: false })
+  const viewingFollowed = !!route && others.some((c) => c.slug === route.slug)
+  const routeCourse = useQuery({ queryKey: ['course', route?.slug], queryFn: () => getCourse(route!.slug), enabled: !!viewingOther && !viewingFollowed, retry: false })
 
   return (
     <>
-      {viewingOther && routeCourse.data && (
+      {viewingOther && !viewingFollowed && routeCourse.data && (
         <>
           <h3 className="lp-label">This course</h3>
           <ul className="tree">
@@ -176,6 +182,25 @@ export function SemesterTree() {
             ),
           )}
         </ul>
+      )}
+      {others.length > 0 && (
+        <>
+          <h3 className="lp-label">Other courses I'm following</h3>
+          <ul className="tree">
+            {others.map((c) =>
+              c.slug === route?.slug ? (
+                <ActiveCourse key={c.slug} course={c} progress={bySlug.get(c.slug)} currentPart={route.part} inCourse />
+              ) : (
+                <li key={c.slug}>
+                  <Link to={`/courses/${c.slug}`} className="tc" title={c.title}>
+                    <span className="tc-t">{shortTitle(c.title)}</span>
+                    {coursePill(c, bySlug.get(c.slug))}
+                  </Link>
+                </li>
+              ),
+            )}
+          </ul>
+        </>
       )}
       <Link to="/courses" className="lp-browse"><Icon name="search" size={15} /> Browse all courses</Link>
     </>
