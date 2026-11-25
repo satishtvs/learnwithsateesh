@@ -28,13 +28,14 @@ function readCollapsed(): boolean {
   }
 }
 
-type Section = 'home' | 'courses' | 'dashboard' | 'live' | 'admin' | 'me' | 'overview' | 'learners' | 'adminlive' | null
+type Section = 'home' | 'courses' | 'dashboard' | 'live' | 'admin' | 'me' | 'overview' | 'learners' | 'adminlive' | 'adminfeedback' | null
 
 function sectionOf(pathname: string, staff = false): Section {
   if (staff) {
     // Instructors and admins: their own area, plus the learner pages as a preview.
     if (pathname === '/admin/learners') return 'learners'
     if (pathname === '/admin/live') return 'adminlive'
+    if (pathname === '/admin/feedback') return 'adminfeedback'
     if (pathname.startsWith('/admin')) return 'overview'
     if (pathname === '/dashboard/profile') return 'me'
     if (pathname.startsWith('/courses')) return 'courses'
@@ -60,6 +61,7 @@ const PANEL_ENTRY: Record<Exclude<Section, null>, { label: string; to: string; i
   overview: { label: 'Overview', to: '/admin', icon: 'grid' },
   learners: { label: 'Learners', to: '/admin/learners', icon: 'learning' },
   adminlive: { label: 'Live sessions', to: '/admin/live', icon: 'live' },
+  adminfeedback: { label: 'Feedback', to: '/admin/feedback', icon: 'flag' },
 }
 
 function RailLink({ to, label, icon, active, onActive }: { to: string; label: string; icon: IconName; active: boolean; onActive?: () => void }) {
@@ -159,6 +161,7 @@ export function Shell() {
             <RailLink to="/admin" label="Overview" icon="grid" active={section === 'overview'} onActive={() => setOpen(!open)} />
             <RailLink to="/admin/learners" label="Learners" icon="learning" active={section === 'learners'} onActive={() => setOpen(!open)} />
             <RailLink to="/admin/live" label="Live sessions" icon="live" active={section === 'adminlive'} onActive={() => setOpen(!open)} />
+            <RailLink to="/admin/feedback" label="Feedback" icon="flag" active={section === 'adminfeedback'} onActive={() => setOpen(!open)} />
             <RailLink to="/courses" label="Preview courses" icon="courses" active={section === 'courses'} onActive={() => setOpen(!open)} />
           </>
         ) : (
@@ -261,6 +264,7 @@ export function Shell() {
               ['/admin', 'Overview', 'grid', section === 'overview'],
               ['/admin/learners', 'Learners', 'learning', section === 'learners'],
               ['/admin/live', 'Live', 'live', section === 'adminlive'],
+              ['/admin/feedback', 'Feedback', 'flag', section === 'adminfeedback'],
               [meTo, 'Me', 'user', section === 'me'],
             ]
           : [

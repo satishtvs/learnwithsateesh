@@ -364,6 +364,7 @@ class Overview(BaseModel):
     pass_rate: int | None
     courses: list[CourseStat]
     recent_attempts: list[RecentAttempt]
+    feedback_new: int = 0
 
 
 @router.get("/overview", response_model=Overview)
@@ -431,7 +432,12 @@ async def overview(session: AsyncSession = Depends(get_async_session)):
         )
         for a, u, q, c in rows
     ]
+    from app.models import PartFeedback  # local import keeps admin.py free of a cycle with feedback.py
+    feedback_new = (
+        await session.execute(select(func.count()).select_from(PartFeedback).where(PartFeedback.status == "new"))
+    ).scalar_one()
     return Overview(
+        feedback_new=feedback_new,
         learners=learners, active_7d=active_7d, parts_completed=completed, attempts=attempts,
         pass_rate=round(100 * passed / attempts) if attempts else None, courses=stats, recent_attempts=recent,
     )

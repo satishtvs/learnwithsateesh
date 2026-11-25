@@ -20,6 +20,7 @@ const LivePage = lazy(() => import('./live').then((m) => ({ default: m.LivePage 
 const AdminLive = lazy(() => import('./live').then((m) => ({ default: m.AdminLive })))
 const AdminHome = lazy(() => import('./admin').then((m) => ({ default: m.AdminHome })))
 const AdminLearners = lazy(() => import('./admin').then((m) => ({ default: m.AdminLearners })))
+const AdminFeedbackPage = lazy(() => import('./admin').then((m) => ({ default: m.AdminFeedbackPage })))
 const CourseEditor = lazy(() => import('./admin').then((m) => ({ default: m.CourseEditor })))
 const QuizEditor = lazy(() => import('./admin').then((m) => ({ default: m.QuizEditor })))
 
@@ -53,6 +54,7 @@ export default function App() {
                 <Route path="/admin" element={<AdminHome />} />
                 <Route path="/admin/live" element={<AdminLive />} />
                 <Route path="/admin/learners" element={<AdminLearners />} />
+                <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
                 <Route path="/admin/courses/:id" element={<CourseEditor />} />
                 <Route path="/admin/quizzes/:id" element={<QuizEditor />} />
               </Route>

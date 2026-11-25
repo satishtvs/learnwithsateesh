@@ -6,6 +6,7 @@ import { isStaffUser, useAuth } from './auth'
 import { PartList } from './course-detail'
 import { LoginGate } from './courses'
 import { partGroups, shortTitle } from './format'
+import { PartFeedbackBox } from './feedback'
 import { QuizRunner } from './quiz'
 import { WatchedVideo } from './watch'
 import { Icon, Loading, PreviewBanner, ProgressBar } from './ui'
@@ -166,6 +167,8 @@ export function PartPage() {
           </p>
         )}
       </section>
+
+      {signedIn && <PartFeedbackBox key={`${slug}/${partSlug}`} course={slug} part={partSlug} />}
 
       <nav className="prevnext" aria-label="Part navigation">
         {data.prev ? (

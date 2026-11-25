@@ -408,6 +408,7 @@ export interface AdminOverview {
   attempts: number
   pass_rate: number | null
   courses: { id: number; title: string; published: boolean; learners: number; completions: number; part_count: number }[]
+  feedback_new: number
   recent_attempts: { learner: string; quiz_title: string; course_title: string; score: number; total: number; passed: boolean; created_at: string }[]
 }
 
@@ -576,4 +577,48 @@ export interface LiveForm {
 }
 export async function listLiveSessions(): Promise<LiveSession[]> {
   return (await request('/live-sessions')).json()
+}
+
+// ---------------------------------------------------------------- feedback on a part
+export type FeedbackKind = 'mistake' | 'unclear' | 'suggestion' | 'other'
+export type FeedbackStatus = 'new' | 'in_progress' | 'resolved' | 'dismissed'
+
+export async function sendPartFeedback(
+  course: string,
+  part: string,
+  b: { kind: FeedbackKind; message: string; video_time_seconds?: number | null },
+): Promise<void> {
+  await request(`/courses/${encodeURIComponent(course)}/parts/${encodeURIComponent(part)}/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(b),
+  })
+}
+
+export interface AdminFeedback {
+  id: number
+  kind: FeedbackKind
+  message: string
+  video_time_seconds: number | null
+  status: FeedbackStatus
+  admin_note: string
+  created_at: string
+  updated_at: string | null
+  part_id: number
+  part_title: string
+  part_slug: string
+  course_slug: string
+  course_title: string
+  learner_name: string
+  learner_email: string
+}
+export interface AdminFeedbackList {
+  counts: Record<FeedbackStatus, number>
+  items: AdminFeedback[]
+}
+export const adminFeedback = {
+  list: (status: string) => adminCall<AdminFeedbackList>('GET', `/feedback?status=${encodeURIComponent(status)}`),
+  update: (id: number, b: { status?: FeedbackStatus; admin_note?: string }) =>
+    adminCall<AdminFeedback>('PATCH', `/feedback/${id}`, b),
+  remove: (id: number) => adminCall<void>('DELETE', `/feedback/${id}`),
 }

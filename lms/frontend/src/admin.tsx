@@ -3,9 +3,13 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   admin,
+  adminFeedback,
   ApiError,
   type AdminUnit,
   type AdminOverview,
+  type AdminFeedback,
+  type FeedbackKind,
+  type FeedbackStatus,
   type AdminPart,
   type AdminQuestion,
   type AdminQuiz,
@@ -14,7 +18,7 @@ import {
 } from './api'
 import { useAuth } from './auth'
 import { LoginGate } from './courses'
-import { Icon, Loading, PageHeader } from './ui'
+import { Icon, Loading, PageHeader, type IconName } from './ui'
 
 const fmtWhen = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
@@ -87,21 +91,25 @@ const ask = (msg: string) => window.confirm(msg)
 
 // ---------------------------------------------------------------- overview
 function OverviewPanel({ o }: { o: AdminOverview }) {
-  const tiles = [
+  const tiles: { icon: IconName; label: string; value: number; tone: string; to?: string }[] = [
     { icon: 'learning' as const, label: 'Learners', value: o.learners, tone: 'orange' },
     { icon: 'sparkle' as const, label: 'Active this week', value: o.active_7d, tone: 'navy' },
     { icon: 'check' as const, label: 'Parts completed', value: o.parts_completed, tone: 'green' },
     { icon: 'quiz' as const, label: o.pass_rate === null ? 'Quiz attempts' : `Quiz attempts · ${o.pass_rate}% passed`, value: o.attempts, tone: 'violet' },
+    { icon: 'flag', label: o.feedback_new === 1 ? 'New report from learners' : 'New reports from learners', value: o.feedback_new, tone: 'red', to: '/admin/feedback' },
   ]
   return (
     <>
       <section className="stats" aria-label="Overview">
-        {tiles.map((t) => (
-          <div className="stat" key={t.label}>
-            <span className={`stat-ico ${t.tone}`}><Icon name={t.icon} size={20} /></span>
-            <div><strong>{t.value}</strong><span>{t.label}</span></div>
-          </div>
-        ))}
+        {tiles.map((t) => {
+          const inner = (
+            <>
+              <span className={`stat-ico ${t.tone}`}><Icon name={t.icon} size={20} /></span>
+              <div><strong>{t.value}</strong><span>{t.label}</span></div>
+            </>
+          )
+          return t.to ? <Link className="stat" key={t.label} to={t.to}>{inner}</Link> : <div className="stat" key={t.label}>{inner}</div>
+        })}
       </section>
       <div className="two-col block">
         <section className="panel">
@@ -644,6 +652,83 @@ export function AdminLearners() {
         )}
         {data && data.length >= 200 && <p className="muted small">Showing the 200 most recent learners. Use search to find others.</p>}
       </section>
+    </Gate>
+  )
+}
+
+// ---------------------------------------------------------------- feedback inbox
+const KIND_LABEL: Record<FeedbackKind, string> = {
+  mistake: 'Mistake', unclear: 'Unclear', suggestion: 'Suggestion', other: 'Other',
+}
+const STATUS_LABEL: Record<FeedbackStatus, string> = {
+  new: 'New', in_progress: 'In progress', resolved: 'Resolved', dismissed: 'Dismissed',
+}
+const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+
+function FeedbackCard({ f, refresh }: { f: AdminFeedback; refresh: unknown[][] }) {
+  const [note, setNote] = useState(f.admin_note)
+  const upd = useAdminMutation((b: { status?: FeedbackStatus; admin_note?: string }) => adminFeedback.update(f.id, b), refresh)
+  const del = useAdminMutation(() => adminFeedback.remove(f.id), refresh)
+  const partUrl = `/courses/${f.course_slug}/parts/${f.part_slug}`
+  return (
+    <article className={`panel fb-card fb-${f.status}`}>
+      <header style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <div>
+          <span className="chip">{KIND_LABEL[f.kind]}</span>{' '}
+          <Link to={partUrl}><strong>{f.part_title}</strong></Link>
+          <span className="muted small"> · {f.course_title}</span>
+        </div>
+        <span className="muted small">{new Date(f.created_at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+      </header>
+      <p style={{ whiteSpace: 'pre-wrap', margin: '10px 0' }}>{f.message}</p>
+      <p className="muted small">
+        From {f.learner_name}{f.learner_email && ` (${f.learner_email})`}
+        {f.video_time_seconds !== null && <> · at {mmss(f.video_time_seconds)} in the video</>}
+      </p>
+      <label className="field">
+        <span>Your note (only you see this)</span>
+        <textarea rows={2} value={note} maxLength={2000} onChange={(e) => setNote(e.target.value)} />
+      </label>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <label className="small muted" htmlFor={`st-${f.id}`}>Status</label>
+        <select id={`st-${f.id}`} value={f.status} style={{ width: 'auto' }} onChange={(e) => upd.mutate({ status: e.target.value as FeedbackStatus })}>
+          {(Object.keys(STATUS_LABEL) as FeedbackStatus[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+        </select>
+        <button type="button" className="btn ghost small" disabled={note === f.admin_note || upd.isPending} onClick={() => upd.mutate({ admin_note: note })}>Save note</button>
+        <button type="button" className="btn ghost small danger" onClick={() => window.confirm('Delete this report?') && del.mutate(undefined)}>Delete</button>
+      </div>
+      <ErrorNote error={upd.error ?? del.error} />
+    </article>
+  )
+}
+
+export function AdminFeedbackPage() {
+  const [status, setStatus] = useState<string>('open')
+  const key = ['admin', 'feedback', status]
+  const { data, isLoading, isError } = useQuery({ queryKey: key, queryFn: () => adminFeedback.list(status) })
+  const tabs: [string, string][] = [
+    ['open', `Open${data ? ` (${data.counts.new + data.counts.in_progress})` : ''}`],
+    ['resolved', `Resolved${data ? ` (${data.counts.resolved})` : ''}`],
+    ['dismissed', `Dismissed${data ? ` (${data.counts.dismissed})` : ''}`],
+    ['all', 'All'],
+  ]
+  return (
+    <Gate>
+      <PageHeader title="Feedback" subtitle="Mistakes and suggestions that learners reported on parts. Newest first." />
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '8px 0 16px' }}>
+        {tabs.map(([v, label]) => (
+          <button key={v} type="button" className={`btn small${status === v ? '' : ' ghost'}`} aria-pressed={status === v} onClick={() => setStatus(v)}>{label}</button>
+        ))}
+      </div>
+      {isLoading ? <Loading /> : isError ? (
+        <p className="error" role="alert">Could not load feedback.</p>
+      ) : !data || data.items.length === 0 ? (
+        <p className="muted">{status === 'open' ? 'Nothing waiting. New reports from learners appear here.' : 'Nothing here.'}</p>
+      ) : (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {data.items.map((f) => <FeedbackCard key={`${f.id}-${f.updated_at}`} f={f} refresh={[['admin', 'feedback']]} />)}
+        </div>
+      )}
     </Gate>
   )
 }

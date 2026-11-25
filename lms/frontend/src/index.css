@@ -680,6 +680,9 @@ button.adorn:hover { background: var(--surface-2); color: var(--text); }
 .stat-ico.navy { background: color-mix(in srgb, var(--steel) 16%, transparent); color: var(--steel); }
 .stat-ico.green { background: var(--ok-bg); color: var(--ok); }
 .stat-ico.violet { background: color-mix(in srgb, #0891b2 14%, transparent); color: #0e6a80; }
+.stat-ico.red { background: var(--bad-bg); color: var(--bad); }
+a.stat { color: inherit; text-decoration: none; }
+a.stat:hover { border-color: var(--orange); }
 .stats + .two-col { margin-top: 16px; }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .pill-tab { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; cursor: pointer; }

@@ -265,3 +265,25 @@ class LiveSession(Base):
     recording_youtube_id: Mapped[str | None] = mapped_column(String(11), nullable=True)
     course_id: Mapped[int | None] = mapped_column(ForeignKey("course.id", ondelete="SET NULL"), nullable=True)
     published: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+
+
+class PartFeedback(Base):
+    """A learner's report or suggestion about one part (a mistake in the video, notes or quiz, or an idea).
+
+    The instructor works through these in the admin area: status new -> in_progress -> resolved / dismissed.
+    """
+
+    __tablename__ = "part_feedback"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    part_id: Mapped[int] = mapped_column(ForeignKey("part.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"), nullable=True, index=True)
+    # "mistake" | "unclear" | "suggestion" | "other"
+    kind: Mapped[str] = mapped_column(String(20), default="mistake", server_default="mistake")
+    message: Mapped[str] = mapped_column(Text)
+    video_time_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)  # where in the video, if known
+    # "new" | "in_progress" | "resolved" | "dismissed"
+    status: Mapped[str] = mapped_column(String(20), default="new", server_default="new", index=True)
+    admin_note: Mapped[str] = mapped_column(Text, default="", server_default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -7,6 +7,8 @@ from app.catalogue import me_router as syllabus_router
 from app.catalogue import router as catalogue_router
 from app.courses import router as courses_router
 from app.emailer import email_enabled
+from app.feedback import admin_router as feedback_admin_router
+from app.feedback import router as feedback_router
 from app.certificates import router as certificates_router
 from app.live import admin_router as live_admin_router
 from app.live import router as live_router
@@ -67,6 +69,8 @@ api.include_router(my_attempts_router)
 api.include_router(admin_router)
 api.include_router(live_router)
 api.include_router(live_admin_router)
+api.include_router(feedback_router)
+api.include_router(feedback_admin_router)
 
 
 @api.get("/me", response_model=UserRead)

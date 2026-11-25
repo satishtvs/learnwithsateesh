@@ -4,7 +4,7 @@ import { initialsOf } from './format'
 export type IconName =
   | 'home' | 'courses' | 'learning' | 'quiz' | 'award' | 'live' | 'menu' | 'lock' | 'check' | 'play' | 'user'
   | 'logout' | 'x' | 'chevron' | 'chevronLeft' | 'clock' | 'sparkle' | 'settings' | 'mail' | 'eye' | 'eyeOff'
-  | 'grid' | 'share' | 'search' | 'arrow' | 'layers' | 'panel' | 'captions' | 'shield' | 'notes'
+  | 'grid' | 'share' | 'search' | 'arrow' | 'layers' | 'panel' | 'captions' | 'shield' | 'notes' | 'flag'
 
 const PATHS: Record<IconName, ReactNode> = {
   home: <><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v10h5v-6h4v6h5V10" /></>,
@@ -36,6 +36,7 @@ const PATHS: Record<IconName, ReactNode> = {
   panel: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>,
   captions: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3" /></>,
   shield: <><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6z" /><path d="m9 12 2 2 4-4" /></>,
+  flag: <><path d="M5 21V4" /><path d="M5 4h12l-2 4 2 4H5" /></>,
   notes: <><path d="M6 3h9l4 4v14H6z" /><path d="M9 11h7M9 15h7M9 7h4" /></>,
 }
 
