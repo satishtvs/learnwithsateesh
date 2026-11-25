@@ -1,0 +1,525 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II), Unit II quizzes.
+# Questions are original; they follow the Unit II slides and narration (6 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: data-analytics-r22
+  title: 'Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II'
+  description: 'Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques, and the Student''s Handbook for Associate Analytics.'
+  published: false
+unit:
+  code: U2
+  title: Data Analytics
+  label: Unit - II
+  textbook_ref: 'Han, Kamber and Pei, Data Mining: Concepts and Techniques (3rd ed.)'
+quizzes:
+- slug: u2-p1
+  title: 'Part 1: Introduction to analytics'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: Which kind of analytics answers the question "Why did it happen?"
+    options:
+    - Descriptive analytics
+    - Predictive analytics
+    - Diagnostic analytics
+    - Prescriptive analytics
+    answer: C
+    explain: Diagnostic analytics looks back and digs for the cause, for example why one day had lower revenue.
+  - q: 'Descriptive analytics mainly uses:'
+    options:
+    - Totals, averages, counts and charts that summarize the past
+    - Models that recommend the best action
+    - Forecasts of future values
+    - Experiments that prove a cause
+    answer: A
+    explain: Descriptive analytics summarizes what already happened. It does not explain or predict.
+  - q: 'In the retailer''s data, day 9 had lower revenue mainly because:'
+    options:
+    - Far fewer orders arrived all day
+    - The average order value fell sharply
+    - It was a weekend with fewer shoppers
+    - Payments failed far more often in the afternoon hours
+    answer: D
+    explain: The failure rate was about 12.6 percent on day 9 against about 4 percent on other days, concentrated between 2 pm and 6 pm.
+  - q: What does a drill down do in diagnostic analytics?
+    options:
+    - Rounds the numbers to fewer digits
+    - Splits a total into smaller parts, such as hours of a day
+    - Forecasts the next value of a series
+    - Joins two tables on a key
+    answer: B
+    explain: Drilling down breaks a total into parts so that the part responsible for a change becomes visible.
+  - q: Why did the "same day last week" forecast beat the all-days average?
+    options:
+    - It uses the weekly pattern of the data
+    - It uses more days of history
+    - It ignores recent days
+    - It never makes an error
+    answer: A
+    explain: Revenue repeats every seven days, and only the same-weekday rule uses that pattern.
+  - q: 'The mean absolute percentage error is:'
+    options:
+    - The largest error in the data
+    - The share of days forecast exactly right
+    - The average size of the error as a percentage of the actual value
+    - The error measured on training days only
+    answer: C
+    explain: It averages the absolute error divided by the actual value, so smaller is better.
+  - q: Which is a prescriptive analytics task?
+    options:
+    - Summing yesterday's revenue
+    - Choosing the discount level that gives the most profit under stated assumptions
+    - Finding why a day dipped
+    - Predicting tomorrow's orders
+    answer: B
+    explain: Prescriptive analytics recommends an action. Here it compared discount levels under assumed cost and response.
+  - q: Which is the first phase of the CRISP-DM lifecycle?
+    options:
+    - Data preparation
+    - Modeling
+    - Deployment
+    - Business understanding
+    answer: D
+    explain: The project starts by stating the decision to support and how success will be measured.
+  - q: 'In CRISP-DM, the evaluation phase checks:'
+    options:
+    - Whether the results meet the business goal
+    - Only whether the code runs without errors
+    - Which database to use
+    - How to name the columns
+    answer: A
+    explain: Evaluation asks whether the results serve the business goal, not only whether the numbers look good.
+  - q: How does analytics differ from statistics and data mining?
+    options:
+    - It uses no models at all
+    - It works only with very large data
+    - It starts from a business question, uses methods of both, and ends with a decision
+    - It never needs a business question
+    answer: C
+    explain: Analytics is the broadest field. It borrows methods from statistics and data mining to support a decision.
+- slug: u2-p2
+  title: 'Part 2: Tools and environment'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: Why can the 21 days of click events not be kept in a single spreadsheet worksheet?
+    options:
+    - Clicks cannot be stored as numbers
+    - About 7.8 million rows exceed the worksheet limit of 1,048,576 rows
+    - Spreadsheets cannot sum large numbers
+    - A worksheet holds at most 504 rows
+    answer: B
+    explain: The click rows are more than seven times the limit of one worksheet, so a database or a program is needed.
+  - q: Which tool is best for asking precise questions of a large table that lives in a database?
+    options:
+    - A pivot table
+    - A word processor
+    - A hand-drawn chart
+    - SQL
+    answer: D
+    explain: SQL states what is wanted and the database does the heavy work.
+  - q: The same average was computed in a spreadsheet formula, SQL, Python and R. What does this show?
+    options:
+    - The tool changes how it is written, not the mathematics
+    - Only SQL can compute averages
+    - Python gives a different answer from R
+    - Spreadsheets always round the answer
+    answer: A
+    explain: All four give the same result for the same question and the same table, so a wrong answer comes from the question or the data.
+  - q: What is the main advantage of a notebook?
+    options:
+    - It needs no data
+    - It makes charts without any code
+    - Code, results and notes live together, and it can be run again on new data
+    - It cannot be shared
+    answer: C
+    explain: A notebook records the whole analysis so that anyone can repeat it with no manual steps.
+  - q: Which is the usual order of a notebook workflow?
+    options:
+    - Share, model, explore, clean, load
+    - Model, load, share, clean, explore
+    - Clean, share, load, model, explore
+    - Load, clean, explore, model, share
+    answer: D
+    explain: Data is loaded first, cleaned, explored, modeled and finally shared as a report or dashboard.
+  - q: Which statement about R and Python is correct?
+    options:
+    - Python cannot run in notebooks
+    - R was designed for statistics and graphics, while Python is a general-purpose language
+    - R is not free
+    - Only R can read files
+    answer: B
+    explain: 'Both are free and run in notebooks. Their origins differ: R began in statistics, Python as a general-purpose language.'
+  - q: What is the main limit of a BI dashboard?
+    options:
+    - It cannot show a chart
+    - It cannot be shared
+    - It answers only the questions its builder planned
+    - It never updates
+    answer: C
+    explain: A dashboard gives live views to many people, but its questions are fixed in advance.
+  - q: 'A pivot table in a spreadsheet is best described as:'
+    options:
+    - A summary grid, for example revenue by week and weekday
+    - A list of formulas
+    - A copy of the database
+    - A kind of chart that cannot be edited
+    answer: A
+    explain: A pivot summarizes values by categories with a few clicks while the numbers stay visible.
+  - q: What does GROUP BY do in an SQL query?
+    options:
+    - Deletes duplicate columns
+    - Puts rows with the same label into groups and summarizes each group
+    - Sorts the whole table by date
+    - Joins two tables
+    answer: B
+    explain: In the retailer example the days were grouped as weekday or weekend and each group's average was computed.
+  - q: 'Managers need the key numbers every morning without writing anything. The best first choice is:'
+    options:
+    - A spreadsheet of 300 rows
+    - A one-off SQL query
+    - A statistics textbook
+    - A BI dashboard
+    answer: D
+    explain: A dashboard is built for sharing live views with many people.
+- slug: u2-p3
+  title: 'Part 3: Databases, types of data and variables'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: What is a primary key?
+    options:
+    - A column that repeats in every row
+    - A column that stores amounts
+    - A link to another database
+    - A column whose value names exactly one row of its table
+    answer: D
+    explain: In the customers table the customer id names one customer.
+  - q: 'In the orders table, the customer id column is a foreign key because it:'
+    options:
+    - Names exactly one order
+    - Points to a row in the customers table
+    - Stores the amount of the order
+    - Is always empty
+    answer: B
+    explain: A foreign key links a row to the primary key of another table.
+  - q: What does a join do?
+    options:
+    - Counts the rows of one table
+    - Deletes rows that have no key
+    - Matches rows of two tables using a key
+    - Converts a table to a document
+    answer: C
+    explain: A join looks up each order's customer, so customer columns such as the segment can be used with the order.
+  - q: 'A document store keeps data as:'
+    options:
+    - Nested records such as JSON
+    - Only single numbers
+    - Fixed rows and columns with no keys
+    - Nodes and links only
+    answer: A
+    explain: A document can hold a whole order with its customer and items inside one record.
+  - q: Which kind of NoSQL store is a natural fit for friends, followers and recommendations?
+    options:
+    - A key-value store
+    - A column family store
+    - A graph database
+    - A spreadsheet
+    answer: C
+    explain: A graph database stores nodes and the links between them.
+  - q: The segment new, regular, premium is which type of variable?
+    options:
+    - Nominal
+    - Continuous
+    - Discrete
+    - Ordinal
+    answer: D
+    explain: It is categorical, and the labels have an order, but the gaps between ranks are not measured.
+  - q: Which type is the order amount in rupees?
+    options:
+    - Numeric and continuous
+    - Nominal
+    - Ordinal
+    - Numeric and discrete
+    answer: A
+    explain: An amount is a measured quantity that can take any value in a range.
+  - q: Which summary suits a nominal variable such as city?
+    options:
+    - The mean
+    - The mode
+    - The standard deviation
+    - The correlation
+    answer: B
+    explain: We can count categories and report the most common one. A mean of cities has no meaning.
+  - q: In the question "Does the app raise spending?", which is the dependent variable?
+    options:
+    - The channel, app or web
+    - The customer segment
+    - The order amount
+    - The city
+    answer: C
+    explain: The dependent variable is the outcome studied. The channel is the independent variable and the segment is the confounder.
+  - q: Why did the app look better than the web in the overall averages?
+    options:
+    - Premium customers, who spend more, use the app more often
+    - The app lowers prices
+    - Web orders are always smaller
+    - The database counted app orders twice
+    answer: A
+    explain: The segment is linked to both the channel and the amount, so the raw comparison was unfair. Within segments the gaps were small.
+- slug: u2-p4
+  title: 'Part 4: Data modeling techniques'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: What does a conceptual data model describe?
+    options:
+    - The things that matter to the business and how they relate, with no technology
+    - Index definitions and partitions
+    - Data types of every column
+    - The files on a disk
+    answer: A
+    explain: The conceptual level names entities and relationships, and a business person can read it.
+  - q: Which choices belong to the physical level of a data model?
+    options:
+    - Entities and relationships only
+    - The business questions
+    - Data types, indexes and partitions
+    - The names of the managers
+    answer: C
+    explain: The physical level fits the design to one real database system.
+  - q: 'A customer places many orders, and each order has one customer. This relationship is:'
+    options:
+    - One to one
+    - One to many
+    - Many to many
+    - Many to one in both directions
+    answer: B
+    explain: The customer id is stored in each order row.
+  - q: How is a many-to-many relationship between orders and products stored?
+    options:
+    - By repeating the product in the order table
+    - By deleting one side
+    - It cannot be stored
+    - With a third table, the order line, holding one row per product in an order
+    answer: D
+    explain: The order line splits the link into two one-to-many links.
+  - q: What is an update anomaly in a flat table?
+    options:
+    - A table that has too few columns
+    - A repeated value is changed in some rows but not in others, so the data contradicts itself
+    - A key that is missing
+    - A query that runs too slowly
+    answer: B
+    explain: Customer 62's city was repeated on 12 order rows, and missing one of them would leave two cities.
+  - q: What does third normal form require?
+    options:
+    - No column depends on another column that is not the key
+    - Every cell holds a list
+    - Every table has exactly three columns
+    - No table has a primary key
+    answer: A
+    explain: In the flat table the city depended on the customer id, which is not the key, so the city moved to a customers table.
+  - q: 'An index is like:'
+    options:
+    - A second copy of the whole table
+    - A rule that deletes old rows
+    - A chart of the data
+    - A sorted list at the back of a book that points to the rows
+    answer: D
+    explain: An index speeds up search, but it costs space and slows writes.
+  - q: What does the fact table of a star schema hold?
+    options:
+    - Only the names of products
+    - Only the dates
+    - The numbers to add up, such as quantity and amount, with keys to the dimensions
+    - Only the customer addresses
+    answer: C
+    explain: Facts are added up, and dimensions are used to group and filter them.
+  - q: What do dimension tables hold?
+    options:
+    - Only numbers to add up
+    - Foreign keys without any other data
+    - The indexes of the database
+    - Descriptive attributes such as weekday, city and product category
+    answer: D
+    explain: Dimensions hold the words by which the facts are grouped, such as category and kind of day.
+  - q: How does a statistical model differ from a data model?
+    options:
+    - They are two names for the same thing
+    - A statistical model is an equation for patterns and noise, a data model is a structure that stores data
+    - A data model is an equation, a statistical model is a table design
+    - A statistical model is only used for storing
+    answer: B
+    explain: In the lesson, revenue against day and weekend is a statistical model, and the star schema is a data model.
+- slug: u2-p5
+  title: 'Part 5: Missing value imputation'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: 'In M A R, a value is missing:'
+    options:
+    - Completely by accident
+    - Because of its own value
+    - In a way that depends on other columns we can see
+    - Only in the last row
+    answer: C
+    explain: Missing at random means the gap depends on observed columns, for example age.
+  - q: When is median imputation safer than mean imputation?
+    options:
+    - When the numbers are skewed or have outliers
+    - When the column is a category
+    - When no values are missing
+    - When the column is an identifier
+    answer: A
+    explain: The median is not pulled by a few very large values.
+  - q: Which fill suits a categorical column such as city?
+    options:
+    - The mean
+    - The mode, the most common value
+    - The median of the codes
+    - Zero
+    answer: B
+    explain: A mean of categories has no meaning, so we use the most common one.
+  - q: What does regression imputation do?
+    options:
+    - Copies the previous row
+    - Deletes the row
+    - Uses the same value for every gap
+    - Predicts the missing value from other columns
+    answer: D
+    explain: In the test it used age and the number of orders, and it gave the smallest error.
+  - q: How does k nearest neighbor imputation fill a gap?
+    options:
+    - It averages the values of the k rows most similar to the incomplete row
+    - It uses the overall mean
+    - It uses the largest value
+    - It deletes the k nearest rows
+    answer: A
+    explain: In the example the three nearest customers had spends 1,920, 2,059 and 2,367, and the fill was 2,115.
+  - q: Why are the columns standardized before finding nearest neighbors?
+    options:
+    - To make all values positive
+    - To remove the missing values
+    - So that a column with bigger numbers does not dominate the distance
+    - To make k larger
+    answer: C
+    explain: Age and the number of orders are put on the same scale before distances are measured.
+  - q: What does a mean fill do to the spread of a column?
+    options:
+    - It increases the standard deviation
+    - It leaves it exactly unchanged
+    - It makes it negative
+    - It shrinks the standard deviation
+    answer: D
+    explain: The same value is copied many times, so the data looks more alike. The standard deviation fell from 548 to 485 with 20 percent missing.
+  - q: What is the effect of adding random noise to regression fills?
+    options:
+    - The spread shrinks further
+    - The spread is close to the true spread, but each single fill is less accurate
+    - The errors all become zero
+    - Nothing changes
+    answer: B
+    explain: The noise restores the variation, at the price of larger errors on single values.
+  - q: Why add an indicator flag column after imputation?
+    options:
+    - It makes the mean larger
+    - It removes the need to fill
+    - It is required by SQL
+    - The fact that a value was missing can itself carry information
+    answer: D
+    explain: Customers with no address on file churned more often in the example, and the flag lets a model use that fact.
+  - q: Why should the fill values be learned from the training rows only?
+    options:
+    - To make the training set smaller
+    - Because test rows have no columns
+    - To avoid leaking information from the test set
+    - To avoid using the median
+    answer: C
+    explain: If test rows help to compute the mean, the test score looks better than it should.
+- slug: u2-p6
+  title: 'Part 6: Modeling in business'
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: What should every business model end with?
+    options:
+    - A longer report
+    - A step that somebody can take
+    - A larger data set
+    - A new chart
+    answer: B
+    explain: A model that nobody can act on is a report with no business value.
+  - q: 'Predicting which customers are about to leave is framed as:'
+    options:
+    - A forecasting model
+    - An association rule
+    - A classification model
+    - A star schema
+    answer: C
+    explain: Churn is yes or no for each customer.
+  - q: 'Predicting how many units will be sold next week is framed as:'
+    options:
+    - A classification model
+    - An association rule
+    - A normalization step
+    - A forecasting model
+    answer: D
+    explain: The target is a number of units for each day.
+  - q: What does a gains curve show?
+    options:
+    - The share of churners reached as more customers are called, best scores first
+    - The error of a forecast by day
+    - The number of tables in a database
+    - The distance between two neighbors
+    answer: A
+    explain: A model is useful when its curve is far above the diagonal of calling at random.
+  - q: Why did calling all 600 customers lose money in the churn case?
+    options:
+    - Every customer was a churner
+    - The model scores were all zero
+    - The cost of calls to low-risk customers exceeded the value of the customers kept
+    - Calls keep no customers at all
+    answer: C
+    explain: With the assumed costs, a call pays off only when the churn risk is above 25 percent.
+  - q: Why was the best stock level above the forecast?
+    options:
+    - The forecast is always too high
+    - Running short cost more than having extra, so stock covers demand on 3 days in 4
+    - Extra stock earns more profit
+    - Demand never varies
+    answer: B
+    explain: With a short cost of 300 and an extra cost of 100 per unit, the best stock is the 75 percent point of demand.
+  - q: In the credit risk case, what does the best approval limit depend on?
+    options:
+    - The profit of a repaid loan and the loss of a default
+    - Only the color of the chart
+    - Only the number of applicants
+    - The name of the model
+    answer: A
+    explain: With the assumed costs a loan breaks even at a risk of 20 percent.
+  - q: 'In market basket analysis, support is:'
+    options:
+    - The share of phone baskets that contain a case
+    - Confidence divided by the share of case baskets
+    - The price of the items
+    - The share of all baskets that contain both items
+    answer: D
+    explain: Support tells us whether a rule matters, confidence how reliable it is, lift whether it is more than chance.
+  - q: 'A lift of 1.0 for two items means:'
+    options:
+    - They are always bought together
+    - They are bought together no more often than chance
+    - They are never bought together
+    - One of them has no sales
+    answer: B
+    explain: Phone and shirt had a lift of 1.0, so there was no link.
+  - q: Which of these measures business value rather than a model score?
+    options:
+    - Profit of the retention campaign
+    - Lift of the model
+    - Accuracy of the model
+    - Area under a curve
+    answer: A
+    explain: Score measures the model. Value measures the decision taken with it, and it depends on our costs.

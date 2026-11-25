@@ -23,12 +23,12 @@ units:
     label: "Unit - II"
     textbook_ref: "Han, Kamber and Pei"
     parts:
-      - {slug: u2-p1, title: "Part 1: Introduction to Analytics: Descriptive, Predictive, Prescriptive and CRISP-DM", youtube_id: null}
-      - {slug: u2-p2, title: "Part 2: Analytics Tools and Environment: Spreadsheet, SQL, R, Python, BI Dashboards", youtube_id: null}
-      - {slug: u2-p3, title: "Part 3: Databases, Types of Data and Variables: SQL, NoSQL, Confounding", youtube_id: null}
-      - {slug: u2-p4, title: "Part 4: Data Modeling Techniques: ER Diagram, Normalization, Star Schema", youtube_id: null}
-      - {slug: u2-p5, title: "Part 5: Missing Value Imputation: Mean, Median, Regression, kNN and Variance", youtube_id: null}
-      - {slug: u2-p6, title: "Part 6: Modeling in Business: Churn, Demand, Credit Risk, Market Basket", youtube_id: null}
+      - {slug: u2-p1, title: "Part 1: Introduction to Analytics: Descriptive, Predictive, Prescriptive and CRISP-DM", youtube_id: bq0lRSlfcCA}
+      - {slug: u2-p2, title: "Part 2: Analytics Tools and Environment: Spreadsheet, SQL, R, Python, BI Dashboards", youtube_id: O6PlcjDdalM}
+      - {slug: u2-p3, title: "Part 3: Databases, Types of Data and Variables: SQL, NoSQL, Confounding", youtube_id: e2fe6IrqXaU}
+      - {slug: u2-p4, title: "Part 4: Data Modeling Techniques: ER Diagram, Normalization, Star Schema", youtube_id: vsKzz1-L3Tw}
+      - {slug: u2-p5, title: "Part 5: Missing Value Imputation: Mean, Median, Regression, kNN and Variance", youtube_id: B7OfQCjoqJw}
+      - {slug: u2-p6, title: "Part 6: Modeling in Business: Churn, Demand, Credit Risk, Market Basket", youtube_id: bE6gvyJizWo}
   - code: U3
     title: "Regression and Logistic Regression"
     label: "Unit - III"
