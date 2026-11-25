@@ -1,0 +1,495 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II), Unit I quizzes.
+# Questions are original; they follow the Unit I slides and narration (5 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: data-analytics-r22
+  title: "Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques, and the Student's Handbook for Associate Analytics."
+  published: false
+unit:
+  code: U1
+  title: "Data Management"
+  label: "Unit - I"
+  textbook_ref: "Han, Kamber and Pei, Data Mining: Concepts and Techniques (3rd ed.)"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u1-p1
+    title: "Part 1: Designing a data architecture"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which list gives the five layers of a data architecture in the correct order?"
+        options:
+          - "Sources, ingestion, storage, processing, serving"
+          - "Storage, sources, serving, ingestion, processing"
+          - "Ingestion, sources, processing, storage, serving"
+          - "Serving, processing, storage, ingestion, sources"
+        answer: A
+        explain: "Data is born in the sources, moved in by ingestion, kept in storage, worked on by processing, and handed to users by serving."
+
+      - q: "A data warehouse checks the structure of every record before it is loaded. This is called:"
+        options:
+          - "Schema on read"
+          - "Schema on write"
+          - "Change capture"
+          - "Schema on queue"
+        answer: B
+        explain: "The warehouse applies the schema when data is written, so bad records are rejected. A lake applies the structure later, when the data is read."
+
+      - q: "What is the main job of a message queue placed in front of a processor?"
+        options:
+          - "To clean malformed records"
+          - "To make storage cheaper"
+          - "To absorb a spike so that no event is lost"
+          - "To join two tables"
+        answer: C
+        explain: "A queue lets extra events wait, so the speed of the producers is separated from the speed of the consumers."
+
+      - q: "Which task most clearly needs stream processing instead of batch processing?"
+        options:
+          - "A monthly payroll"
+          - "A daily sales report"
+          - "A yearly audit"
+          - "A fraud alert on a payment"
+        answer: D
+        explain: "A fraud check must answer within seconds. Payroll, daily reports and audits can wait for a scheduled batch job."
+
+      - q: "Which store keeps raw data of any form, such as files, logs and images, and applies structure only when the data is read?"
+        options:
+          - "A data lake"
+          - "A data warehouse"
+          - "A relational table"
+          - "A dashboard"
+        answer: A
+        explain: "A data lake stores raw data cheaply in any form and uses schema on read."
+
+      - q: "In the lambda architecture, what does the serving layer do?"
+        options:
+          - "It stores the raw logs"
+          - "It combines the batch result with the recent speed result"
+          - "It cleans malformed records"
+          - "It replaces the batch layer"
+        answer: B
+        explain: "The batch layer is accurate but old, the speed layer covers only the last few minutes, and the serving layer adds the two."
+
+      - q: "In ELT, as often used with a data lake, what is the order of the steps?"
+        options:
+          - "Extract, transform, load"
+          - "Transform, extract, load"
+          - "Extract, load, and transform later"
+          - "Load, transform, and extract later"
+        answer: C
+        explain: "ELT loads the raw data first and transforms it later, because storage is cheap and the raw data is kept."
+
+      - q: "Order values are skewed by a few very large orders. Which summary is safer for the typical order?"
+        options:
+          - "The maximum"
+          - "The sum"
+          - "The mean"
+          - "The median"
+        answer: D
+        explain: "A few very large orders pull the mean upward, while the median, the middle value, is not affected much."
+
+      - q: "Change capture brings data into the architecture by:"
+        options:
+          - "Reading each insert and update from the database's own log"
+          - "Copying a whole table every night"
+          - "Asking users to type the data again"
+          - "Counting the clicks on a page"
+        answer: A
+        explain: "Change capture follows the database log, so the warehouse follows the shop closely without copying whole tables."
+
+      - q: "In the lesson's illustration, 400 events arrive every second for 20 seconds, but the processor handles only 200 a second. With no queue, how many events are lost in all?"
+        options:
+          - "2,000"
+          - "4,000"
+          - "8,000"
+          - "400"
+        answer: B
+        explain: "Two hundred events a second are lost for twenty seconds, which is four thousand events."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u1-p2
+    title: "Part 2: Sources of data and attribute types"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A cold-room sensor is read once an hour, but the door is open for only a few minutes at a time. What goes wrong?"
+        options:
+          - "The readings become noisy"
+          - "The data turns semi-structured"
+          - "Most door openings are never seen"
+          - "The timestamps are lost"
+        answer: C
+        explain: "Sampling too slowly does not add noise, it misses the events. In the lesson, hourly readings saw none of the six openings."
+
+      - q: "How is the distance between two consecutive G P S pings computed?"
+        options:
+          - "By counting the number of pings"
+          - "By subtracting the two times"
+          - "By multiplying the ping interval by the speed limit"
+          - "With the haversine formula on the two latitude and longitude pairs"
+        answer: D
+        explain: "The haversine formula gives the distance on the surface of the earth, and the distances of all consecutive pairs are added up."
+
+      - q: "In a web server log, what does the status code 200 mean?"
+        options:
+          - "The request succeeded"
+          - "The page was not found"
+          - "The server had an error"
+          - "The browser already had the latest copy"
+        answer: A
+        explain: "Two hundred means success. Four hundred and four means not found, five hundred means a server error, and three hundred and four means not changed."
+
+      - q: "What does parsing a log line mean?"
+        options:
+          - "Deleting lines that repeat"
+          - "Cutting the line into fields such as address, time, request and status"
+          - "Compressing the line to save space"
+          - "Sending the line to the courier"
+        answer: B
+        explain: "Parsing turns a line of text that follows a pattern into separate fields, so the log can be counted and analysed like a table."
+
+      - q: "Which family of sources records a business event such as an order or a payment?"
+        options:
+          - "Sensors"
+          - "Logs"
+          - "Transactions"
+          - "Social data"
+        answer: C
+        explain: "A transaction records one business event. Transactions are well structured and go straight into the warehouse."
+
+      - q: "What does a web funnel from sessions to viewed a product to added to cart to paid show?"
+        options:
+          - "Which courier is fastest"
+          - "How much storage is used"
+          - "Which words customers use in reviews"
+          - "The stages at which shoppers drop out"
+        answer: D
+        explain: "Each bar of the funnel is a stage where some shoppers leave, and clickstream data shows exactly where."
+
+      - q: "Which description fits semi-structured data?"
+        options:
+          - "Each value carries its own label, as in J S O N or X M L"
+          - "Fixed columns defined in advance by a schema"
+          - "Pictures, audio and video only"
+          - "Data that has been encrypted"
+        answer: A
+        explain: "Semi-structured data has no fixed table, but every value is labelled, so records can have different fields."
+
+      - q: "In the lesson's example, with its assumed sizes, which shape holds the largest share of the day's data volume?"
+        options:
+          - "Structured data"
+          - "Semi-structured data"
+          - "Unstructured data"
+          - "All three are equal"
+        answer: B
+        explain: "The many small click and G P S events add up to about 56 percent, while the tidy tables are only about 5 percent."
+
+      - q: "Which attribute type has equal gaps and a true zero, so that ratios are meaningful?"
+        options:
+          - "Nominal"
+          - "Ordinal"
+          - "Ratio"
+          - "Interval"
+        answer: C
+        explain: "Ratio attributes, such as the amount of an order or a delivery time in minutes, have equal gaps and a true zero."
+
+      - q: "Why is 40 degrees Celsius not twice as hot as 20 degrees Celsius?"
+        options:
+          - "Celsius is a nominal scale"
+          - "The thermometer is not accurate"
+          - "The ratio of two temperatures is always one"
+          - "Celsius is an interval scale with no true zero, so the ratio changes with the scale"
+        answer: D
+        explain: "In Kelvin the same temperatures are 293.15 and 313.15, a ratio of only 1.068, so the Celsius ratio of 2 meant nothing."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u1-p3
+    title: "Part 3: Data management and data quality"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Who defines what each field means and sets its quality rules?"
+        options:
+          - "The data owner"
+          - "The data custodian"
+          - "The data consumer"
+          - "The data steward"
+        answer: D
+        explain: "The steward defines meaning and quality rules. The owner is accountable, the custodian runs storage and access, and the consumer uses the data."
+
+      - q: "Three teams report revenue as 16.59, 16.05 and 15.43 million rupees from the same orders. What fixes this?"
+        options:
+          - "One agreed definition of revenue published by the data steward"
+          - "Buying faster computers"
+          - "Deleting the raw data"
+          - "Asking each team to round the numbers"
+        answer: A
+        explain: "All three teams computed correctly but used different definitions. Governance settles this with one published definition."
+
+      - q: "Which kind of metadata records when a table was last refreshed and how many rows it has?"
+        options:
+          - "Technical metadata"
+          - "Operational metadata"
+          - "Business metadata"
+          - "Lineage"
+        answer: B
+        explain: "Operational metadata describes the life of the data: refresh time, row count and quality. Technical metadata describes type and format, and business metadata describes meaning and owner."
+
+      - q: "The dashboard is built from 11,094 orders, but the clean orders table has 11,545 rows. What does the lineage show?"
+        options:
+          - "The dashboard is wrong"
+          - "Malformed records were added"
+          - "451 failed payments were left out between the two tables"
+          - "The lake lost some rows"
+        answer: C
+        explain: "The difference of 451 rows is the failed payments that the step from clean orders to paid orders leaves out."
+
+      - q: "Which quality dimension asks whether the same fact is written the same way everywhere?"
+        options:
+          - "Completeness"
+          - "Accuracy"
+          - "Timeliness"
+          - "Consistency"
+        answer: D
+        explain: "Consistency checks that a fact, such as a city name, is not written in several different ways."
+
+      - q: "In the lesson, 368 of 11,913 order records have no price. Which dimension does this affect, and what is the score?"
+        options:
+          - "Completeness, 96.9 percent"
+          - "Accuracy, 3.1 percent"
+          - "Validity, 96.9 percent"
+          - "Uniqueness, 3.1 percent"
+        answer: A
+        explain: "A missing price is a completeness problem, and 11,545 of 11,913 records pass, which is 96.9 percent."
+
+      - q: "How does noise differ from an outlier?"
+        options:
+          - "Noise is one value far from all the others"
+          - "Noise is a small random error on every reading"
+          - "Noise is always a typing slip"
+          - "Noise is always a real but rare event"
+        answer: B
+        explain: "Noise is a small random error on every reading, and we smooth it. An outlier is one far value that we investigate."
+
+      - q: "A moving average with a window that is far too wide mainly causes:"
+        options:
+          - "More noise"
+          - "Duplicate records"
+          - "Flattening of the real changes in the signal"
+          - "Missing values"
+        answer: C
+        explain: "In the lesson the error fell until a window of 15 readings, and then rose again for 31 readings because the real wave was flattened."
+
+      - q: "For 15 delivery times with mean 36.5 and standard deviation 16.6, what is the z-score of the 95 minute delivery, and is it flagged by the rule of absolute z above 3?"
+        options:
+          - "1.2, not flagged"
+          - "3.51, not flagged"
+          - "0.35, not flagged"
+          - "3.51, flagged"
+        answer: D
+        explain: "The z-score is (95 minus 36.5) divided by 16.6, which is 3.51. That is above 3, so the value is flagged."
+
+      - q: "If Q1 is 29.5 and Q3 is 35.5, what is the upper fence of the I Q R rule?"
+        options:
+          - "44.5"
+          - "41.5"
+          - "89"
+          - "20.5"
+        answer: A
+        explain: "The I Q R is 6, and the upper fence is Q3 plus 1.5 times the I Q R, which is 35.5 plus 9, or 44.5."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u1-p4
+    title: "Part 4: Missing values and duplicate data"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A survey answer is missing more often for younger customers, and age is a column we can see. Which mechanism is this?"
+        options:
+          - "Missing at random, because it depends on another column we can see"
+          - "Missing completely at random"
+          - "Missing not at random"
+          - "Not missing at all"
+        answer: A
+        explain: "When the chance of a gap depends on another observed column, such as age, the mechanism is M A R."
+
+      - q: "High spenders hide their spend, so the gaps depend on the missing value itself. Which mechanism is this?"
+        options:
+          - "M C A R"
+          - "M N A R"
+          - "M A R"
+          - "Not applicable"
+        answer: B
+        explain: "When the chance of a gap depends on the hidden value itself, the mechanism is missing not at random."
+
+      - q: "In the lesson's simulation, answers were lost completely at random. What happened to the mean of the remaining answers?"
+        options:
+          - "It became far too high"
+          - "It became far too low"
+          - "It stayed almost equal to the true mean"
+          - "It became zero"
+        answer: C
+        explain: "The mean of the remaining answers was 1,723 rupees against the true 1,724, because the gaps were unrelated to the data."
+
+      - q: "In a column of ages, 90 of 1,000 unknown ages are stored as 0. What is the problem?"
+        options:
+          - "Nothing, because zero is harmless"
+          - "The ages turn into text"
+          - "The rows become duplicates"
+          - "The zeros are averaged in as real ages and pull the mean down"
+        answer: D
+        explain: "The mean age fell from 40.4 to 36.7. Always find out how missing is coded before computing."
+
+      - q: "Each of eight columns is missing at about 5 percent, and every row with any gap is deleted. Roughly what share of rows survives in the lesson's example?"
+        options:
+          - "About 71 percent"
+          - "About 95 percent"
+          - "About 50 percent"
+          - "All of them"
+        answer: A
+        explain: "A row is lost if any needed column is missing, so only 710 of 1,000 rows were complete in all eight columns."
+
+      - q: "What does filling every gap with the mean do to the spread of the data?"
+        options:
+          - "It increases it"
+          - "It shrinks it"
+          - "It leaves it exactly the same"
+          - "It makes it negative"
+        answer: B
+        explain: "Filling with one value adds points at the centre, so the spread falls. In the lesson it dropped from 10.65 to 9.00."
+
+      - q: "Which filling method is safer for data with a few huge values?"
+        options:
+          - "The mean"
+          - "The mode"
+          - "The median"
+          - "Zero"
+        answer: C
+        explain: "Huge values pull the mean, while the median stays near the typical value."
+
+      - q: "How are exact duplicate records found?"
+        options:
+          - "By edit distance only"
+          - "By random sampling"
+          - "By blocking on the name"
+          - "By grouping on a key and finding groups with more than one record"
+        answer: D
+        explain: "Exact copies share the same key fields, so grouping on the key and counting groups above one finds them."
+
+      - q: "What is the edit distance between Sunita and Sunitha?"
+        options:
+          - "1"
+          - "2"
+          - "7"
+          - "0"
+        answer: A
+        explain: "One inserted letter h turns Sunita into Sunitha, so the distance is 1."
+
+      - q: "What is the purpose of blocking in record linkage?"
+        options:
+          - "To merge records into one"
+          - "To compare only records that share a key, so far fewer pairs are compared"
+          - "To delete the duplicates"
+          - "To fill the missing values"
+        answer: B
+        explain: "Blocking by PIN code cut the comparisons from 237,705 pairs to 19,973, at the cost of missing pairs whose PIN is wrong."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u1-p5
+    title: "Part 5: Data processing and processing pipelines"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In which order do the steps of the lesson's processing pipeline run?"
+        options:
+          - "Reduce, clean, integrate, transform"
+          - "Transform, collect, reduce, clean"
+          - "Collect, clean, integrate, transform, reduce"
+          - "Integrate, collect, reduce, clean"
+        answer: C
+        explain: "Keep a raw copy, clean it, integrate the sources, transform the form, and reduce to what the analysis needs."
+
+      - q: "A join gives amounts that are 100 times wrong because one source stores rupees and the other stores paise. What kind of problem is this?"
+        options:
+          - "A naming conflict"
+          - "A format conflict"
+          - "A redundant column"
+          - "A unit conflict"
+        answer: D
+        explain: "The same quantity is stored in different units, so one source must be converted before the join."
+
+      - q: "Two columns have a correlation r of 1.00. What does this suggest?"
+        options:
+          - "One of them is redundant"
+          - "They are unrelated"
+          - "Both are missing"
+          - "One is an outlier"
+        answer: A
+        explain: "A correlation of 1 means one column is just a straight line function of the other, so it adds nothing."
+
+      - q: "Which formula in words is min-max normalization?"
+        options:
+          - "Value minus the mean, divided by the standard deviation"
+          - "Value minus the minimum, divided by the maximum minus the minimum"
+          - "Value divided by the sum of all values"
+          - "Value minus the median, divided by the mean"
+        answer: B
+        explain: "Min-max scaling maps the smallest value to 0 and the largest to 1."
+
+      - q: "Six order amounts have a minimum of 347.37 and a maximum of 1,968.70. What is the min-max value of the maximum?"
+        options:
+          - "0"
+          - "0.5"
+          - "1"
+          - "1.77"
+        answer: C
+        explain: "The maximum minus the minimum, divided by the same range, is exactly 1."
+
+      - q: "What does a z-score of 1.0 mean?"
+        options:
+          - "The value equals the mean"
+          - "The value is the maximum"
+          - "The value is one percent above the mean"
+          - "The value is one standard deviation above the mean"
+        answer: D
+        explain: "A z-score counts how many standard deviations a value lies from the mean."
+
+      - q: "For the skewed order values, equal width bins put 91 percent of the orders in the first bin. Which binning spreads the orders evenly?"
+        options:
+          - "Equal frequency binning"
+          - "Equal width binning with more bins"
+          - "Sorting the orders by time"
+          - "Min-max scaling"
+        answer: A
+        explain: "Equal frequency bins hold about the same number of orders each, here about 2,383."
+
+      - q: "Which statement about sampling is correct?"
+        options:
+          - "Sampling keeps every row but removes columns"
+          - "Sampling keeps a random subset of the rows"
+          - "Sampling replaces numbers by intervals"
+          - "Sampling joins two tables"
+        answer: B
+        explain: "Sampling reduces the number of rows by analysing a random subset."
+
+      - q: "In the lesson, the typical error of a sample mean fell from about 357 rupees at 10 orders to about 35 rupees at 1,000 orders. A hundred times more data gave about:"
+        options:
+          - "A hundred times less error"
+          - "The same error"
+          - "Ten times less error"
+          - "Ten times more error"
+        answer: C
+        explain: "The error shrinks roughly with the square root of the sample size, so a hundred times more data gives about ten times less error."
+
+      - q: "In the lesson's picture of 200 customers, the first direction keeps 90.1 percent of the variation. What can we do?"
+        options:
+          - "Add a third column"
+          - "Delete the customers"
+          - "Normalize the first column only"
+          - "Replace the two columns by one combined column and lose only about 9.9 percent"
+        answer: D
+        explain: "That is dimensionality reduction: when columns move together, one combined direction keeps most of the information."

@@ -44,3 +44,17 @@ courses:
     year: 4
     semester: 1
     subject_code: AM701PC
+  - slug: data-analytics-r22
+    university: jntuh
+    regulations: [R22]
+    branches: [cse-aiml]
+    year: 3
+    semester: 2
+    subject_code: AM602PC
+  - slug: natural-language-processing-r22
+    university: jntuh
+    regulations: [R22]
+    branches: [cse-aiml]
+    year: 3
+    semester: 2
+    subject_code: AM603PC

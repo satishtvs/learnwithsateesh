@@ -1,0 +1,63 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II): the video parts.
+# Ids are written by `python -m lws.package apply` (keys da-u1-p1 ...); keep the `youtube_id: null` placeholders.
+# The course is hidden from students until it is published in the instructor admin.
+
+course:
+  slug: data-analytics-r22
+  title: "Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques."
+
+units:
+  - code: U1
+    title: "Data Management"
+    label: "Unit - I"
+    textbook_ref: "Han, Kamber and Pei"
+    parts:
+      - {slug: u1-p1, title: "Part 1: Designing a Data Architecture: Layers, Warehouse vs Lake, Batch vs Stream", youtube_id: QZWxvbxlX4A}
+      - {slug: u1-p2, title: "Part 2: Sources of Data: Sensors, GPS, Logs, Web; Structured vs Unstructured; Attribute Types", youtube_id: O_rDLShLC6k}
+      - {slug: u1-p3, title: "Part 3: Data Management and Data Quality: Governance, Metadata, Lineage, Outliers", youtube_id: XV6RYrx9hRQ}
+      - {slug: u1-p4, title: "Part 4: Missing Values and Duplicate Data: MCAR, MAR, MNAR, Record Linkage", youtube_id: J-IvouNDnEw}
+      - {slug: u1-p5, title: "Part 5: Data Processing and Pipelines: Cleaning, Integration, Normalization, Reduction", youtube_id: UcNWyetjZwA}
+  - code: U2
+    title: "Data Analytics"
+    label: "Unit - II"
+    textbook_ref: "Han, Kamber and Pei"
+    parts:
+      - {slug: u2-p1, title: "Part 1: Introduction to Analytics: Descriptive, Predictive, Prescriptive and CRISP-DM", youtube_id: null}
+      - {slug: u2-p2, title: "Part 2: Analytics Tools and Environment: Spreadsheet, SQL, R, Python, BI Dashboards", youtube_id: null}
+      - {slug: u2-p3, title: "Part 3: Databases, Types of Data and Variables: SQL, NoSQL, Confounding", youtube_id: null}
+      - {slug: u2-p4, title: "Part 4: Data Modeling Techniques: ER Diagram, Normalization, Star Schema", youtube_id: null}
+      - {slug: u2-p5, title: "Part 5: Missing Value Imputation: Mean, Median, Regression, kNN and Variance", youtube_id: null}
+      - {slug: u2-p6, title: "Part 6: Modeling in Business: Churn, Demand, Credit Risk, Market Basket", youtube_id: null}
+  - code: U3
+    title: "Regression and Logistic Regression"
+    label: "Unit - III"
+    textbook_ref: "Han, Kamber and Pei"
+    parts:
+      - {slug: u3-p1, title: "Part 1: Simple Linear Regression and Least Squares Estimation", youtube_id: null}
+      - {slug: u3-p2, title: "Part 2: BLUE and the Gauss-Markov Assumptions in Regression", youtube_id: null}
+      - {slug: u3-p3, title: "Part 3: Multiple Regression, Dummy Variables, VIF and Variable Selection", youtube_id: null}
+      - {slug: u3-p4, title: "Part 4: Model Fit: R-squared, F-test, t-tests and Residual Analysis", youtube_id: null}
+      - {slug: u3-p5, title: "Part 5: Logistic Regression: Odds, Sigmoid, Maximum Likelihood", youtube_id: null}
+      - {slug: u3-p6, title: "Part 6: Logistic Regression: Deviance, Confusion Matrix, ROC and AUC", youtube_id: null}
+  - code: U4
+    title: "Object Segmentation and Time Series Methods"
+    label: "Unit - IV"
+    textbook_ref: "Han, Kamber and Pei"
+    parts:
+      - {slug: u4-p1, title: "Part 1: Segmentation, Supervised vs Unsupervised and K-Means Clustering", youtube_id: null}
+      - {slug: u4-p2, title: "Part 2: Decision Trees: Entropy, Information Gain, Gini and Regression Trees", youtube_id: null}
+      - {slug: u4-p3, title: "Part 3: Overfitting, Pruning, Bagging and Random Forests", youtube_id: null}
+      - {slug: u4-p4, title: "Part 4: Time Series: Trend, Seasonality, Stationarity, ACF, PACF and STL", youtube_id: null}
+      - {slug: u4-p5, title: "Part 5: ARIMA: AR, MA, Differencing, Choosing p d q, Fitting and Forecasting", youtube_id: null}
+      - {slug: u4-p6, title: "Part 6: Forecast Accuracy (MAE, RMSE, MAPE) and Series Features", youtube_id: null}
+  - code: U5
+    title: "Data Visualization"
+    label: "Unit - V"
+    textbook_ref: "Han, Kamber and Pei"
+    parts:
+      - {slug: u5-p1, title: "Part 1: Why Visualize? Visual Encoding and Pixel-Oriented Techniques", youtube_id: null}
+      - {slug: u5-p2, title: "Part 2: Geometric Projection: Scatter Plots, Scatter Matrix, Parallel Coordinates", youtube_id: null}
+      - {slug: u5-p3, title: "Part 3: Icon-Based Visualization: Chernoff Faces and Stick Figures", youtube_id: null}
+      - {slug: u5-p4, title: "Part 4: Hierarchical Visualization: Tree Maps, Dendrograms, Worlds-within-Worlds, Cone Trees", youtube_id: null}
+      - {slug: u5-p5, title: "Part 5: Networks, Tag Clouds, Dashboards and Course Summary with Exam Strategy", youtube_id: null}

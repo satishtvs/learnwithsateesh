@@ -19,7 +19,7 @@ PARTS_DIR = CONTENT / "parts"
 NOTES_DIR = CONTENT / "part_notes"
 # Courses whose notes live in content/part_notes/<course slug>__<part slug>.md (part slugs repeat across courses; the
 # older courses keep the bare <part slug>.md files).
-NAMESPACED_NOTES = {"deep-learning-r22"}
+NAMESPACED_NOTES = {"deep-learning-r22", "data-analytics-r22", "natural-language-processing-r22"}
 YOUTUBE_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
 
 
