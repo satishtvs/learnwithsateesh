@@ -1,0 +1,591 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II), Unit III quizzes.
+# Questions are original; they follow the Unit III slides and narration (6 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: data-analytics-r22
+  title: "Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques, and the Student's Handbook for Associate Analytics."
+  published: false
+unit:
+  code: U3
+  title: "Regression and Logistic Regression"
+  label: "Unit - III"
+  textbook_ref: "Standard statistics textbooks; Han, Kamber and Pei, Data Mining: Concepts and Techniques (3rd ed.)"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u3-p1
+    title: "Part 1: Simple linear regression and least squares"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does the least squares method choose?"
+        options:
+          - "The line that passes through the first and last data points"
+          - "The line with the largest correlation to x"
+          - "The intercept and slope that make the sum of squared errors smallest"
+          - "The line with the smallest sum of plain errors"
+        answer: C
+        explain: "Least squares picks the intercept and slope that give the smallest possible sum of squared errors (S S E) over the data."
+
+      - q: "In regression, the error (residual) of one day is defined as:"
+        options:
+          - "Predicted value plus actual value"
+          - "Actual value minus predicted value"
+          - "Actual value divided by predicted value"
+          - "The square root of the slope"
+        answer: B
+        explain: "A residual is the actual y minus the y predicted by the line, measured vertically."
+
+      - q: "Why do we square the errors instead of adding the plain errors?"
+        options:
+          - "Positive and negative plain errors cancel, so a bad line can look perfect"
+          - "Squaring makes every error smaller"
+          - "Plain errors cannot be computed by a computer"
+          - "Squares remove the need for an intercept"
+        answer: A
+        explain: "Plain errors of opposite sign cancel. A poor line with slope 3 had plain errors adding to zero, yet its S S E was 306.83."
+
+      - q: "Which formula gives the least squares slope?"
+        options:
+          - "Mean of y divided by mean of x"
+          - "S x x divided by S x y"
+          - "Mean of x minus mean of y"
+          - "S x y divided by S x x"
+        answer: D
+        explain: "The slope is the sum of products of deviations (S x y) divided by the sum of squared x deviations (S x x). For the six days it is 237 over 42."
+
+      - q: "Which formula gives the least squares intercept?"
+        options:
+          - "Slope minus mean of y"
+          - "Mean of y minus slope times mean of x"
+          - "Mean of x minus slope times mean of y"
+          - "S x y divided by the number of days"
+        answer: B
+        explain: "The intercept is b zero equals the mean of y minus b one times the mean of x, which makes the line pass through the point of means."
+
+      - q: "In the six-day example the fitted slope is 5.643. What does it mean?"
+        options:
+          - "Sales are 5.643 thousand rupees when advertising is zero"
+          - "Each extra thousand rupees of advertising goes with about 5.64 thousand rupees more sales"
+          - "Advertising explains 5.643 percent of sales"
+          - "Sales fall by 5.643 for each extra day"
+        answer: C
+        explain: "The slope is the change in predicted sales for one extra unit of advertising. The data show association, not proof of cause."
+
+      - q: "The fitted line is sales = 34.31 + 5.643 times spend. What sales does it predict for a spend of 9?"
+        options:
+          - "85.10 thousand rupees"
+          - "39.95 thousand rupees"
+          - "92.40 thousand rupees"
+          - "50.79 thousand rupees"
+        answer: A
+        explain: "34.31 plus 5.643 times 9 is 85.10 thousand rupees, and 9 lies inside the data range of 2 to 10."
+
+      - q: "Which statement about the least squares line is always true?"
+        options:
+          - "It passes through every data point"
+          - "Its slope equals the correlation"
+          - "All residuals are positive"
+          - "It passes through the point of the two means"
+        answer: D
+        explain: "The first normal equation forces the line through the point (mean of x, mean of y). The residuals also add up to zero."
+
+      - q: "Why is the prediction of 147.17 for a spend of 20 unreliable in the six-day example?"
+        options:
+          - "Negative spends are not allowed"
+          - "The data stop at a spend of 10, so this is extrapolation"
+          - "The slope changes sign after 10"
+          - "The intercept is too large"
+        answer: B
+        explain: "Predictions are safe only inside the range of the data. Beyond a spend of 10 nobody knows if the straight-line pattern continues."
+
+      - q: "A seventh day is added far to the right of the other days, with sales much lower than the trend. What happens to the fitted slope?"
+        options:
+          - "It drops noticeably, because one far point can drag the line"
+          - "It stays exactly the same"
+          - "It becomes the correlation"
+          - "It doubles"
+        answer: A
+        explain: "Squared errors punish big errors strongly, and a point far from the others in x has a strong pull. In the animation the slope fell from 5.78 to 1.55."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u3-p2
+    title: "Part 2: BLUE and the Gauss-Markov assumptions"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does B L U E stand for?"
+        options:
+          - "Biased, linear, uniform estimate"
+          - "Best linear unbiased estimator"
+          - "Basic least squares error"
+          - "Balanced linear unweighted estimate"
+        answer: B
+        explain: "B L U E means best linear unbiased estimator. Under the Gauss Markov assumptions, least squares has this property."
+
+      - q: "What does it mean for an estimator to be unbiased?"
+        options:
+          - "Every single estimate equals the true value"
+          - "The estimate never changes from sample to sample"
+          - "Its variance is zero"
+          - "Averaged over many samples, the estimates equal the true value"
+        answer: D
+        explain: "Individual estimates vary from sample to sample, but an unbiased estimator is right on average. In the simulation, 3,000 least squares slopes averaged 5.00 against a true value of 5."
+
+      - q: "In B L U E, what does the word best mean?"
+        options:
+          - "The estimator has the largest slope"
+          - "The estimator is the easiest to compute"
+          - "Among linear unbiased estimators it has the smallest variance"
+          - "The estimator uses the fewest data points"
+        answer: C
+        explain: "Best means the least scatter. Among all linear unbiased estimators, least squares has the smallest variance."
+
+      - q: "In the simulation, the rival estimator that uses only the first and last day was also unbiased. Why did it lose to least squares?"
+        options:
+          - "Its estimates were more scattered, with sd 1.02 against 0.55"
+          - "Its estimates averaged 6 instead of 5"
+          - "It could not be written as a weighted sum of y values"
+          - "It needed normal errors"
+        answer: A
+        explain: "Both centered on the true slope, but ignoring the other 18 days made the rival's spread almost twice as large."
+
+      - q: "Which of these is NOT one of the Gauss Markov assumptions listed in the video?"
+        options:
+          - "Errors have constant variance"
+          - "Errors are independent of each other"
+          - "The errors are normally distributed"
+          - "No perfect collinearity among predictors"
+        answer: C
+        explain: "Normal errors are not needed for B L U E. Normality is only needed for exact small sample tests and confidence intervals."
+
+      - q: "The residuals form a fan that widens as x grows. What does this show, and what is the consequence?"
+        options:
+          - "Linked errors; the estimates become biased"
+          - "Perfect collinearity; the model cannot be fitted"
+          - "A missing intercept; the line will not pass through the means"
+          - "Unequal variance; estimates stay unbiased but are no longer best and standard errors are wrong"
+        answer: D
+        explain: "A fan is the sign of non-constant variance. Least squares stays unbiased but loses the best property, and the usual standard errors mislead."
+
+      - q: "The Durbin Watson statistic of the residuals in time order is 0.43. What does this suggest?"
+        options:
+          - "Neighboring errors are linked, because the value is far below 2"
+          - "The errors are independent, because the value is below 1"
+          - "The errors have constant variance"
+          - "The predictors are collinear"
+        answer: A
+        explain: "A value near 2 means no first order link between neighboring errors. A value as low as 0.43 signals strong positive linkage. A healthy case gave 2.03."
+
+      - q: "Two predictors have a correlation of 0.9. What is the variance inflation factor, one over one minus the correlation squared?"
+        options:
+          - "0.9"
+          - "5.3"
+          - "1.9"
+          - "9.0"
+        answer: B
+        explain: "One minus 0.81 is 0.19, and one divided by 0.19 is about 5.3. The standard deviation of the coefficient grew from 1.26 to 2.90."
+
+      - q: "Which change would make the estimated slope more precise?"
+        options:
+          - "Squeezing all x values into a narrow range"
+          - "Using fewer days"
+          - "Adding more noise to y"
+          - "Spreading the x values over a wider range"
+        answer: D
+        explain: "The variance of the slope is sigma squared over S x x. A wider spread of x raises S x x. Narrowing the range from 1 to 12 down to 5 to 8 raised the standard deviation from 0.54 to 1.96."
+
+      - q: "If the true relationship is curved but we fit a straight line, what is damaged?"
+        options:
+          - "Only the standard errors, not the estimates"
+          - "Nothing, because R squared will be high"
+          - "The estimates are biased for the true pattern, and the residual plot shows a U shape"
+          - "The Durbin Watson statistic becomes exactly 2"
+        answer: C
+        explain: "A wrong functional form biases the estimates. In the example R squared was 0.98 and yet the residuals formed a U shape, so a high R squared does not prove the line is right."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u3-p3
+    title: "Part 3: Multiple regression and variable selection"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In multiple regression, what does the slope of one predictor represent?"
+        options:
+          - "The correlation of that predictor with y"
+          - "The share of variation that predictor alone explains"
+          - "The average of that predictor"
+          - "The change in y for one more unit of it, with the other predictors held fixed"
+        answer: D
+        explain: "Each slope is a change in y per unit of that predictor while the other predictors stay fixed."
+
+      - q: "The weekend dummy has a coefficient of 15.12 in the retailer's model. What does it mean?"
+        options:
+          - "Weekend days have about 15.12 thousand rupees more sales than weekdays, other variables fixed"
+          - "Weekends are 15.12 percent of all days"
+          - "Sales fall by 15.12 on a weekend"
+          - "The slope of advertising is 15.12 on weekends"
+        answer: A
+        explain: "A dummy variable shifts the intercept. The weekend line lies 15.12 thousand rupees above the weekday line at every spend."
+
+      - q: "The model is sales = 28.77 + 4.50 times advertising + 1.09 times discount + 15.12 times weekend. What does it predict for spend 8, discount 10 and a weekend?"
+        options:
+          - "75.68 thousand rupees"
+          - "64.89 thousand rupees"
+          - "90.80 thousand rupees"
+          - "104.30 thousand rupees"
+        answer: C
+        explain: "28.77 plus 4.50 times 8, plus 1.09 times 10, plus 15.12 gives 90.80 thousand rupees."
+
+      - q: "A categorical variable has three levels: no festival, minor festival and major festival. How many dummy variables are needed?"
+        options:
+          - "Three"
+          - "One"
+          - "Four"
+          - "Two"
+        answer: D
+        explain: "A variable with k levels needs k minus one dummies. The left-out level is the baseline absorbed in the intercept."
+
+      - q: "What is the dummy variable trap?"
+        options:
+          - "Using a dummy for a numeric variable"
+          - "Including a dummy for every level together with the intercept, which creates perfect collinearity"
+          - "Coding a dummy as 0 and 2"
+          - "Dropping the baseline level"
+        answer: B
+        explain: "If all k dummies and the intercept are included, the dummy columns add up to the constant column, so the equations have no unique solution."
+
+      - q: "In the 60-day data, advertising and site visits have a correlation of 0.98. What problem does this signal?"
+        options:
+          - "Multicollinearity"
+          - "Unequal variance"
+          - "Linked errors"
+          - "A missing dummy"
+        answer: A
+        explain: "Two predictors that carry almost the same information are collinear, which makes their separate coefficients unstable."
+
+      - q: "In the five-variable model, advertising has a V I F of about 32.6. How should this be read?"
+        options:
+          - "Advertising is the best predictor"
+          - "Advertising is tangled with another predictor, a serious level of collinearity"
+          - "Advertising has no effect on sales"
+          - "The model fits perfectly"
+        answer: B
+        explain: "A V I F above about 5 or 10 is a concern. Here advertising and site visits are almost perfectly predicted by each other."
+
+      - q: "What happened to the advertising coefficient when site visits was added to the model?"
+        options:
+          - "It stayed at 4.50 with the same interval"
+          - "It doubled to 9.00"
+          - "It became exactly zero"
+          - "It fell to 2.70 and its interval widened to plus or minus 2.98"
+        answer: D
+        explain: "With a collinear partner in the model the estimate became unstable and the interval was so wide that we could not tell whether advertising matters."
+
+      - q: "How does backward elimination work?"
+        options:
+          - "It starts with no variables and adds the best one at each step"
+          - "It starts with all variables and removes the one with the largest p-value above the limit at each step"
+          - "It tries all possible combinations of variables"
+          - "It removes the variable with the smallest p-value"
+        answer: B
+        explain: "Backward elimination starts full and drops the weakest variable, the largest p-value above 0.05, one step at a time until all remaining are significant."
+
+      - q: "Forward selection (by adjusted R squared) and backward elimination gave different final models. What is the lesson?"
+        options:
+          - "One of the two methods is always wrong"
+          - "Both must be repeated until they agree"
+          - "Automatic methods are tools, so combine them with checks such as V I F and business sense"
+          - "Selection methods are never useful"
+        answer: C
+        explain: "Forward kept visits and advertising together with a V I F of about 32 for almost no gain. Good analysts combine statistics, collinearity checks, simplicity and business sense."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u3-p4
+    title: "Part 4: Model building and model fit"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does R squared measure?"
+        options:
+          - "The share of the variation in y explained by the model"
+          - "The probability that the model is correct"
+          - "The average size of the residuals"
+          - "The number of useful predictors"
+        answer: A
+        explain: "R squared is one minus the sum of squared errors over the total variation, the share of variation explained, between zero and one."
+
+      - q: "The retailer's final model has an R squared of 0.8887. How do we say this in words?"
+        options:
+          - "It makes correct predictions on 88.87 percent of days"
+          - "Sales change by 0.8887 for each unit of advertising"
+          - "It explains about 89 percent of the variation in daily sales"
+          - "The standard error is 0.8887"
+        answer: C
+        explain: "R squared is a share of variation, here about 88.9 percent of the variation in daily sales."
+
+      - q: "How does adjusted R squared differ from R squared?"
+        options:
+          - "It is always larger"
+          - "It ignores the number of predictors"
+          - "It is only for logistic regression"
+          - "It penalizes extra predictors and can fall when a useless variable is added"
+        answer: D
+        explain: "Adjusted R squared divides each sum of squares by its degrees of freedom, so a variable must earn its place to raise it."
+
+      - q: "Twelve useless random columns were added to the model. What happened to R squared and adjusted R squared?"
+        options:
+          - "Both rose"
+          - "R squared rose to 0.9000 but adjusted R squared fell to 0.8659"
+          - "R squared fell and adjusted R squared rose"
+          - "Neither changed"
+        answer: B
+        explain: "R squared can only rise when variables are added, even useless ones. Adjusted R squared corrects for this, so we compare models with it."
+
+      - q: "The standard error of the regression is 6.06. What does it tell us?"
+        options:
+          - "A typical residual is about 6.06 thousand rupees"
+          - "The slope is 6.06"
+          - "The model explains 6.06 percent of variation"
+          - "There are 6.06 predictors"
+        answer: A
+        explain: "The standard error is the square root of the sum of squared errors over n minus k minus one, in the units of y."
+
+      - q: "With 60 days and 3 predictors, how many degrees of freedom does the error term have?"
+        options:
+          - "60"
+          - "57"
+          - "56"
+          - "63"
+        answer: C
+        explain: "Degrees of freedom for the errors are n minus k minus one, 60 minus 3 minus 1, which is 56."
+
+      - q: "What is the null hypothesis of the F test in multiple regression?"
+        options:
+          - "The residuals are normal"
+          - "All the slopes are zero"
+          - "The intercept is zero"
+          - "R squared equals one"
+        answer: B
+        explain: "The F test asks whether at least one slope differs from zero, that is, whether the model as a whole beats just using the average."
+
+      - q: "How is the t value of a coefficient calculated?"
+        options:
+          - "Square the coefficient"
+          - "Coefficient times its standard error"
+          - "Standard error divided by the coefficient"
+          - "Coefficient divided by its standard error"
+        answer: D
+        explain: "The t value is the estimate divided by its standard error, and it is compared with a t distribution on n minus k minus one degrees of freedom."
+
+      - q: "Why is the prediction interval for one new day wider than the interval for the average of such days?"
+        options:
+          - "Averages are always less certain"
+          - "The model has more error for new days"
+          - "A single day also carries its own random error"
+          - "The interval uses a different data set"
+        answer: C
+        explain: "The interval for the average only reflects uncertainty about the line. A single new day adds its own random error as well."
+
+      - q: "Without the weekend flag, weekend days had a mean residual of about plus 10.97. What does this show?"
+        options:
+          - "A variable is missing, so the model underestimates weekend sales"
+          - "The weekend flag is not useful"
+          - "The errors are independent"
+          - "The model overestimates weekend sales"
+        answer: A
+        explain: "Residuals that are not a shapeless cloud, here all positive for weekends, point to a missing variable. Adding the flag made the mean residual zero and cut the standard error from 9.09 to 6.06."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u3-p5
+    title: "Part 5: Logistic regression, model theory"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Why is an ordinary straight-line regression a poor choice for a yes or no outcome?"
+        options:
+          - "It cannot use more than one predictor"
+          - "Its fitted values can fall below 0 or rise above 1, which are impossible probabilities"
+          - "It always gives a slope of zero"
+          - "It needs a dummy variable"
+        answer: B
+        explain: "In the churn data, 19 customers got a fitted value below zero and 9 above one. We need a curve that stays between 0 and 1."
+
+      - q: "Odds of an event are defined as:"
+        options:
+          - "p times (1 minus p)"
+          - "The logarithm of p"
+          - "p divided by (1 minus p)"
+          - "One divided by p"
+        answer: C
+        explain: "Odds are the chance of the event over the chance of its opposite. A probability of 0.75 gives odds of 3."
+
+      - q: "What are the log odds of an event whose probability is exactly one half?"
+        options:
+          - "Zero"
+          - "One"
+          - "Minus one"
+          - "0.5"
+        answer: A
+        explain: "A probability of one half gives odds of 1, and the natural logarithm of 1 is 0."
+
+      - q: "Which function turns a score z into a probability?"
+        options:
+          - "z squared"
+          - "The sigmoid, one over (1 plus e to the minus z)"
+          - "The logarithm of z"
+          - "The square root of z"
+        answer: B
+        explain: "The sigmoid, or logistic function, maps any score from minus infinity to plus infinity into a probability between 0 and 1."
+
+      - q: "In the logistic regression model, which quantity is a straight-line function of the predictors?"
+        options:
+          - "The probability"
+          - "The log odds"
+          - "The residual"
+          - "The deviance"
+        answer: B
+        explain: "The model says the log odds equal b zero plus b one x one and so on. The probability itself follows an S curve."
+
+      - q: "What does a larger slope in the sigmoid do to the curve?"
+        options:
+          - "It moves the curve to the left"
+          - "It makes the curve flatter"
+          - "It lowers the curve"
+          - "It makes the curve steeper, a sharper switch from no to yes"
+        answer: D
+        explain: "With the intercept at zero, a slope of 4 gave a probability of 0.982 at x equal to 1, against 0.622 for a slope of 0.5."
+
+      - q: "What does maximum likelihood do?"
+        options:
+          - "It makes the sum of squared errors smallest"
+          - "It picks the model with the most predictors"
+          - "It chooses the coefficients that make the observed data most probable"
+          - "It sets all coefficients to zero"
+        answer: C
+        explain: "Maximum likelihood searches for the coefficients with the highest likelihood, equivalently the highest log-likelihood, of the data actually seen."
+
+      - q: "In the churn model the complaints coefficient is 0.790, so e to the coefficient is 2.20. How do we read this?"
+        options:
+          - "Each extra complaint multiplies the odds of churn by about 2.2, with tenure fixed"
+          - "Each extra complaint adds 2.2 percent to the probability of churn"
+          - "Customers with complaints churn 2.2 months sooner"
+          - "Complaints explain 2.2 percent of churn"
+        answer: A
+        explain: "E to the power of a coefficient is the odds ratio for one more unit of that predictor, with the other predictors fixed."
+
+      - q: "The tenure coefficient is minus 0.0713, with odds ratio 0.931. What does this mean?"
+        options:
+          - "Tenure has no effect"
+          - "Churn probability rises by 0.931 per month"
+          - "Each extra month of tenure lowers the odds of churning by about 6.9 percent"
+          - "Customers stay 0.931 months longer per complaint"
+        answer: C
+        explain: "An odds ratio below one lowers the odds. One minus 0.931 is about 0.069, so the odds fall by about 6.9 percent per month."
+
+      - q: "A customer has 12 months of tenure and 2 complaints. The score z is 1.103. What is the probability of churn?"
+        options:
+          - "0.290"
+          - "0.903"
+          - "1.103"
+          - "0.751"
+        answer: D
+        explain: "The odds are e to the 1.103, about 3.02, and the probability is odds over 1 plus odds, 0.751."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u3-p6
+    title: "Part 6: Logistic regression, fit statistics and construction"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "How is the deviance of a logistic model defined?"
+        options:
+          - "The sum of squared errors"
+          - "The number of misclassified customers"
+          - "The standard error of the intercept"
+          - "Minus two times the log-likelihood; smaller means a better fit"
+        answer: D
+        explain: "Deviance is minus 2 times the log-likelihood. Our churn model has a deviance of 655.63 against a null deviance of 815.70."
+
+      - q: "In the likelihood ratio test, what is the test statistic?"
+        options:
+          - "Null deviance minus residual deviance, compared with chi-square on the number of added predictors"
+          - "Residual deviance divided by the null deviance"
+          - "The largest Wald z value"
+          - "The area under the ROC curve"
+        answer: A
+        explain: "The statistic was 815.70 minus 655.63, which is 160.07, compared with chi-square on 2 degrees of freedom. The 5 percent cut-off is 5.99."
+
+      - q: "McFadden pseudo R squared is calculated as:"
+        options:
+          - "Model deviance divided by null deviance"
+          - "The square of the correlation"
+          - "One minus the model log-likelihood divided by the null log-likelihood"
+          - "Accuracy minus one half"
+        answer: C
+        explain: "McFadden R squared is one minus the model log-likelihood over the null log-likelihood, which was 0.196 here. It is not comparable with linear R squared."
+
+      - q: "When comparing two logistic models fitted on the same data, how is A I C used?"
+        options:
+          - "The larger A I C is preferred"
+          - "The smaller A I C is preferred"
+          - "A I C must equal zero"
+          - "A I C is used only for linear models"
+        answer: B
+        explain: "A I C is the deviance plus 2 times the number of parameters, so a smaller value means a better balance of fit and simplicity."
+
+      - q: "Recall (sensitivity) is calculated as:"
+        options:
+          - "True negatives over all customers"
+          - "True positives over all customers flagged"
+          - "True positives over (true positives plus false negatives)"
+          - "False positives over true negatives"
+        answer: C
+        explain: "Recall is the share of real churners that we catch. At cut-off 0.5 it was 43 out of 77, which is 0.558."
+
+      - q: "At cut-off 0.5 the model flagged 66 customers and 43 really churned. What is the precision?"
+        options:
+          - "0.652"
+          - "0.558"
+          - "0.777"
+          - "0.683"
+        answer: A
+        explain: "Precision is true positives over all flagged customers, 43 over 66, which is 0.652."
+
+      - q: "What happens when the cut-off is raised from 0.5 to 0.8?"
+        options:
+          - "Both precision and recall rise"
+          - "Precision rises and recall falls"
+          - "Precision falls and recall rises"
+          - "Neither changes"
+        answer: B
+        explain: "A high cut-off flags only the surest cases. Precision rose to 0.933 but recall fell to 0.182, so most churners were missed."
+
+      - q: "What are the axes of the ROC curve?"
+        options:
+          - "Precision against accuracy"
+          - "Deviance against A I C"
+          - "Predicted probability against actual churn"
+          - "True positive rate against false positive rate"
+        answer: D
+        explain: "Each cut-off gives one point: the share of churners caught against the share of stayers wrongly flagged."
+
+      - q: "Which statement about the A U C is correct?"
+        options:
+          - "A value of 0.5 means a useless model, no better than a coin toss"
+          - "A value of 0 means a perfect model"
+          - "It depends on the chosen cut-off"
+          - "It must be above 0.99 for any usable model"
+        answer: A
+        explain: "The A U C is the chance that a random churner is scored higher than a random stayer. 0.5 is a useless model and 1 is perfect. Our test A U C was 0.789."
+
+      - q: "Missing a churner costs 1,500 rupees but a false alarm costs only 100 rupees. How should this affect the cut-off?"
+        options:
+          - "Always use exactly 0.5"
+          - "Raise the cut-off to flag fewer customers"
+          - "Lower the cut-off to flag generously, since misses are expensive"
+          - "Ignore the costs and maximize accuracy"
+        answer: C
+        explain: "With these assumed costs the total cost was lowest at a cut-off of 0.20, with 6,400 rupees against 53,300 at 0.5."

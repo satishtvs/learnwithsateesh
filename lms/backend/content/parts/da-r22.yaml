@@ -34,23 +34,23 @@ units:
     label: "Unit - III"
     textbook_ref: "Han, Kamber and Pei"
     parts:
-      - {slug: u3-p1, title: "Part 1: Simple Linear Regression and Least Squares Estimation", youtube_id: null}
-      - {slug: u3-p2, title: "Part 2: BLUE and the Gauss-Markov Assumptions in Regression", youtube_id: null}
-      - {slug: u3-p3, title: "Part 3: Multiple Regression, Dummy Variables, VIF and Variable Selection", youtube_id: null}
-      - {slug: u3-p4, title: "Part 4: Model Fit: R-squared, F-test, t-tests and Residual Analysis", youtube_id: null}
-      - {slug: u3-p5, title: "Part 5: Logistic Regression: Odds, Sigmoid, Maximum Likelihood", youtube_id: null}
-      - {slug: u3-p6, title: "Part 6: Logistic Regression: Deviance, Confusion Matrix, ROC and AUC", youtube_id: null}
+      - {slug: u3-p1, title: "Part 1: Simple Linear Regression and Least Squares Estimation", youtube_id: zmtMFUKz1Sc}
+      - {slug: u3-p2, title: "Part 2: BLUE and the Gauss-Markov Assumptions in Regression", youtube_id: VcLuRmjKfCA}
+      - {slug: u3-p3, title: "Part 3: Multiple Regression, Dummy Variables, VIF and Variable Selection", youtube_id: IGE2L6ZXdtU}
+      - {slug: u3-p4, title: "Part 4: Model Fit: R-squared, F-test, t-tests and Residual Analysis", youtube_id: 43UtA7rO1kg}
+      - {slug: u3-p5, title: "Part 5: Logistic Regression: Odds, Sigmoid, Maximum Likelihood", youtube_id: fsfKCTmStp4}
+      - {slug: u3-p6, title: "Part 6: Logistic Regression: Deviance, Confusion Matrix, ROC and AUC", youtube_id: -pAMoHxGFcs}
   - code: U4
     title: "Object Segmentation and Time Series Methods"
     label: "Unit - IV"
     textbook_ref: "Han, Kamber and Pei"
     parts:
-      - {slug: u4-p1, title: "Part 1: Segmentation, Supervised vs Unsupervised and K-Means Clustering", youtube_id: null}
-      - {slug: u4-p2, title: "Part 2: Decision Trees: Entropy, Information Gain, Gini and Regression Trees", youtube_id: null}
-      - {slug: u4-p3, title: "Part 3: Overfitting, Pruning, Bagging and Random Forests", youtube_id: null}
-      - {slug: u4-p4, title: "Part 4: Time Series: Trend, Seasonality, Stationarity, ACF, PACF and STL", youtube_id: null}
-      - {slug: u4-p5, title: "Part 5: ARIMA: AR, MA, Differencing, Choosing p d q, Fitting and Forecasting", youtube_id: null}
-      - {slug: u4-p6, title: "Part 6: Forecast Accuracy (MAE, RMSE, MAPE) and Series Features", youtube_id: null}
+      - {slug: u4-p1, title: "Part 1: Segmentation, Supervised vs Unsupervised and K-Means Clustering", youtube_id: d1pEqcdxgjM}
+      - {slug: u4-p2, title: "Part 2: Decision Trees: Entropy, Information Gain, Gini and Regression Trees", youtube_id: SAhwHHIK_GE}
+      - {slug: u4-p3, title: "Part 3: Overfitting, Pruning, Bagging and Random Forests", youtube_id: ELaP7V5pf3A}
+      - {slug: u4-p4, title: "Part 4: Time Series: Trend, Seasonality, Stationarity, ACF, PACF and STL", youtube_id: VsF8vy6-Z5w}
+      - {slug: u4-p5, title: "Part 5: ARIMA: AR, MA, Differencing, Choosing p d q, Fitting and Forecasting", youtube_id: N59vIf1W15E}
+      - {slug: u4-p6, title: "Part 6: Forecast Accuracy (MAE, RMSE, MAPE) and Series Features", youtube_id: ubf9ey-DO_8}
   - code: U5
     title: "Data Visualization"
     label: "Unit - V"

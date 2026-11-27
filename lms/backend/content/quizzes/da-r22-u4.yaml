@@ -1,0 +1,591 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II), Unit IV quizzes.
+# Questions are original; they follow the Unit IV slides and narration (6 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: data-analytics-r22
+  title: "Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques, and the Student's Handbook for Associate Analytics."
+  published: false
+unit:
+  code: U4
+  title: "Object Segmentation and Time Series Methods"
+  label: "Unit - IV"
+  textbook_ref: "Han, Kamber and Pei, Data Mining: Concepts and Techniques (3rd ed.); standard statistics textbooks for time series"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u4-p1
+    title: "Part 1: Segmentation and k-means clustering"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which question does segmentation answer, as opposed to regression?"
+        options:
+          - "What number will tomorrow's sales be?"
+          - "Which customers behave alike, so that they can be put into groups?"
+          - "Is the sales line steeper this year than last year?"
+          - "What is the best price for a product?"
+        answer: B
+        explain: "Segmentation puts similar objects into groups and needs no answer column. Regression predicts a number from other columns."
+
+      - q: "Which of these is an unsupervised learning task?"
+        options:
+          - "Predicting a customer's churn from past churn labels"
+          - "Predicting sales from advertising spend"
+          - "Classifying emails as spam using labeled emails"
+          - "Clustering customers into segments without any answer column"
+        answer: D
+        explain: "Clustering has no teacher and no answer column, so it is unsupervised. The other three learn from known answers."
+
+      - q: "In the assign step of k-means, what happens?"
+        options:
+          - "Each customer joins the group of the nearest center"
+          - "Each center moves to the mean of its group"
+          - "The number of groups k is increased by one"
+          - "The customer with the largest basket becomes a center"
+        answer: A
+        explain: "The assign step gives every customer to its nearest center. The update step then moves the centers."
+
+      - q: "In the update step of k-means, each center is moved to:"
+        options:
+          - "The customer with the most orders in the group"
+          - "A random customer of the group"
+          - "The mean of the orders and the mean of the baskets of its group"
+          - "The point farthest from the other centers"
+        answer: C
+        explain: "The new center of a group is the mean of its members, which is the point with the smallest total squared distance to them."
+
+      - q: "What happens to the sum of squared errors (S S E) from one pass of k-means to the next?"
+        options:
+          - "It rises, then falls"
+          - "It never goes up, which is why the loop stops"
+          - "It stays constant"
+          - "It falls only in the first pass"
+        answer: B
+        explain: "Neither the assign step nor the update step can increase the S S E, so it is non-increasing. In our run it fell from 1675 to 121.75."
+
+      - q: "In the lesson, the S S E was 442.25 for k = 2 and 121.75 for k = 3, then fell only slowly. What does the elbow rule suggest?"
+        options:
+          - "Choose k = 6, the largest k tried"
+          - "Choose k = 1, the smallest S S E per group"
+          - "Choose k = 2, because it is the first drop"
+          - "Choose k = 3, where the curve stops falling steeply"
+        answer: D
+        explain: "The elbow rule picks the k after which extra groups bring only small drops. Here the big drop ends at k = 3."
+
+      - q: "Why should columns usually be standardized before k-means?"
+        options:
+          - "Otherwise a column with large numbers swamps the distance and the others are ignored"
+          - "Otherwise the algorithm cannot compute a mean"
+          - "Standardizing makes k-means find more groups"
+          - "Standardizing removes the need to choose k"
+        answer: A
+        explain: "Distance adds up squared differences, so a column measured in rupees dominates a column of orders. Standardizing gives the columns the same scale."
+
+      - q: "Starting k-means from customers E, F and H gave an S S E of 406, much worse than 121.75. What is the practical remedy?"
+        options:
+          - "Use only one start and accept the answer"
+          - "Delete the customers that cause the problem"
+          - "Run k-means from many starts and keep the answer with the smallest S S E"
+          - "Always use k = 2"
+        answer: C
+        explain: "K-means can stop at a poor local minimum. Running it from many starting centers and keeping the lowest S S E is the standard remedy."
+
+      - q: "Customer A has 4 orders and a basket of 3, and customer G has 18 orders and a basket of 7. What is their Euclidean distance?"
+        options:
+          - "About 14.56"
+          - "About 18"
+          - "About 21"
+          - "About 4"
+        answer: A
+        explain: "The differences are 14 and 4, so the distance is the square root of 14 squared plus 4 squared, about 14.56. The value 18 is the Manhattan distance."
+
+      - q: "Which statement about a k-means center is correct?"
+        options:
+          - "It is always one of the customers"
+          - "It is always the customer with the largest basket"
+          - "It is fixed before the algorithm starts and never changes"
+          - "It is a mean of the group and need not be an actual customer"
+        answer: D
+        explain: "A center is the mean of its group, so it is usually a point that no customer occupies, such as (6.75, 3.75) in our example."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u4-p2
+    title: "Part 2: Classification and regression trees"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does a leaf of a classification tree give?"
+        options:
+          - "The next question to ask"
+          - "The mean of the rows in it"
+          - "The majority class of the rows that reach it"
+          - "The Gini index of the whole data"
+        answer: C
+        explain: "A leaf asks no more questions. In a classification tree it gives the majority class of the rows in it, and in a regression tree the mean."
+
+      - q: "What is the entropy of a node in which every customer has the same answer?"
+        options:
+          - "Zero"
+          - "One"
+          - "One half"
+          - "It cannot be computed"
+        answer: A
+        explain: "A pure node has no mixing, so its entropy is zero. The entropy is largest when the classes are split half and half."
+
+      - q: "How is the information gain of a question defined?"
+        options:
+          - "The number of branches the question creates"
+          - "The Gini index of the first branch"
+          - "The entropy after the split divided by the entropy before"
+          - "The entropy before the split minus the weighted entropy after the split"
+        answer: D
+        explain: "Gain is the entropy before minus the average entropy of the branches, each weighted by its share of the rows."
+
+      - q: "In the 14 customer example, tenure was chosen as the root question. Why?"
+        options:
+          - "It has the most branches"
+          - "It had the largest information gain, about 0.396"
+          - "It was the first column in the table"
+          - "It made every leaf pure at once"
+        answer: B
+        explain: "The tree always asks the question with the largest gain. Tenure scored 0.396, against 0.048 for support tickets and 0.001 for discount used."
+
+      - q: "How is the Gini index of a node computed?"
+        options:
+          - "Minus the sum of p times the logarithm of p"
+          - "The largest share p"
+          - "One minus the sum of the squared shares"
+          - "The number of classes divided by the number of rows"
+        answer: C
+        explain: "Gini is one minus the sum of the squared class shares. For the root of our example, with shares 6/14 and 8/14, it is 0.490."
+
+      - q: "For two classes, what is the largest possible value of the entropy, measured in bits?"
+        options:
+          - "One"
+          - "Two"
+          - "One half"
+          - "The number of rows"
+        answer: A
+        explain: "A half and half split has an entropy of exactly one bit. The largest Gini index for two classes is one half."
+
+      - q: "How does a regression tree choose a split?"
+        options:
+          - "It picks the split with the most rows on the left"
+          - "It picks the split with the largest information gain"
+          - "It always splits at the median"
+          - "It picks the split that gives the smallest total sum of squared errors of the two sides"
+        answer: D
+        explain: "A regression tree measures impurity by the sum of squared errors around the mean, and each leaf then predicts the mean of its rows."
+
+      - q: "How does a decision tree handle a numeric attribute such as days since the last order?"
+        options:
+          - "It ignores numeric attributes"
+          - "It tests thresholds at midpoints between sorted values and keeps the best one"
+          - "It turns every value into its own branch"
+          - "It rounds the values to the nearest ten"
+        answer: B
+        explain: "The tree tries each midpoint as a threshold, computes the impurity after the split, and keeps the threshold with the best score."
+
+      - q: "Which impurity measure is used by the CART algorithm?"
+        options:
+          - "The Gini index"
+          - "The information gain"
+          - "The standard deviation of the labels"
+          - "The correlation coefficient"
+        answer: A
+        explain: "CART uses the Gini index, while ID3 and C4.5 use information gain based on entropy. In practice they usually choose the same split."
+
+      - q: "In the regression tree example, ten days of discount percent against units sold were split at 27.5. What was the reason?"
+        options:
+          - "27.5 is the average discount"
+          - "It leaves the same number of days on both sides"
+          - "It gave the smallest total sum of squared errors among the seven candidate thresholds"
+          - "It is the largest discount in the data"
+        answer: C
+        explain: "The seven midpoints were tried one by one, and 27.5 gave the smallest total S S E, 591.38, separating the two highest sales days."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u4-p3
+    title: "Part 3: Overfitting, pruning and random forests"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "A fully grown tree had a training accuracy of 1.000 and a test accuracy of 0.777. What does this show?"
+        options:
+          - "The tree is underfitted"
+          - "The tree is overfitted: it memorized the training data"
+          - "The test data are wrong"
+          - "The tree needs more depth"
+        answer: B
+        explain: "A large gap between training and test accuracy is the sign of overfitting. The tree memorized the noise of the training customers."
+
+      - q: "What is underfitting?"
+        options:
+          - "A tree that is too large and follows the noise"
+          - "A model with a perfect training score"
+          - "A model that has too many training rows"
+          - "A model too simple to capture the pattern, so even the training accuracy is low"
+        answer: D
+        explain: "An underfitted model is too simple, for example a tree with too few splits, and it is poor on both the training and the test data."
+
+      - q: "Which of these is an example of pre-pruning?"
+        options:
+          - "Stopping growth with a maximum depth or a minimum leaf size"
+          - "Cutting branches off a fully grown tree"
+          - "Averaging many trees"
+          - "Adding random features at each split"
+        answer: A
+        explain: "Pre-pruning stops the tree while it grows. Cutting back a full tree is post-pruning, and averaging trees is bagging."
+
+      - q: "The cost-complexity measure of a subtree is:"
+        options:
+          - "The number of leaves divided by the training error"
+          - "The depth of the tree times the Gini index"
+          - "The training error plus alpha times the number of leaves"
+          - "The test error minus the training error"
+        answer: C
+        explain: "Alpha is the price of each leaf. A larger alpha makes leaves expensive, so the best subtree becomes smaller."
+
+      - q: "How was the value of alpha chosen in the lesson?"
+        options:
+          - "It was the value with the best test accuracy"
+          - "It was always set to one"
+          - "It was chosen by the teacher at random"
+          - "By cross-validation on the training data, never using the test data"
+        answer: D
+        explain: "Five-fold cross-validation picked alpha and gave a tree with 10 leaves. The test data were only used for the final check."
+
+      - q: "What is a bootstrap sample?"
+        options:
+          - "Half of the rows, chosen without replacement"
+          - "A sample of the same size drawn with replacement, so some rows appear twice and some not at all"
+          - "The rows with the largest values"
+          - "A sample that keeps every row exactly once"
+        answer: B
+        explain: "Rows are drawn one at a time with replacement. On average about 63 percent of the distinct rows appear in each sample."
+
+      - q: "How does bagging make its final prediction?"
+        options:
+          - "By a majority vote of trees trained on bootstrap samples"
+          - "By using the single best tree"
+          - "By averaging the training rows"
+          - "By pruning one large tree"
+        answer: A
+        explain: "Bagging trains one deep tree per bootstrap sample and classifies a new customer by the majority vote of all the trees."
+
+      - q: "What does a random forest add to bagging?"
+        options:
+          - "A depth limit for every tree"
+          - "A larger training set"
+          - "Only a random few of the columns may be tried at each split"
+          - "A separate test set for every tree"
+        answer: C
+        explain: "Random feature choice at each split makes the trees less alike, so their errors cancel better in the vote."
+
+      - q: "What are out-of-bag rows?"
+        options:
+          - "Rows with missing values"
+          - "The rows a tree never saw because they were left out of its bootstrap sample"
+          - "The rows with the largest errors"
+          - "The test rows"
+        answer: B
+        explain: "Each tree can be scored on its own out-of-bag rows, which gives an honest error estimate without a separate test set."
+
+      - q: "Why does a vote of many trees usually beat a single deep tree?"
+        options:
+          - "Each tree is more accurate than a single tree"
+          - "Voting makes the trees shallower"
+          - "Voting removes the need for training data"
+          - "The errors of different trees partly cancel, which reduces the variance"
+        answer: D
+        explain: "A single deep tree depends strongly on the rows it happened to see. Averaging many such trees keeps what they agree on and washes out the noise."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u4-p4
+    title: "Part 4: Time series basics"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Why can the rows of a time series not be shuffled freely?"
+        options:
+          - "Time series have too many rows"
+          - "The values are always random"
+          - "Shuffling makes the mean change"
+          - "The order of the values carries information, because today depends on the past"
+        answer: D
+        explain: "In a time series each value is related to earlier values, so shuffling destroys the structure that we want to study."
+
+      - q: "When should a multiplicative model be preferred to an additive model?"
+        options:
+          - "When there is no trend"
+          - "When the seasonal swing grows as the level of the series rises"
+          - "When the series is stationary"
+          - "When there are fewer than 12 months"
+        answer: B
+        explain: "If the seasonal swing is proportional to the level, trend times seasonal factor fits better. Taking logarithms turns the product into a sum."
+
+      - q: "Why does a centered 12-month moving average estimate the trend?"
+        options:
+          - "It keeps only the largest month"
+          - "It uses the first year only"
+          - "A full year holds every season once, so the seasonal ups and downs cancel and noise is averaged down"
+          - "It removes the trend and keeps the noise"
+        answer: C
+        explain: "Averaging over exactly one season length cancels the seasonal pattern, and what remains is the trend with less noise."
+
+      - q: "How is the seasonal index of a month found in classical decomposition?"
+        options:
+          - "By averaging its detrended values over the years, then adjusting so the 12 indices sum to zero"
+          - "By taking the highest value of that month"
+          - "By dividing the month by the next month"
+          - "By fitting a straight line through that month"
+        answer: A
+        explain: "Detrended value means sales minus the trend. The average for each calendar month, centered to sum to zero, is its seasonal index."
+
+      - q: "What does S T L stand for?"
+        options:
+          - "Smoothing, trend and lag"
+          - "Seasonal and trend decomposition using loess"
+          - "Stationary time lag"
+          - "Standard trend line"
+        answer: B
+        explain: "S T L splits a series into seasonal, trend and remainder parts using loess, which is locally weighted regression."
+
+      - q: "Which statement describes a stationary series?"
+        options:
+          - "Its values never change"
+          - "Its mean rises steadily"
+          - "It repeats a pattern every 12 months"
+          - "Its mean and variance are constant and its correlation depends only on the lag"
+        answer: D
+        explain: "Stationarity means that the statistical behavior does not depend on when we look. A series with trend or seasonality is not stationary."
+
+      - q: "Which operation removes a trend, and which removes a seasonal pattern?"
+        options:
+          - "A seasonal difference removes the trend, a first difference removes seasonality"
+          - "Taking the average removes both"
+          - "A first difference removes the trend, a seasonal difference (minus 12 months ago) removes seasonality"
+          - "Sorting the values removes both"
+        answer: C
+        explain: "The first difference is this month minus last month. The seasonal difference is this month minus the same month a year ago."
+
+      - q: "What does the autocorrelation at lag k measure?"
+        options:
+          - "The correlation of the series with itself k periods later"
+          - "The average of the last k values"
+          - "The slope of the trend over k months"
+          - "The variance of the first k values"
+        answer: A
+        explain: "We pair each value with the value k periods later and compute the correlation. In our sales series it was 0.875 at lag 1."
+
+      - q: "For a series of 48 values, what is the approximate 95 percent band for ACF bars of white noise?"
+        options:
+          - "Plus or minus 0.05"
+          - "Plus or minus 0.5"
+          - "Plus or minus 1.96"
+          - "Plus or minus 1.96 divided by the square root of 48, about 0.283"
+        answer: D
+        explain: "Bars inside plus or minus 1.96 over the square root of n can be treated as zero."
+
+      - q: "What does the partial autocorrelation (PACF) at lag k measure?"
+        options:
+          - "The correlation at lag k averaged over all lags"
+          - "The correlation between the series and its value k periods earlier after removing the effect of the lags in between"
+          - "The correlation between two different series"
+          - "The share of variance explained by the trend"
+        answer: B
+        explain: "Lag one is the same as the ACF. At higher lags the PACF removes what was passed along through the intermediate lags."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u4-p5
+    title: "Part 5: ARIMA models"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In ARIMA(p, d, q), what does d stand for?"
+        options:
+          - "The number of times the series is differenced"
+          - "The number of past values used"
+          - "The number of seasonal periods"
+          - "The number of past errors used"
+        answer: A
+        explain: "d is the order of differencing. p is the autoregressive order and q is the moving average order."
+
+      - q: "What does an autoregressive model of order p say about today's value?"
+        options:
+          - "It equals the average of all past values"
+          - "It depends on the last q errors"
+          - "It is a constant plus weights times the last p values plus an error"
+          - "It is the same as yesterday's value"
+        answer: C
+        explain: "AR(p) regresses the series on its own last p values. The moving average part uses past errors instead."
+
+      - q: "Which plot pattern points to an AR(p) model?"
+        options:
+          - "Both plots stay inside the band"
+          - "The ACF cuts off after lag p"
+          - "The PACF is always zero"
+          - "The ACF tails off and the PACF cuts off after lag p"
+        answer: D
+        explain: "For AR(p) the PACF stops after lag p and the ACF decays gradually. For MA(q) the roles are reversed."
+
+      - q: "Which pattern points to an MA(q) model?"
+        options:
+          - "The PACF cuts off after lag q"
+          - "The ACF cuts off after lag q and the PACF tails off"
+          - "Both plots tail off slowly"
+          - "The ACF is large at every lag"
+        answer: B
+        explain: "An MA(1) series with coefficient 0.7 has one ACF spike at lag one, about 0.47 in theory, and then nothing."
+
+      - q: "An AR(1) series has coefficient 0.99. What does its time plot look like?"
+        options:
+          - "It wanders like a random walk, with a long memory"
+          - "It zigzags up and down"
+          - "It is pure noise"
+          - "It is a perfect straight line"
+        answer: A
+        explain: "The autocorrelation at lag k is the coefficient to the power k, so with 0.99 it decays very slowly. A coefficient of one gives a random walk, which is not stationary."
+
+      - q: "For the 120 days of orders, why was ARIMA(1, 1, 0) chosen?"
+        options:
+          - "Because it has the fewest letters"
+          - "Because the original series was stationary"
+          - "The differenced series had a decaying ACF and a PACF that cut off after lag one"
+          - "Because the PACF of the original series was zero"
+        answer: C
+        explain: "The first difference was needed for the drifting level, and the ACF and PACF of the differences showed the fingerprint of AR(1)."
+
+      - q: "How is the A I C used to compare candidate models?"
+        options:
+          - "The model with the largest value wins"
+          - "The model with the smallest value wins, because it rewards small error and penalizes extra parameters"
+          - "Only the difference from the naive forecast is used"
+          - "It is used only for seasonal models"
+        answer: B
+        explain: "In the lesson ARIMA(1, 1, 0) had the smallest A I C, 149.55, and the extra terms did not improve on it."
+
+      - q: "What should the residuals of an acceptable model look like?"
+        options:
+          - "Growing with time"
+          - "Always positive"
+          - "Equal to the original series"
+          - "Like white noise, with no autocorrelation left"
+        answer: D
+        explain: "The residual ACF stayed inside the band and the Ljung and Box p-value was 0.76, so no structure was left."
+
+      - q: "How does the forecast interval change as we forecast further ahead?"
+        options:
+          - "It shrinks"
+          - "It stays the same"
+          - "It widens, because the errors of each day add up"
+          - "It disappears"
+        answer: C
+        explain: "One day ahead the interval was 7.2 wide and ten days ahead 59.6 wide. The further ahead we forecast, the less we know."
+
+      - q: "What is the order of the steps in the Box and Jenkins method?"
+        options:
+          - "Identify, estimate, check the residuals, forecast"
+          - "Forecast, estimate, identify, check"
+          - "Estimate, forecast, identify, check"
+          - "Check, forecast, estimate, identify"
+        answer: A
+        explain: "We identify the orders, estimate the candidates, check that the residuals are white noise, and then forecast. A failed check sends us back to the first step."
+
+  # ------------------------------------------------------------------ Part 6
+  - slug: u4-p6
+    title: "Part 6: Forecast accuracy and feature extraction"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the mean absolute error (M A E)?"
+        options:
+          - "The square root of the average squared error"
+          - "The average error divided by the actual value"
+          - "The average of the sizes of the errors, ignoring the sign"
+          - "The largest error"
+        answer: C
+        explain: "M A E averages the absolute errors and has the same units as the data. In our test it was 3.78 thousand rupees."
+
+      - q: "Which measure punishes one large error most strongly?"
+        options:
+          - "M A E"
+          - "R M S E"
+          - "The mean error"
+          - "The count of errors"
+        answer: B
+        explain: "R M S E squares the errors before averaging, so a big error dominates. When one error grew by 60, R M S E nearly quadrupled while M A E about doubled."
+
+      - q: "What is the main problem of M A P E?"
+        options:
+          - "It is undefined, or explodes, when an actual value is zero or tiny"
+          - "It has the same units as the data"
+          - "It can only be computed for seasonal data"
+          - "It ignores the size of the errors"
+        answer: A
+        explain: "M A P E divides each error by the actual value, so a zero actual makes it undefined. Its advantage is that it has no units."
+
+      - q: "Why do we hold out the latest months for testing, rather than a random sample of months?"
+        options:
+          - "A random sample is too small"
+          - "The latest months are always easier to forecast"
+          - "The latest months never contain noise"
+          - "A random split lets the model peek at the future, which makes the scores look too good"
+        answer: D
+        explain: "In a time series the test period must come after the training period, as it will in real use."
+
+      - q: "Why compare a method with the naive forecast?"
+        options:
+          - "The naive forecast is always the best"
+          - "A score means little unless a simple baseline sets the standard that the method must beat"
+          - "The naive forecast has no error"
+          - "It is required by the A R I M A model"
+        answer: B
+        explain: "The naive forecast scored an M A E of 14.76 on our test months. The trend and seasonal method scored 3.78, so it is clearly useful."
+
+      - q: "What is rolling-origin evaluation?"
+        options:
+          - "Testing on a random sample of months"
+          - "Using the whole series for training and testing"
+          - "Repeatedly fitting the model, forecasting the next period, and moving the origin forward"
+          - "Rolling a die to choose the test months"
+        answer: C
+        explain: "The origin only moves forward, so the model never sees the future, and many forecast errors are collected instead of twelve."
+
+      - q: "How was the average energy of a series defined in the lesson?"
+        options:
+          - "The average of the squared values"
+          - "The maximum value"
+          - "The slope of the fitted line"
+          - "The standard deviation"
+        answer: A
+        explain: "Average energy is the mean of the squares of the values. For the series 42, 45, 44, 47, 52, 58, 61, 57 it was 2621.50."
+
+      - q: "What is the height of a series as a feature?"
+        options:
+          - "Its average value"
+          - "The difference between the first and last values"
+          - "The number of months"
+          - "Its peak, the maximum value"
+        answer: D
+        explain: "Height is the maximum value. Other features were the mean, the spread, the trend slope and the seasonality strength."
+
+      - q: "How were series features used for prediction in the lesson?"
+        options:
+          - "The features were deleted before modeling"
+          - "They were averaged into one number"
+          - "Features were computed for each product and given to a decision tree, which classified the product type"
+          - "They were used only to plot the series"
+        answer: C
+        explain: "A tree on the features classified 29 of 30 test products correctly, while using only the mean demand gave 0.300."
+
+      - q: "If the R M S E is much larger than the M A E, what does this suggest?"
+        options:
+          - "The forecast is perfect"
+          - "A few large errors are hiding among the forecast errors"
+          - "The data contain zeros"
+          - "The errors are all about the same size"
+        answer: B
+        explain: "R M S E is at least as large as M A E. It is close to it when the errors have similar sizes, and much larger when a few errors are big."
