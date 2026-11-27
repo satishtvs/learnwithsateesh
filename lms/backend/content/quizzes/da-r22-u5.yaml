@@ -1,0 +1,495 @@
+# Data Analytics (JNTUH R22 CSE-AIML, III-II), Unit V quizzes.
+# Questions are original; they follow the Unit V slides and narration (5 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: data-analytics-r22
+  title: "Data Analytics: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Data Analytics (AM602PC), following Han, Kamber and Pei, Data Mining: Concepts and Techniques, and the Student's Handbook for Associate Analytics."
+  published: false
+unit:
+  code: U5
+  title: "Data Visualization"
+  label: "Unit - V"
+  textbook_ref: "Han, Kamber and Pei, Data Mining: Concepts and Techniques (3rd ed.)"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u5-p1
+    title: "Part 1: Why visualize, visual encoding and pixel-oriented techniques"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What do Anscombe's four small data sets have in common?"
+        options:
+          - "They look the same when they are plotted"
+          - "The same mean of y, correlation and best fit line, but very different pictures"
+          - "The same outlier in every set"
+          - "The same mean of y, but different correlations"
+        answer: B
+        explain: "The summary numbers are identical, yet the pictures are a cloud, a curve, a line with one outlier and a line created by one point. This is why we draw the data first."
+
+      - q: "Which visual encoding do people judge most accurately?"
+        options:
+          - "Position on a common scale"
+          - "Area"
+          - "Color shade"
+          - "Angle of a pie slice"
+        answer: A
+        explain: "Position on a common scale is read most accurately, then length, then angle, then area, and color shade is the least exact."
+
+      - q: "Color shade is a poor choice when the reader must:"
+        options:
+          - "See a broad pattern across thousands of items"
+          - "Notice which region is darker overall"
+          - "Compare many groups at once"
+          - "Read an exact value or compare two close values"
+        answer: D
+        explain: "Shade is good for patterns but poor for exact values, so two close values such as 28.1 and 27.4 lakh cannot be told apart."
+
+      - q: "Which color scheme suits the difference of each hour's orders from the hourly average?"
+        options:
+          - "Categorical"
+          - "Rainbow"
+          - "Diverging"
+          - "Sequential"
+        answer: C
+        explain: "A diverging scheme has two colors that meet at a meaningful middle value, here the average, so below and above are easy to see."
+
+      - q: "Which scheme suits the four customer segments, which have no order among them?"
+        options:
+          - "Sequential, light to dark"
+          - "Categorical, clearly different hues"
+          - "Diverging, blue to red"
+          - "A single color in four shades"
+        answer: B
+        explain: "Groups without an order need unrelated hues, because no group is higher or lower than another."
+
+      - q: "In a pixel-oriented display, how many pixels does each data value use?"
+        options:
+          - "One row of pixels"
+          - "A block of nine pixels"
+          - "A circle of pixels"
+          - "Exactly one pixel"
+        answer: D
+        explain: "Every value becomes one pixel, and its color shows the value, which is why a screen can show millions of values at once."
+
+      - q: "When a table has six attributes, how does a pixel-oriented display usually show it?"
+        options:
+          - "Six windows, with each record at the same position in every window"
+          - "One window with six colors for each pixel"
+          - "Six pixels per record in one long row"
+          - "One window that shows only the average"
+        answer: A
+        explain: "Each attribute gets its own window, and a record keeps the same place in all windows, so the windows can be compared by eye."
+
+      - q: "What is the advantage of a Hilbert curve over row-by-row placement?"
+        options:
+          - "It makes the pixels larger"
+          - "It sorts the records by value"
+          - "Records close in the sequence stay close on the screen, in a compact patch"
+          - "It needs fewer pixels"
+        answer: C
+        explain: "In the 64 by 64 test, a run of 64 consecutive records fitted a box of width plus height 19.7 for the Hilbert curve against 66.0 for row by row."
+
+      - q: "In the recursive pattern picture of the retailer's orders, what does one row of 24 pixels show?"
+        options:
+          - "One week, one pixel per day"
+          - "One day, one pixel per hour"
+          - "One hour, one pixel per minute"
+          - "One month, one pixel per day"
+        answer: B
+        explain: "The first level is hours, so one row of 24 pixels is one day. Seven rows make a week block and the week blocks sit side by side."
+
+      - q: "In the circle segments technique, what does each wedge of the circle represent?"
+        options:
+          - "One attribute, with records ordered from the center outward"
+          - "One customer"
+          - "One day of the week"
+          - "One cluster of records"
+        answer: A
+        explain: "The circle is cut into one wedge per attribute, and the same records are placed in the same order in every wedge, starting at the center."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u5-p2
+    title: "Part 2: Geometric projection techniques"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In geometric projection techniques, what do the axes and the points stand for?"
+        options:
+          - "Axes are records and points are attributes"
+          - "Axes are clusters and points are outliers"
+          - "Axes are attributes and points are records"
+          - "Axes are time and points are colors"
+        answer: C
+        explain: "Each attribute is a direction in space and each record is a point placed at its values."
+
+      - q: "In the scatter-plot matrix of the six customer attributes, which pair had the strongest positive correlation?"
+        options:
+          - "Orders and sessions"
+          - "Basket and discount"
+          - "Tenure and returns"
+          - "Basket and tenure"
+        answer: A
+        explain: "Orders a year and app sessions a month had a correlation of 0.85. Basket and discount were the strongest opposite pair at minus 0.63."
+
+      - q: "With six attributes, how many different pairs does a scatter-plot matrix show?"
+        options:
+          - "6"
+          - "12"
+          - "36"
+          - "15"
+        answer: D
+        explain: "The matrix has 36 panels, the diagonal has only the names, and the rest are mirror images, which leaves 15 different pairs."
+
+      - q: "What does brushing do in a scatter-plot matrix?"
+        options:
+          - "It removes the selected records"
+          - "It highlights the selected records in every panel"
+          - "It changes the scale of every axis"
+          - "It sorts the panels by correlation"
+        answer: B
+        explain: "Brushing links the panels, so a group selected in one view is highlighted in all the others."
+
+      - q: "In parallel coordinates, how is one record drawn?"
+        options:
+          - "As a bar on one axis"
+          - "As one dot on the first axis"
+          - "As a pie slice"
+          - "As a line joining its value on every axis"
+        answer: D
+        explain: "Each record becomes one line that joins its value on each of the parallel axes."
+
+      - q: "Between two neighboring axes, many lines cross in an X shape. What does this suggest?"
+        options:
+          - "A strong positive relationship"
+          - "No relationship at all"
+          - "A negative relationship"
+          - "Missing values"
+        answer: C
+        explain: "Crossing lines mean that records high on one axis are low on the other, as with basket and discount."
+
+      - q: "Why does the order of the axes matter in parallel coordinates?"
+        options:
+          - "A relationship is easy to see only between neighboring axes"
+          - "The first axis is always the most important"
+          - "Axes must be in alphabetical order"
+          - "The lines cannot cross otherwise"
+        answer: A
+        explain: "Orders and sessions were at opposite ends of the plot, so their strong link was hidden. Reordering the axes can reveal it."
+
+      - q: "In the distance experiment, what happened to (farthest minus nearest) divided by nearest as the number of attributes grew?"
+        options:
+          - "It grew without limit"
+          - "It fell, so near and far points looked alike"
+          - "It stayed the same"
+          - "It became exactly zero for two attributes"
+        answer: B
+        explain: "It fell from 128.25 with two attributes to 0.26 with two hundred, so distances lose meaning in many dimensions."
+
+      - q: "What does a good projection onto two directions try to keep?"
+        options:
+          - "The smallest values"
+          - "The first two attributes"
+          - "As much of the variance as possible"
+          - "Only the outliers"
+        answer: C
+        explain: "Principal components choose directions of largest variance. The first two directions kept 79.4 percent of the variance of the six attributes."
+
+      - q: "In the sweep of the projection direction for basket and discount, which direction kept the most variance?"
+        options:
+          - "0 degrees, the basket axis"
+          - "135 degrees, with variance 1.63"
+          - "90 degrees, the discount axis"
+          - "45 degrees, with variance 1.63"
+        answer: B
+        explain: "Each axis alone gives variance 1.00. At 135 degrees the variance is 1.63, which is one plus the size of the correlation."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u5-p3
+    title: "Part 3: Icon-based techniques"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the basic idea of icon-based visualization?"
+        options:
+          - "Each value becomes one pixel"
+          - "All records are drawn as one line"
+          - "Records are grouped into a tree"
+          - "Each record becomes its own small picture whose parts show the attributes"
+        answer: D
+        explain: "Every part of the icon shows one attribute, and similar records produce similar icons that we compare by eye."
+
+      - q: "In Chernoff faces, how is an attribute shown?"
+        options:
+          - "By the name written under the face"
+          - "By one facial feature, such as the width of the face or the smile"
+          - "By the color of the whole face only"
+          - "By the position of the face on the page"
+        answer: B
+        explain: "Each feature of the face is assigned one attribute, and a high value gives, for example, a wider face or a broader smile."
+
+      - q: "Before the faces are drawn, what is done to each attribute?"
+        options:
+          - "It is scaled to between 0 and 1"
+          - "It is converted to a percentage of the total"
+          - "It is rounded to a whole number"
+          - "It is removed if it has outliers"
+        answer: A
+        explain: "Scaling makes zero the smallest value and one the largest, so every feature can use the same range of drawing."
+
+      - q: "In the lesson's assignment of features, which attribute controlled the smile?"
+        options:
+          - "Orders"
+          - "Discount share"
+          - "Tenure"
+          - "Returns"
+        answer: C
+        explain: "The smile showed tenure, so a customer with five months of tenure frowned and a long-tenure customer smiled broadly."
+
+      - q: "In the classic stick figure technique, what do the two attributes that give the position on the page do?"
+        options:
+          - "They set the length of the body"
+          - "They place the figure horizontally and vertically, while the limbs show others"
+          - "They set the color of the figure"
+          - "They are not used at all"
+        answer: B
+        explain: "Four attributes set the limb angles and two attributes set where the figure stands, so six attributes fit in one picture."
+
+      - q: "The same four segment averages were drawn with two different feature assignments. What did this show?"
+        options:
+          - "Faces give exact values"
+          - "Faces cannot show averages"
+          - "The same data always look the same"
+          - "The look of a face depends on which attribute is given to which feature"
+        answer: D
+        explain: "The data were identical, but the faces gave a different first impression, so the look of a face depends on which attribute is given to which feature."
+
+      - q: "Why was the mosaic of 120 faces a warning?"
+        options:
+          - "The faces were too small to be drawn"
+          - "The groups could not be seen at all"
+          - "It was already crowded and exact values cannot be read from faces"
+          - "All the faces were identical"
+        answer: C
+        explain: "The groups looked alike inside and different between, but the picture was crowded and it would be hopeless with thousands of records."
+
+      - q: "For which task do icon-based displays work best?"
+        options:
+          - "Comparing groups or finding odd ones in a modest sample of records"
+          - "Reading exact values from millions of records"
+          - "Showing a hierarchy of categories"
+          - "Showing a time series of one value"
+        answer: A
+        explain: "Icons suit tens or hundreds of records, where we ask whether groups look alike or whether one record breaks the pattern."
+
+      - q: "What is a sensible remedy when there are too many records for icons?"
+        options:
+          - "Make the icons larger"
+          - "Add more features to every icon"
+          - "Use a brighter color"
+          - "Sample the records or draw the group averages"
+        answer: D
+        explain: "Sampling or averaging reduces crowding, and a table or label can be added when exact values are needed."
+
+      - q: "Why can stick figures not be rearranged freely on the page?"
+        options:
+          - "Their limbs would break"
+          - "Their position itself carries two attributes"
+          - "They are always sorted by name"
+          - "They must stay in a grid of six"
+        answer: B
+        explain: "In the stick figure technique the position on the page shows two attributes, whereas faces can be placed in any order."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u5-p4
+    title: "Part 4: Hierarchical visualization"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In a tree map, what does the area of a rectangle show?"
+        options:
+          - "The value, such as revenue, of that part of the hierarchy"
+          - "The number of children of the node"
+          - "The depth of the node"
+          - "The name of the category"
+        answer: A
+        explain: "A tree map fills the screen with nested rectangles whose areas are proportional to a value, such as revenue."
+
+      - q: "How does the squarified tree map improve on slice and dice?"
+        options:
+          - "It uses less screen space"
+          - "It removes the nesting"
+          - "It keeps the boxes close to squares, so areas are easier to compare"
+          - "It sorts the boxes alphabetically"
+        answer: C
+        explain: "For the 21 subcategory boxes the mean shape ratio fell from 3.3 to 1.6, and the worst from 19.1 to 3.0."
+
+      - q: "In the tree map of the retailer, what did the color show?"
+        options:
+          - "The category name"
+          - "A second measure, the average order value"
+          - "The number of orders in the box"
+          - "The depth of the level"
+        answer: B
+        explain: "Color carries a second number, so one picture shows the hierarchy, the revenue of each part and the average order value."
+
+      - q: "What is a weakness of the plain node-link tree drawing?"
+        options:
+          - "It does not show the parents"
+          - "It cannot be drawn on a screen"
+          - "It needs three dimensions"
+          - "All nodes look alike, so size is hard to see, and space is wasted"
+        answer: D
+        explain: "The node-link drawing shows the nesting clearly, but Fashion at 40.9 lakh looks the same as Books at 9.2 lakh."
+
+      - q: "How is a dendrogram built by hierarchical clustering?"
+        options:
+          - "By repeatedly merging the two nearest clusters"
+          - "By splitting the largest cluster again and again"
+          - "By sorting records by one attribute"
+          - "By drawing a tree map and rotating it"
+        answer: A
+        explain: "We start with every record alone, merge the two nearest clusters, update the distances, and repeat until one cluster is left."
+
+      - q: "How did the lesson choose the number of clusters from the dendrogram?"
+        options:
+          - "By always cutting at half the height"
+          - "By counting the leaves"
+          - "By cutting in the middle of a long vertical gap"
+          - "By cutting at the lowest merge"
+        answer: C
+        explain: "The jump from 0.52 to 1.44 was the long gap. A cut at 0.98 gave four groups, which were exactly the four segments."
+
+      - q: "What is the worlds-within-worlds technique?"
+        options:
+          - "A map of the world with markers"
+          - "A tree that spins in three dimensions"
+          - "A tree map inside a pie chart"
+          - "A plot of some attributes placed at a chosen point of an outer plot"
+        answer: D
+        explain: "The outer point fixes the first attributes, and the inner plot shows the other attributes of the records near that point."
+
+      - q: "In the walk of the outer point, why was the inner plot empty between the loyal regulars and the big spenders?"
+        options:
+          - "The inner plot had stopped working"
+          - "No customers had that mix of basket and discount"
+          - "The orders were all zero"
+          - "The sessions were too large to draw"
+        answer: B
+        explain: "An empty circle means no customer lies there, so the picture itself shows that this mix of basket and discount does not occur."
+
+      - q: "What is the main design idea of a cone tree?"
+        options:
+          - "Children sit on a cone below the parent, and the tree is rotated to bring a branch forward"
+          - "Children are drawn as nested rectangles"
+          - "Only the leaves are shown"
+          - "The tree is drawn as a table"
+        answer: A
+        explain: "Each node's children are spread around a circle below it, and rotating the tree gives focus on one branch while the rest stays in view."
+
+      - q: "When does a hierarchical visualization help?"
+        options:
+          - "Whenever there are many attributes"
+          - "For any data set with numbers"
+          - "Only when the data really has levels or nesting"
+          - "Only for text data"
+        answer: C
+        explain: "A hierarchy helps when the data has levels, such as category and subcategory, so choose the technique by the question you want to answer."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u5-p5
+    title: "Part 5: Networks, text, dashboards and the course summary"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "In an adjacency matrix, what does a colored cell mean?"
+        options:
+          - "The two nodes are far apart"
+          - "The row node and the column node are linked"
+          - "The node has no links"
+          - "The node is the hub"
+        answer: B
+        explain: "There is one row and one column for every node, and a colored cell marks a link between them. A matrix has no crossing lines."
+
+      - q: "In a force-directed layout, what moves the nodes?"
+        options:
+          - "Alphabetical order"
+          - "The size of the screen"
+          - "A random shuffle at every step"
+          - "Links pull linked nodes together while all nodes push each other apart"
+        answer: D
+        explain: "Like springs and magnets, these forces are applied step by step. In the lesson the crossings fell from 119 to 8."
+
+      - q: "What did sorting the rows and columns of the matrix by category show?"
+        options:
+          - "Nothing, because order does not matter"
+          - "That no products were bought together"
+          - "Blocks along the diagonal, because most links stay inside a category"
+          - "That the graph has no hub"
+        answer: C
+        explain: "With the nodes in random order the links looked scattered. Sorted by category, 27 of the 40 links formed diagonal blocks."
+
+      - q: "What is the weakness of a node-link drawing compared with a matrix?"
+        options:
+          - "Crossing lines clutter it when the graph is large"
+          - "It cannot show neighbors"
+          - "It needs the rows to be sorted"
+          - "It cannot show a hub"
+        answer: A
+        explain: "A matrix has no crossing lines and stays readable when dense, but paths are easier to follow in a node-link drawing."
+
+      - q: "What are the steps to turn text such as reviews into a picture?"
+        options:
+          - "Draw, count, clean, collect"
+          - "Count, draw, then collect"
+          - "Collect, clean, count, draw"
+          - "Clean, collect, draw, count"
+        answer: C
+        explain: "We collect the text, clean it by lowercasing and removing filler words, count the words, and then draw bars or a tag cloud."
+
+      - q: "In a tag cloud, what does the size of a word show?"
+        options:
+          - "The length of the word"
+          - "How often the word appears"
+          - "How recent the word is"
+          - "Whether the word is positive"
+        answer: B
+        explain: "A bigger word appears more often. In our reviews delivery was the biggest word, with 1,095 mentions in 1,500 reviews."
+
+      - q: "Why is a bar chart sometimes better than a tag cloud?"
+        options:
+          - "A bar chart is always prettier"
+          - "A tag cloud cannot use color"
+          - "A bar chart needs fewer words"
+          - "Long words look bigger in a cloud and close counts are hard to compare"
+        answer: D
+        explain: "In bars the same count always gives the same length. Use the cloud for a first look and the bars for decisions."
+
+      - q: "What does a linked view do in a dashboard?"
+        options:
+          - "A selection in one view updates the other views"
+          - "It hides all other views"
+          - "It prints the dashboard"
+          - "It changes the data permanently"
+        answer: A
+        explain: "When we brushed the evening hours, the tiles and the category bars updated. A view without a link, like the customer scatter plot, stayed the same."
+
+      - q: "Which of these is a rule for a good dashboard?"
+        options:
+          - "Show as many views as possible"
+          - "Build it to answer one question, with few views and honest scales"
+          - "Use a different color for every view"
+          - "Start bar charts above zero to show change clearly"
+        answer: B
+        explain: "A good dashboard has one question, four to six views, consistent colors, linked views and honest scales such as bars starting at zero."
+
+      - q: "In the course map, which unit covers least squares, the Gauss-Markov assumptions and the odds ratio?"
+        options:
+          - "Unit I"
+          - "Unit II"
+          - "Unit III"
+          - "Unit V"
+        answer: C
+        explain: "Unit III is regression and logistic regression, from least squares to fit statistics and odds ratios."

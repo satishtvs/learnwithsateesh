@@ -56,8 +56,8 @@ units:
     label: "Unit - V"
     textbook_ref: "Han, Kamber and Pei"
     parts:
-      - {slug: u5-p1, title: "Part 1: Why Visualize? Visual Encoding and Pixel-Oriented Techniques", youtube_id: null}
-      - {slug: u5-p2, title: "Part 2: Geometric Projection: Scatter Plots, Scatter Matrix, Parallel Coordinates", youtube_id: null}
-      - {slug: u5-p3, title: "Part 3: Icon-Based Visualization: Chernoff Faces and Stick Figures", youtube_id: null}
-      - {slug: u5-p4, title: "Part 4: Hierarchical Visualization: Tree Maps, Dendrograms, Worlds-within-Worlds, Cone Trees", youtube_id: null}
-      - {slug: u5-p5, title: "Part 5: Networks, Tag Clouds, Dashboards and Course Summary with Exam Strategy", youtube_id: null}
+      - {slug: u5-p1, title: "Part 1: Why Visualize? Visual Encoding and Pixel-Oriented Techniques", youtube_id: 5HyFEdIeN8k}
+      - {slug: u5-p2, title: "Part 2: Geometric Projection: Scatter Plots, Scatter Matrix, Parallel Coordinates", youtube_id: 5zMfAYEfvDY}
+      - {slug: u5-p3, title: "Part 3: Icon-Based Visualization: Chernoff Faces and Stick Figures", youtube_id: BSzxdZQd1pE}
+      - {slug: u5-p4, title: "Part 4: Hierarchical Visualization: Tree Maps, Dendrograms, Worlds-within-Worlds, Cone Trees", youtube_id: ex6FWCxeY2s}
+      - {slug: u5-p5, title: "Part 5: Networks, Tag Clouds, Dashboards and Course Summary with Exam Strategy", youtube_id: Oa2r7w03NZw}
