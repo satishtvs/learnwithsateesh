@@ -1,0 +1,585 @@
+# Natural Language Processing (JNTUH R22 CSE-AIML, III-II), Unit III quizzes.
+# Questions are original; they follow the Unit III lessons (6 parts). `answer` is the letter of the correct option.
+
+course:
+  slug: natural-language-processing-r22
+  title: "Natural Language Processing: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Natural Language Processing (AM603PC), following Bikel and Zitouni, Multilingual Natural Language Processing Applications."
+  published: false
+unit:
+  code: U3
+  title: "Syntax II and Semantic Parsing I"
+  label: "Unit - III"
+  textbook_ref: "Bikel and Zitouni, Multilingual Natural Language Processing Applications (Pearson)"
+
+quizzes:
+  - slug: u3-p1
+    title: "Part 1: Models for ambiguity resolution in parsing"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "How does a probabilistic context free grammar score a parse tree?"
+        options:
+          - "It adds the probabilities of the words"
+          - "It multiplies the probabilities of all rules used in the tree"
+          - "It counts the number of leaves"
+          - "It uses only the probability of the top rule"
+        answer: B
+        explain: "The probability of a tree is the product of its rule probabilities. In the example parse A scored about 73 in a million and parse B about 48."
+
+      - q: "In the example, why did parse A beat parse B?"
+        options:
+          - "Parse A had more words"
+          - "Parse B broke the grammar rules"
+          - "A used verb phrase to verb phrase and PP with probability 0.3, B used noun phrase to noun phrase and PP with 0.2"
+          - "Parse A used a longer sentence"
+        answer: C
+        explain: "The two parses shared every rule except one, giving A a ratio of 1.5 over B."
+
+      - q: "What happened to the ratio of the two parses when the nouns were changed (telescope, olives, fork)?"
+        options:
+          - "It rose with each new noun"
+          - "It fell to zero"
+          - "It became 1.0"
+          - "It stayed 1.5 in every sentence"
+        answer: D
+        explain: "The grammar never looks at the noun, so the winner and the margin did not change."
+
+      - q: "Which is a limit of a plain PCFG listed in the lesson?"
+        options:
+          - "Every rule is chosen alone, with no influence from neighbours or words"
+          - "It cannot be written down"
+          - "It needs a dictionary of senses"
+          - "It only works for Hindi"
+        answer: A
+        explain: "Blindness to words, independence of rules and one probability for a rule everywhere are the three limits."
+
+      - q: "What is the head of a verb phrase?"
+        options:
+          - "Its object"
+          - "Its verb"
+          - "Its preposition"
+          - "Its subject"
+        answer: B
+        explain: "A verb phrase takes the head word of its verb, or of the inner verb phrase."
+
+      - q: "What does lexicalization do to a grammar rule?"
+        options:
+          - "It removes all probabilities"
+          - "It turns rules into trees"
+          - "It adds the head word to every label, such as VP(saw)"
+          - "It deletes rare words"
+        answer: C
+        explain: "Lexicalized labels let the rule probability depend on words, but the rules become many more."
+
+      - q: "In the example, the three trees used 7 plain rules. How many lexicalized rules did they use?"
+        options:
+          - "7"
+          - "10"
+          - "21"
+          - "16"
+        answer: D
+        explain: "Adding head words made 16 different rules, more than twice as many, which causes sparse data."
+
+      - q: "What is backoff?"
+        options:
+          - "Using counts for a more general case when the specific case was not seen"
+          - "Deleting rare rules"
+          - "Running the parser backwards"
+          - "Adding noise to counts"
+        answer: A
+        explain: "For chopsticks the noun was unseen, so the counts for the verb ate gave 11 of 23, or 0.48."
+
+      - q: "What does a discriminative parsing model model?"
+        options:
+          - "The chance of the words alone"
+          - "The chance of the tree given the words"
+          - "The chance of the tree and the words together"
+          - "Only the head words"
+        answer: B
+        explain: "A generative model gives a joint probability of tree and words, a discriminative model scores the tree given the words."
+
+      - q: "In the logistic regression example, why did the chopsticks case stay near 0.51?"
+        options:
+          - "Chopsticks is always a verb attachment"
+          - "The weights were all zero"
+          - "The model never saw that noun and could use only the verb"
+          - "Logistic regression cannot use verbs"
+        answer: C
+        explain: "With an unseen noun only the verb and the constant contribute, so the chance stays near the middle."
+
+  - slug: u3-p2
+    title: "Part 2: Discriminative models and parse reranking"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does a reranker do?"
+        options:
+          - "It parses the sentence from scratch"
+          - "It removes unknown words"
+          - "It rescores the n best trees of a base parser and picks the highest score"
+          - "It builds the grammar"
+        answer: C
+        explain: "A second model scores each complete candidate tree using features."
+
+      - q: "Why is a two stage reranking design practical?"
+        options:
+          - "It needs no training data"
+          - "It avoids the base parser"
+          - "It always gives exact answers"
+          - "The second model scores only a few trees, so its features can be rich"
+        answer: D
+        explain: "It scores five trees, not every possible tree."
+
+      - q: "In the example, where did the base parser put the correct tree?"
+        options:
+          - "Tied for second place"
+          - "First"
+          - "Last"
+          - "It was missing from the list"
+        answer: A
+        explain: "Trees 2 and 3 both scored 0.67 relative to tree 1, and tree 3 was correct."
+
+      - q: "How is the score of a tree computed in the log-linear model?"
+        options:
+          - "Number of words in the tree"
+          - "Sum of the weights of its features plus the base log probability times its weight"
+          - "Product of the word lengths"
+          - "Probability of the first rule"
+        answer: B
+        explain: "Positive weights push a tree up and negative weights push it down."
+
+      - q: "What are the three steps of the maximum entropy model?"
+        options:
+          - "Count, round, sort"
+          - "Parse, tag, chunk"
+          - "Add the weights, take the exponential, divide by the total"
+          - "Multiply, add, subtract"
+        answer: C
+        explain: "The final chances of the candidates add up to one."
+
+      - q: "After reranking, how many of the 6 held-out sentences were correct?"
+        options:
+          - "3"
+          - "4"
+          - "0"
+          - "6"
+        answer: D
+        explain: "The base parser alone was right on 3 of 6, and after reranking all 6 were right."
+
+      - q: "What does a structured perceptron do when its best tree is wrong?"
+        options:
+          - "Adds the features of the correct tree and subtracts those of the wrong tree"
+          - "Deletes the sentence"
+          - "Doubles all weights"
+          - "Switches to a new grammar"
+        answer: A
+        explain: "It is simple, fast and needs no probabilities."
+
+      - q: "In PARSEVAL, precision is:"
+        options:
+          - "Correct brackets divided by gold brackets"
+          - "Correct brackets divided by predicted brackets"
+          - "Predicted words divided by gold words"
+          - "The number of crossing brackets"
+        answer: B
+        explain: "In the example 9 of 10 predicted brackets matched, so precision was 0.90."
+
+      - q: "What does a crossing bracket mean?"
+        options:
+          - "A phrase with no words"
+          - "A repeated word"
+          - "A predicted phrase cuts across a gold phrase"
+          - "A wrongly spelled label"
+        answer: C
+        explain: "The predicted verb phrase saw the girl cut across the gold noun phrase the girl with a hat."
+
+      - q: "For the dependency example, UAS was 0.90 and LAS was 0.80. What does LAS also need?"
+        options:
+          - "A longer sentence"
+          - "A second parser"
+          - "No head at all"
+          - "The correct label as well as the correct head"
+        answer: D
+        explain: "The labeled score can never be higher than the unlabeled score."
+
+  - slug: u3-p3
+    title: "Part 3: Multilingual issues in parsing"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which order is typical for Hindi and Telugu?"
+        options:
+          - "Subject, verb, object"
+          - "Verb, subject, object"
+          - "Object, verb, subject only"
+          - "Subject, object, verb"
+        answer: D
+        explain: "English puts the verb in the middle, while Hindi and Telugu put it at the end of the clause."
+
+      - q: "Which statement about prepositions and postpositions is correct?"
+        options:
+          - "English uses prepositions, Hindi uses postpositions such as mein"
+          - "Hindi uses prepositions only"
+          - "English uses postpositions"
+          - "Neither language has them"
+        answer: A
+        explain: "In the books becomes kitaabon mein, where mein comes after the noun."
+
+      - q: "How many orders can 4 chunks have?"
+        options:
+          - "8"
+          - "24"
+          - "16"
+          - "12"
+        answer: B
+        explain: "The number of orders is the factorial of the number of chunks: 2, 6, 24, 120, 720."
+
+      - q: "Why can Hindi move chunks around without changing the meaning?"
+        options:
+          - "Hindi has no verbs"
+          - "Word order is ignored by speakers"
+          - "Markers such as ne and ko show who did what"
+          - "Every word is a name"
+        answer: C
+        explain: "The markers move together with the nouns."
+
+      - q: "In the simulation, what happened when each root had more forms?"
+        options:
+          - "Fewer types"
+          - "The same number of types"
+          - "No rare words"
+          - "More different types and more types seen only once"
+        answer: D
+        explain: "With 2, 3 and 4 forms the types were 3,635, 4,445 and 5,050."
+
+      - q: "Why does the Hindi verb ending in likhta and likhti help a parser?"
+        options:
+          - "It shows gender agreement with the subject"
+          - "It marks the tense only"
+          - "It gives the root"
+          - "It is a spelling mistake"
+        answer: A
+        explain: "Gender and number must match, so the ending helps link a verb to its subject."
+
+      - q: "The string thetabledownthere has how many splits with the small dictionary?"
+        options:
+          - "1"
+          - "4"
+          - "2"
+          - "9"
+        answer: B
+        explain: "The best split, the table down there, had the highest log probability."
+
+      - q: "If three pipeline stages are right 0.95, 0.93 and 0.90 of the time, the whole pipeline is right about:"
+        options:
+          - "0.95"
+          - "0.90"
+          - "0.80"
+          - "0.50"
+        answer: C
+        explain: "If the errors are independent the product is about 0.8, so one sentence in five is lost."
+
+      - q: "When is a dependency tree non-projective?"
+        options:
+          - "When it has no root"
+          - "When it has a single word"
+          - "When every arc is short"
+          - "When at least two arcs cross"
+        answer: D
+        explain: "In she saw a man yesterday who loves music two arcs cross."
+
+      - q: "Which project annotates treebanks of many languages with one shared scheme?"
+        options:
+          - "Universal Dependencies"
+          - "The Porter project"
+          - "WordNet"
+          - "Senseval"
+        answer: A
+        explain: "A shared scheme lets parsers and studies be compared across languages."
+
+  - slug: u3-p4
+    title: "Part 4: Semantic parsing: introduction and interpretation"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is the output of a semantic parser in the lesson?"
+        options:
+          - "A logical form or query that a machine can run"
+          - "A longer sentence"
+          - "A list of syllables"
+          - "A spelling correction"
+        answer: A
+        explain: "For the question about Hyderabad the logical form was run on a database."
+
+      - q: "What does the principle of compositionality say?"
+        options:
+          - "Every word has one meaning"
+          - "The meaning of a sentence is built from the meanings of its words and how they are combined"
+          - "Sentences have no structure"
+          - "Meaning is stored per sentence"
+        answer: B
+        explain: "That is why a program can understand sentences it has never seen."
+
+      - q: "Which is an example that breaks compositionality?"
+        options:
+          - "Ram likes Sita"
+          - "Every student sleeps"
+          - "The idiom kick the bucket"
+          - "She saw the man"
+        answer: C
+        explain: "No combination of kick and bucket gives the meaning to die."
+
+      - q: "What does lambda x dot sleeps of x denote?"
+        options:
+          - "A finished fact"
+          - "A noun phrase"
+          - "A parse tree"
+          - "A function waiting for one input"
+        answer: D
+        explain: "Giving it the input ram gives sleeps of ram."
+
+      - q: "How many beta steps did Ram likes Sita take?"
+        options:
+          - "2"
+          - "1"
+          - "3"
+          - "5"
+        answer: A
+        explain: "First y was replaced by sita, then x by ram, giving likes of ram and sita."
+
+      - q: "In the interface between syntax and semantics, what does the rule S to NP VP do?"
+        options:
+          - "Applies the NP meaning to the V meaning"
+          - "Applies the VP meaning to the NP meaning"
+          - "Deletes the VP"
+          - "Adds the two words"
+        answer: B
+        explain: "Every grammar rule carries one meaning rule."
+
+      - q: "In the small world, why is every student sleeps false?"
+        options:
+          - "Ram does not exist"
+          - "Uma is a student"
+          - "Sita and Ravi are students who do not sleep"
+          - "Nobody sleeps"
+        answer: C
+        explain: "One failure is enough to make a for all statement false."
+
+      - q: "Why is Sita likes Ram false in the small world?"
+        options:
+          - "Sita is not a name"
+          - "Likes is not a verb"
+          - "Ram sleeps"
+          - "The pair in that direction is not stored, so liking is not symmetric"
+        answer: D
+        explain: "Only ram likes sita and ravi likes uma are stored facts."
+
+      - q: "What is quantifier scope ambiguity?"
+        options:
+          - "One sentence with several logical forms because of the order of quantifiers"
+          - "Two words with one spelling"
+          - "A spelling error"
+          - "A missing verb"
+        answer: A
+        explain: "Every student admires a teacher gave one true and one false reading."
+
+      - q: "What does the word kal show in Hindi?"
+        options:
+          - "Hindi has no tense"
+          - "One word can mean yesterday or tomorrow, so context decides"
+          - "It is an idiom of English"
+          - "It is a noun only"
+        answer: B
+        explain: "Pronouns and time words need the situation to be interpreted."
+
+  - slug: u3-p5
+    title: "Part 5: System paradigms for semantic parsing"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What do rule-based semantic parsers need?"
+        options:
+          - "Thousands of labeled sentences"
+          - "Patterns written by experts"
+          - "Only unlabeled text"
+          - "A neural network"
+        answer: B
+        explain: "Experts write and maintain the rules."
+
+      - q: "What were the coverage and precision of the 8 rules?"
+        options:
+          - "Coverage 100 percent, precision 34.8 percent"
+          - "Both 50 percent"
+          - "Coverage 34.8 percent, precision 100 percent"
+          - "Both 100 percent"
+        answer: C
+        explain: "The rules fired on 139 of 400 sentences and were always right when they fired."
+
+      - q: "What is the main strength of rule-based systems?"
+        options:
+          - "High coverage"
+          - "No expert needed"
+          - "Learning from raw text"
+          - "High precision and easy explanations"
+        answer: D
+        explain: "Every answer can be explained by pointing at the rule."
+
+      - q: "What does the supervised learning curve show?"
+        options:
+          - "Accuracy rises as the number of labeled sentences grows"
+          - "Accuracy falls with more labels"
+          - "Accuracy is constant"
+          - "Labels are not needed"
+        answer: A
+        explain: "Accuracy went from 60.1 percent with 8 labels to 99.5 percent with 256."
+
+      - q: "Which learner did the lesson use for intents?"
+        options:
+          - "K nearest neighbours"
+          - "Naive Bayes"
+          - "A decision tree"
+          - "Lambda calculus"
+        answer: B
+        explain: "It counts how often each word appears with each intent."
+
+      - q: "What is self-training with soft labels?"
+        options:
+          - "Delete unlabeled sentences"
+          - "Label only the longest sentence"
+          - "Label unlabeled sentences with probabilities and retrain on everything"
+          - "Ask a person each time"
+        answer: C
+        explain: "It is the idea of the EM algorithm."
+
+      - q: "What happened to the mean accuracy in semi-supervised learning from 8 labels?"
+        options:
+          - "It fell to 40 percent"
+          - "It reached 100 percent"
+          - "It stayed the same"
+          - "It rose from 66.0 to 79.7 percent"
+        answer: D
+        explain: "All five starting sets improved."
+
+      - q: "What does purity measure for k means clusters?"
+        options:
+          - "The share of sentences in the most common true intent of their cluster"
+          - "The number of clusters"
+          - "The speed of the algorithm"
+          - "The number of labels used"
+        answer: A
+        explain: "The true labels are used only for scoring, and clusters have no names."
+
+      - q: "What happened when the flight learner was tested on hotel sentences?"
+        options:
+          - "It rose to 100 percent"
+          - "Accuracy fell to 69.5 percent"
+          - "It stayed 100 percent"
+          - "It became 0 percent"
+        answer: B
+        explain: "22.5 percent of the hotel words were never seen."
+
+      - q: "Which describes an open-domain system?"
+        options:
+          - "One narrow topic with a small vocabulary"
+          - "Only travel questions"
+          - "Any topic, huge vocabulary, no fixed set of frames"
+          - "Only rule-based"
+        answer: C
+        explain: "Open domain systems are less accurate and need much more data."
+
+  - slug: u3-p6
+    title: "Part 6: Word sense"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which pair shows homonymy?"
+        options:
+          - "paper as material and newspaper"
+          - "phal as fruit and result"
+          - "bank as money and bank as river side"
+          - "run as verb forms"
+        answer: C
+        explain: "Homonyms have unrelated meanings, often separate dictionary entries."
+
+      - q: "What is a synset in WordNet?"
+        options:
+          - "A spelling rule"
+          - "A kind of parser"
+          - "A list of verbs only"
+          - "A set of words with one meaning, plus a gloss"
+        answer: D
+        explain: "Synsets are linked by relations such as is a kind of."
+
+      - q: "What does the Lesk algorithm count?"
+        options:
+          - "Words shared between the context and each gloss"
+          - "The length of the sentence"
+          - "The number of senses"
+          - "The word frequencies in a corpus"
+        answer: A
+        explain: "The sense with the largest overlap is chosen."
+
+      - q: "For She deposited her money in the bank on Monday, what was the overlap with bank sense 1?"
+        options:
+          - "0"
+          - "2 (deposit and money)"
+          - "1"
+          - "5"
+        answer: B
+        explain: "Sense 2 had no shared words, so sense 1 was chosen."
+
+      - q: "What does Lesk do for The bank was crowded and loud?"
+        options:
+          - "Chooses the river sense"
+          - "Chooses sense 1 with overlap 5"
+          - "Gives no answer or falls back on the most frequent sense"
+          - "Parses it again"
+        answer: C
+        explain: "No context word appears in either gloss."
+
+      - q: "How often did Lesk answer on the 120 test sentences?"
+        options:
+          - "100 percent of them"
+          - "10 percent of them"
+          - "Never"
+          - "38.3 percent of them, right on 84.8 percent of those"
+        answer: D
+        explain: "It answered on 46 sentences."
+
+      - q: "What was the most frequent sense baseline accuracy?"
+        options:
+          - "67.5 percent"
+          - "25 percent"
+          - "86.7 percent"
+          - "100 percent"
+        answer: A
+        explain: "Any useful system must beat this baseline."
+
+      - q: "What accuracy did Naive Bayes reach with 80 labeled sentences per word?"
+        options:
+          - "67.5 percent"
+          - "86.7 percent"
+          - "100 percent"
+          - "50 percent"
+        answer: B
+        explain: "It stops below 100 because some sentences have no cue word and some cues mislead."
+
+      - q: "What does unsupervised word sense disambiguation use?"
+        options:
+          - "Marked senses for every word"
+          - "A WordNet gloss only"
+          - "Only raw sentences, grouped into clusters"
+          - "Human annotators at test time"
+        answer: C
+        explain: "Clusters are scored by purity and a person must name them."
+
+      - q: "What is the upper bound for word sense evaluation?"
+        options:
+          - "100 percent always"
+          - "The baseline"
+          - "The size of WordNet"
+          - "How often two human annotators agree"
+        answer: D
+        explain: "If people disagree about fine senses, a program cannot be expected to do better."
+

@@ -1,0 +1,495 @@
+# Natural Language Processing (JNTUH R22 CSE-AIML, III-II), Unit II quizzes: Syntax I.
+# Questions are original; they follow the Unit II slides and narration (5 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: natural-language-processing-r22
+  title: "Natural Language Processing: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Natural Language Processing (AM603PC), following Bikel and Zitouni, Multilingual Natural Language Processing Applications, with Jurafsky and Martin and Siddiqui and Tiwary as reference books."
+  published: false
+unit:
+  code: U2
+  title: "Syntax I"
+  label: "Unit - II"
+  textbook_ref: "Bikel and Zitouni, Multilingual Natural Language Processing Applications (Pearson)"
+
+quizzes:
+  # ------------------------------------------------------------------ Part 1
+  - slug: u2-p1
+    title: "Part 1: Parsing natural language, grammars and ambiguity"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "Which test shows that the words in the garden form a constituent?"
+        options:
+          - "The group contains exactly three words"
+          - "The group can be moved to the front of the sentence as one block"
+          - "The group starts with a preposition"
+          - "The group occurs twice in the corpus"
+        answer: B
+        explain: "The movement test: in the garden the children played football is still correct, so the three words move as one unit."
+
+      - q: "Which are the four parts of a context free grammar?"
+        options:
+          - "Nouns, verbs, adjectives and adverbs"
+          - "Tokens, types, lemmas and stems"
+          - "Rules, trees, words and scores"
+          - "Nonterminals, terminals, rules and a start symbol"
+        answer: D
+        explain: "A context free grammar has nonterminals (labels such as S, NP, VP), terminals (the words), rules, and a start symbol (S)."
+
+      - q: "Why is the rule NP to NP PP called recursive?"
+        options:
+          - "NP appears on both sides, so a noun phrase can contain another noun phrase"
+          - "It can only be used once in a derivation"
+          - "It rewrites a word as a tag"
+          - "It has three symbols on the right"
+        answer: A
+        explain: "Because NP is on both sides of the rule, a noun phrase can contain a noun phrase, which allows stacked prepositional phrases."
+
+      - q: "Which symbol is rewritten at every step of a leftmost derivation?"
+        options:
+          - "The rightmost symbol of the current line"
+          - "A symbol chosen at random"
+          - "The leftmost nonterminal of the current line"
+          - "Only the start symbol"
+        answer: C
+        explain: "A leftmost derivation always rewrites the leftmost nonterminal, which gives one fixed order of steps for a given tree."
+
+      - q: "How many steps did the leftmost derivation of the children played football in the garden take?"
+        options:
+          - "14"
+          - "7"
+          - "12"
+          - "28"
+        answer: A
+        explain: "Each step expands one node, and the tree has 14 nodes above the 7 words, so the derivation has 14 steps."
+
+      - q: "How many parse trees does the toy grammar give for the children played football in the garden?"
+        options:
+          - "One"
+          - "Three"
+          - "Two"
+          - "Seven"
+        answer: C
+        explain: "The prepositional phrase can attach to the verb phrase or to the noun phrase football, so the grammar gives exactly two trees."
+
+      - q: "In the tree where the PP in the garden hangs under the VP, what does the phrase tell us?"
+        options:
+          - "Which football it was"
+          - "Where the children played"
+          - "When the children played"
+          - "Who played"
+        answer: B
+        explain: "Attached to the verb phrase, in the garden gives the place of the playing. Attached to the noun phrase, it would describe the football."
+
+      - q: "What happens to the number of parses when more prepositional phrases are stacked at the end?"
+        options:
+          - "It stays at two"
+          - "It grows slowly in a straight line"
+          - "It halves each time"
+          - "It grows very fast: 2, 5, 14, 42, and 1430 for seven phrases"
+        answer: D
+        explain: "Every extra phrase can attach to the verb phrase or to any earlier noun phrase, so the counts are the Catalan numbers."
+
+      - q: "Of the 2520 different orders of the seven tokens, how many does the toy grammar accept?"
+        options:
+          - "All of them"
+          - "36"
+          - "7"
+          - "1"
+        answer: B
+        explain: "Only 36 orders are accepted, about 1.4 percent. Some of them, such as football played the children in the garden, are accepted although they are odd."
+
+      - q: "Which of these is a kind of ambiguity discussed in the video?"
+        options:
+          - "A word that is spelled in two ways"
+          - "A sentence that has no verb"
+          - "A prepositional phrase that can attach to a verb or to a noun"
+          - "A tree that has no root"
+        answer: C
+        explain: "Prepositional phrase attachment is the main example. The video also mentions word class ambiguity and coordination, as in old men and women."
+
+  # ------------------------------------------------------------------ Part 2
+  - slug: u2-p2
+    title: "Part 2: Treebanks, a data-driven approach to syntax"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What is a treebank?"
+        options:
+          - "A list of words with their frequencies"
+          - "A program that parses sentences"
+          - "A set of grammar rules written by hand without any text"
+          - "A collection of real sentences with parse trees checked by people"
+        answer: D
+        explain: "A treebank holds real sentences with checked trees, so it can train a parser and also test one."
+
+      - q: "Which treebank is named in the video as the one that set the standard for annotating English?"
+        options:
+          - "The Penn Treebank"
+          - "The Prague Dependency Treebank"
+          - "WordNet"
+          - "The Universal Dependencies collection"
+        answer: A
+        explain: "The Penn Treebank, built at the University of Pennsylvania from the early 1990s, is the standard English example. The Prague treebank is for Czech."
+
+      - q: "In bracketed notation, where does a word sit?"
+        options:
+          - "After the closing bracket of S"
+          - "Inside the bracket of its tag"
+          - "At the very start of the tree"
+          - "Outside all brackets"
+        answer: B
+        explain: "A word is written inside the bracket of its tag, for example (DT The), and the tag bracket sits inside its phrase bracket."
+
+      - q: "When a program reads a bracketed tree, what does an opening bracket with its label do?"
+        options:
+          - "Removes the top node from the stack"
+          - "Ends the sentence"
+          - "Pushes a new node onto the stack of open brackets"
+          - "Deletes the previous word"
+        answer: C
+        explain: "An opening bracket pushes a node, and a closing bracket pops it, so the next phrase attaches to its parent."
+
+      - q: "How many different syntactic rules were read from the 12 trees of the mini treebank?"
+        options:
+          - "16"
+          - "12"
+          - "73"
+          - "34"
+        answer: A
+        explain: "There are 16 different syntactic rules. The number 73 is how many times rules were used, and 34 is the number of NP nodes."
+
+      - q: "How is the probability of a rule estimated in a PCFG?"
+        options:
+          - "Count of the rule times the count of its left side"
+          - "Number of words in the rule divided by 10"
+          - "Count of the rule divided by the count of its left side"
+          - "Number of rules divided by number of trees"
+        answer: C
+        explain: "The probability of a rule is its count divided by the count of its left-hand symbol. This is maximum likelihood estimation."
+
+      - q: "The rule VP to VP PP occurs 6 times and there are 18 VP nodes. What is the probability of the rule?"
+        options:
+          - "0.18"
+          - "0.6"
+          - "0.5"
+          - "0.333"
+        answer: D
+        explain: "Six divided by eighteen is 0.333."
+
+      - q: "What is true of the probabilities of all rules that have the same left side?"
+        options:
+          - "They add up to zero"
+          - "They add up to one"
+          - "They are all equal"
+          - "Each of them is larger than one"
+        answer: B
+        explain: "Every VP, for example, must be rewritten by some rule, so the probabilities of all VP rules add up to one."
+
+      - q: "How is the probability of a whole parse tree computed in a PCFG?"
+        options:
+          - "By multiplying the probabilities of all the rules used in the tree"
+          - "By adding the probabilities of all the rules used"
+          - "By taking the average rule probability"
+          - "By taking only the probability of the top rule"
+        answer: A
+        explain: "The probability of a tree is the product of all its rule probabilities, including the word rules."
+
+      - q: "Why did the PCFG prefer tree A, with the PP under the VP?"
+        options:
+          - "Tree A has more words"
+          - "Tree A is shorter"
+          - "The rule VP to VP PP is more probable than NP to NP PP, so tree A is 5.67 times as probable"
+          - "Tree B uses a rule that is not in the grammar"
+        answer: C
+        explain: "The two trees differ in one rule. VP to VP PP has probability 0.333 and NP to NP PP only 0.059, a ratio of 5.67."
+
+  # ------------------------------------------------------------------ Part 3
+  - slug: u2-p3
+    title: "Part 3: Representation of syntactic structure"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does a dependency tree link?"
+        options:
+          - "Phrases to their labels"
+          - "Words directly to other words"
+          - "Sentences to documents"
+          - "Tags to rules"
+        answer: B
+        explain: "In a dependency tree the only nodes are the words, and each arc links a head word to a word that depends on it."
+
+      - q: "What is the head of a phrase?"
+        options:
+          - "Its first word"
+          - "Its longest word"
+          - "Its last word"
+          - "The word that decides the type of the phrase, its core"
+        answer: D
+        explain: "The head is the core word. In the children the head is children, and in played football the head is played."
+
+      - q: "In the head rules of the video, what is the head child of a verb phrase such as played football?"
+        options:
+          - "The verb"
+          - "The noun"
+          - "The prepositional phrase"
+          - "The determiner"
+        answer: A
+        explain: "The head of a verb phrase is the verb, or the inner verb phrase in the rule VP to VP PP."
+
+      - q: "In which direction are head words passed when a phrase tree is converted to a dependency tree?"
+        options:
+          - "From the root down to the words"
+          - "From left to right"
+          - "From the words up the tree"
+          - "In random order"
+        answer: C
+        explain: "Head words are passed up, so that every child already has its head word when its parent needs it."
+
+      - q: "The example sentence has 7 words. How many arcs link words to words, not counting the root arrow?"
+        options:
+          - "7"
+          - "6"
+          - "8"
+          - "14"
+        answer: B
+        explain: "Every word except the root has exactly one head, so 7 words give 6 arcs between words."
+
+      - q: "What is the root of the dependency tree of the children played football in the garden?"
+        options:
+          - "the"
+          - "children"
+          - "garden"
+          - "played"
+        answer: D
+        explain: "The head of the whole sentence is the verb played, which has no head above it."
+
+      - q: "How does the prepositional phrase ambiguity look in dependency terms?"
+        options:
+          - "The word in depends on played in one tree and on football in the other"
+          - "The sentence gets a second root"
+          - "The word the gets two heads"
+          - "The number of words changes"
+        answer: A
+        explain: "Only one arc moves. In tree A the word in depends on played, and in tree B it depends on football."
+
+      - q: "What is lost when a dependency tree is converted back to phrases?"
+        options:
+          - "The words of the sentence"
+          - "The order of the words"
+          - "The verb phrase nodes and the phrase labels, so the phrases are flat"
+          - "The meaning of the sentence"
+        answer: C
+        explain: "Six multiword phrases became four, because the two verb phrases have no node of their own in the dependency tree."
+
+      - q: "When is a dependency tree projective?"
+        options:
+          - "When it has no root"
+          - "When no arcs cross"
+          - "When a word has two heads"
+          - "When the sentence is short"
+        answer: B
+        explain: "A tree is projective when no arcs cross, which means every word between a head and its dependent is itself below that head."
+
+      - q: "Where is the verb in the Hindi and Telugu examples of the video?"
+        options:
+          - "At the very start"
+          - "In the middle, as in English"
+          - "Before the subject"
+          - "At or near the end of the clause"
+        answer: D
+        explain: "In Hindi the verb group comes at the end, and in the three-word Telugu example the verb is the last word."
+
+  # ------------------------------------------------------------------ Part 4
+  - slug: u2-p4
+    title: "Part 4: Parsing algorithms, top-down, bottom-up and CKY"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does a recognizer return?"
+        options:
+          - "Yes or no: whether the grammar accepts the sentence"
+          - "All the parse trees"
+          - "The probability of each tree"
+          - "The lexicon of the grammar"
+        answer: A
+        explain: "A recognizer only says whether the sentence is in the language. A parser also returns the trees, using back pointers."
+
+      - q: "Why does a naive top-down parser loop on the rule NP to NP PP?"
+        options:
+          - "The sentence has too many words"
+          - "A word is missing from the lexicon"
+          - "The chart becomes too large"
+          - "The rule starts with NP itself, so the stack grows and no word is read"
+        answer: D
+        explain: "This is left recursion. Each expansion of NP puts a new NP on top, so the stack grows and the parser never reaches a word."
+
+      - q: "What does a top-down parser do when a tag does not match the next word?"
+        options:
+          - "It stops with an error"
+          - "It backs up and tries the next rule"
+          - "It deletes the word"
+          - "It adds a new rule to the grammar"
+        answer: B
+        explain: "It backtracks. For our sentence it needed 44 steps for the first parse, with 9 failed matches and 9 back-ups."
+
+      - q: "Which statement about bottom-up parsing is true?"
+        options:
+          - "It starts from S"
+          - "It loops on left recursion"
+          - "It never builds an entry that is not used"
+          - "It combines neighbors when a rule fits, but can build phrases that never join into S"
+        answer: D
+        explain: "The bottom-up chart for the example built 23 entries, but only 15 were used in a parse."
+
+      - q: "What shape do the rules have in Chomsky normal form?"
+        options:
+          - "Two symbols on the right, or a single word"
+          - "Three symbols on the right"
+          - "Only unit rules"
+          - "Only words on the right"
+        answer: A
+        explain: "A long rule is split with a helper symbol, so VP to VBZ NP NP becomes VP to VBZ X1 and X1 to NP NP."
+
+      - q: "How many cells does the CKY chart have for a sentence of seven words?"
+        options:
+          - "7"
+          - "14"
+          - "28"
+          - "49"
+        answer: C
+        explain: "There is one cell for every span of neighboring words, and 7 words have 7 times 8 divided by 2, which is 28 spans."
+
+      - q: "In which order are the CKY cells filled?"
+        options:
+          - "Left to right by the first word only"
+          - "By span length, trying every split point inside each span"
+          - "From the top cell downward"
+          - "In alphabetical order of the symbols"
+        answer: B
+        explain: "First the one-word cells from the lexicon, then spans of two words, then three, and so on up to the whole sentence."
+
+      - q: "Why does the chart cell for words 3 to 7 receive a VP twice?"
+        options:
+          - "The lexicon lists the word twice"
+          - "The chart has an error"
+          - "The same rule was applied twice by mistake"
+          - "The VP can be built in two ways, one for each attachment of the prepositional phrase"
+        answer: D
+        explain: "One way is VP plus PP, the other is VBD plus NP. Both give a VP over words 3 to 7, so the chart stores the two readings together."
+
+      - q: "How does the work of the CKY chart grow with the number of words n?"
+        options:
+          - "About n cubed"
+          - "Exponentially, like the number of parses"
+          - "It stays constant"
+          - "In a straight line"
+        answer: A
+        explain: "The number of split points checked is n times n squared minus 1, divided by 6, which is 56 for 7 words."
+
+      - q: "How are the trees read back from a CKY chart?"
+        options:
+          - "By guessing from the words"
+          - "By running the parser again"
+          - "By following back pointers from S in the top cell"
+          - "By sorting the cells by size"
+        answer: C
+        explain: "Every entry remembers how it was built, so following these notes from the top cell gives the two trees."
+
+  # ------------------------------------------------------------------ Part 5
+  - slug: u2-p5
+    title: "Part 5: Probabilistic and dependency parsing"
+    status: approved
+    pass_percent: 70
+    questions:
+      - q: "What does each cell of the Viterbi CKY chart store?"
+        options:
+          - "Only a yes or no answer"
+          - "All the trees of the span"
+          - "The number of words in the span"
+          - "Each symbol together with its best probability"
+        answer: D
+        explain: "A Viterbi cell stores, for every symbol that can cover the span, the probability of the best way to build it."
+
+      - q: "How is a new probability computed in Viterbi CKY?"
+        options:
+          - "The left cell plus the right cell"
+          - "The rule probability times the left cell times the right cell"
+          - "The larger of the two cells only"
+          - "The average of the two cells"
+        answer: B
+        explain: "For the VP over words 3 to 7, way A was 0.333 times 0.00877 times 0.171, which is 5.0e-04."
+
+      - q: "Why can Viterbi CKY keep only the best way to build a symbol?"
+        options:
+          - "A worse way can never lead to a better tree"
+          - "The computer has no memory for more"
+          - "All ways have the same probability"
+          - "Back pointers are not needed"
+        answer: A
+        explain: "Any tree that uses a worse sub-tree for a span can be improved by swapping in the better sub-tree."
+
+      - q: "For the VP over words 3 to 7, which way did the chart keep?"
+        options:
+          - "Way B, 5.67 times better"
+          - "Way A, twice as good"
+          - "Way A, which is 5.67 times better than way B"
+          - "Neither, the cell stayed empty"
+        answer: C
+        explain: "Way A (VP plus PP) had 5.0e-04 and way B (VBD plus NP) had 8.83e-05, so way A is 5.67 times better."
+
+      - q: "What probability did the top cell hold for the example sentence?"
+        options:
+          - "1.56e-05"
+          - "1.04e-04"
+          - "0.333"
+          - "8.83e-05"
+        answer: D
+        explain: "The top cell held S with 8.83e-05, the same value as the product of the rule probabilities of tree A."
+
+      - q: "Which action of the arc-standard parser moves the next word from the buffer onto the stack?"
+        options:
+          - "LEFT-ARC"
+          - "SHIFT"
+          - "RIGHT-ARC"
+          - "REDUCE"
+        answer: B
+        explain: "SHIFT moves the first word of the buffer to the stack. The two arc actions add an arc and remove a word from the stack."
+
+      - q: "What does LEFT-ARC do in the arc-standard system?"
+        options:
+          - "Makes the top word the head of the word below it, and removes that lower word"
+          - "Makes the word below the top the head of the top word"
+          - "Moves a word back to the buffer"
+          - "Adds a new root"
+        answer: A
+        explain: "With s1 on top and s2 below it, LEFT-ARC makes s1 the head of s2, records the arc, and removes s2 from the stack."
+
+      - q: "How many transitions did the parser need for the 7-word sentence?"
+        options:
+          - "7"
+          - "6"
+          - "28"
+          - "14"
+        answer: D
+        explain: "There were 7 shifts, 3 left arcs and 4 right arcs. In general a sentence of n words needs 2n steps."
+
+      - q: "How do the Viterbi method and the inside method differ?"
+        options:
+          - "They do not differ"
+          - "Viterbi takes the maximum to find the best parse; the inside method adds all ways to get the probability of the sentence"
+          - "Viterbi adds all ways; the inside method takes the maximum"
+          - "Viterbi needs no probabilities"
+        answer: B
+        explain: "For the example, the best parse has 8.83e-05, and the sum over both parses is about 1.04e-04, so tree A holds 85 percent."
+
+      - q: "How does transition-based parsing compare with the CKY chart?"
+        options:
+          - "It is slower and always exact"
+          - "Both take about n cubed steps"
+          - "It takes about 2n steps but is greedy, while CKY takes about n cubed steps and is exact for its grammar"
+          - "CKY is greedy and transition parsing is exact"
+        answer: C
+        explain: "At 43 words the transition parser needs 86 steps while the chart checks 13,244 split points. The price is that a wrong greedy action cannot be undone."

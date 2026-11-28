@@ -24,22 +24,22 @@ units:
     label: "Unit - II"
     textbook_ref: "Bikel and Zitouni"
     parts:
-      - {slug: u2-p1, title: "Part 1: Parsing natural language, grammars and ambiguity", youtube_id: null}
-      - {slug: u2-p2, title: "Part 2: Treebanks, a data-driven approach to syntax", youtube_id: null}
-      - {slug: u2-p3, title: "Part 3: Representation of syntactic structure", youtube_id: null}
-      - {slug: u2-p4, title: "Part 4: Parsing algorithms, top-down, bottom-up and CKY", youtube_id: null}
-      - {slug: u2-p5, title: "Part 5: Probabilistic and dependency parsing", youtube_id: null}
+      - {slug: u2-p1, title: "Part 1: Parsing natural language, grammars and ambiguity", youtube_id: 9Jc0IwTZllU}
+      - {slug: u2-p2, title: "Part 2: Treebanks, a data-driven approach to syntax", youtube_id: DEDclgIEtCo}
+      - {slug: u2-p3, title: "Part 3: Representation of syntactic structure", youtube_id: auQm3mwzW_Y}
+      - {slug: u2-p4, title: "Part 4: Parsing algorithms, top-down, bottom-up and CKY", youtube_id: iQ7Xe6O9w_Q}
+      - {slug: u2-p5, title: "Part 5: Probabilistic and dependency parsing", youtube_id: O3LoRosq_8g}
   - code: U3
     title: "Syntax II and Semantic Parsing I"
     label: "Unit - III"
     textbook_ref: "Bikel and Zitouni"
     parts:
-      - {slug: u3-p1, title: "Part 1: Models for ambiguity resolution in parsing", youtube_id: null}
-      - {slug: u3-p2, title: "Part 2: Discriminative models and parse reranking", youtube_id: null}
-      - {slug: u3-p3, title: "Part 3: Multilingual issues in parsing", youtube_id: null}
-      - {slug: u3-p4, title: "Part 4: Semantic parsing: introduction and interpretation", youtube_id: null}
-      - {slug: u3-p5, title: "Part 5: System paradigms for semantic parsing", youtube_id: null}
-      - {slug: u3-p6, title: "Part 6: Word sense", youtube_id: null}
+      - {slug: u3-p1, title: "Part 1: Models for ambiguity resolution in parsing", youtube_id: WMhJQ7__Fx8}
+      - {slug: u3-p2, title: "Part 2: Discriminative models and parse reranking", youtube_id: ZBTMZLVpDEY}
+      - {slug: u3-p3, title: "Part 3: Multilingual issues in parsing", youtube_id: 3ml2LY0lqxs}
+      - {slug: u3-p4, title: "Part 4: Semantic parsing: introduction and interpretation", youtube_id: ojdXaTAuzjo}
+      - {slug: u3-p5, title: "Part 5: System paradigms for semantic parsing", youtube_id: mrvNPoDvcJA}
+      - {slug: u3-p6, title: "Part 6: Word sense", youtube_id: g2jnX4RyCuk}
   - code: U4
     title: "Semantic Parsing II"
     label: "Unit - IV"
