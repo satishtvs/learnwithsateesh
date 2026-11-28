@@ -11,7 +11,7 @@ unit:
   code: U1
   title: "Finding the Structure of Words and Documents"
   label: "Unit - I"
-  textbook_ref: "Bikel and Zitouni, Multilingual Natural Language Processing Applications (Pearson); Jurafsky and Martin, Speech and Language Processing; Siddiqui and Tiwary, Natural Language Processing and Information Retrieval"
+  textbook_ref: "Bikel and Zitouni, Multilingual Natural Language Processing Applications (Pearson)"
 quizzes:
 - slug: "u1-p1"
   title: "Part 1: Words and their components"
