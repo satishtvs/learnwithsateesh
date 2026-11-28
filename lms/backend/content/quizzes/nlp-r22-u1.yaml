@@ -1,0 +1,525 @@
+# Natural Language Processing (JNTUH R22 CSE-AIML, III-II), Unit I quizzes.
+# Questions are original; they follow the Unit I slides and narration (6 parts), not the textbook wording.
+# `answer` is the letter of the correct option.
+
+course:
+  slug: "natural-language-processing-r22"
+  title: "Natural Language Processing: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Natural Language Processing (AM603PC), following Bikel and Zitouni, Multilingual Natural Language Processing Applications, with Jurafsky and Martin and Siddiqui and Tiwary as reference books."
+  published: false
+unit:
+  code: U1
+  title: "Finding the Structure of Words and Documents"
+  label: "Unit - I"
+  textbook_ref: "Bikel and Zitouni, Multilingual Natural Language Processing Applications (Pearson); Jurafsky and Martin, Speech and Language Processing; Siddiqui and Tiwary, Natural Language Processing and Information Retrieval"
+quizzes:
+- slug: "u1-p1"
+  title: "Part 1: Words and their components"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "In our small corpus, what is a token?"
+    options:
+    - "A different word, counted once however often it occurs"
+    - "The dictionary form of a word"
+    - "One running word, counted every time it occurs"
+    - "The smallest meaningful piece inside a word"
+    answer: C
+    explain: "A token is one occurrence, so the word the counts every time it appears. A type is a different word, counted once."
+  - q: "How many tokens and how many types did the four-sentence corpus have?"
+    options:
+    - "22 tokens and 15 types"
+    - "15 tokens and 22 types"
+    - "22 tokens and 22 types"
+    - "12 tokens and 13 types"
+    answer: A
+    explain: "The four sentences contain 22 running words but only 15 different words, so the type-token ratio is 15 divided by 22, about 0.68."
+  - q: "What does a type-token ratio close to 1 tell us?"
+    options:
+    - "Words repeat a great deal"
+    - "The text has no tokens"
+    - "The text is written in an agglutinative language"
+    - "Almost every word in the text is a new word"
+    answer: D
+    explain: "The ratio is types divided by tokens. Near 1 means almost every token is a new type, and a small ratio means words repeat a lot."
+  - q: "In our table, the lemma of happier is happy. What stem did the toy stripper give?"
+    options:
+    - "happy"
+    - "happi, which is not a real word"
+    - "happier"
+    - "hap"
+    answer: B
+    explain: "The toy stripper removed i e r and added i, giving happi. A stem is whatever the rules leave, and it need not be a word."
+  - q: "Why did the toy stemmer leave children and child as two different stems?"
+    options:
+    - "Its rules look only at letters and no rule joins child with children"
+    - "Children is a derived word and not an inflected word"
+    - "A stem must keep at least ten letters"
+    - "The stemmer only works on verbs"
+    answer: A
+    explain: "Children is an irregular plural. A stripper that only removes endings cannot see that it belongs with child, which is the weakness of letter-based rules."
+  - q: "How many morphemes does unhappiness have?"
+    options:
+    - "Eleven, one for each letter"
+    - "Two: un and happiness"
+    - "Three: un, happy and ness"
+    - "Four: un, hap, pi and ness"
+    answer: C
+    explain: "Unhappiness has eleven letters but three morphemes. The piece un means not, happy is the core, and ness turns an adjective into a noun."
+  - q: "Football is built from two roots, foot and ball. What is such a word called?"
+    options:
+    - "An infix"
+    - "A compound"
+    - "A circumfix"
+    - "An inflected form"
+    answer: B
+    explain: "A word with two roots is a compound. The number of morphemes can be one, two, three or more."
+  - q: "Which pair shows derivation rather than inflection?"
+    options:
+    - "play and played"
+    - "play and plays"
+    - "play and playing"
+    - "play and player"
+    answer: D
+    explain: "Derivation builds a new word and often changes the word class. Player is a noun made from the verb play, and the lemma changes."
+  - q: "How is the Telugu phrase pustakaalalo, meaning in the books, built?"
+    options:
+    - "One word with three morphemes: the root, the plural la and the ending lo"
+    - "Three separate words, as in English"
+    - "Two words and three morphemes, as in Hindi"
+    - "One word with one morpheme"
+    answer: A
+    explain: "Telugu glues the plural and the meaning in onto the root, so it is one word with three morphemes. English needs three words for the same meaning."
+  - q: "Which description fits an agglutinative language?"
+    options:
+    - "Words are never changed and always stand alone"
+    - "Endings are glued on one after another, each with one clear meaning"
+    - "Every sentence is written without any words"
+    - "Endings are replaced by prefixes only"
+    answer: B
+    explain: "Telugu is agglutinative, and so are Tamil, Kannada, Malayalam, Turkish and Finnish. Their words can hold many morphemes."
+- slug: "u1-p2"
+  title: "Part 2: Issues and challenges in finding word structure"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "The regular rule add e d was tried on 12 verbs. For how many verbs was it right?"
+    options:
+    - "12"
+    - "6"
+    - "3"
+    - "9"
+    answer: B
+    explain: "It was right for walk, play, jump, talk, want and look, and wrong for go, run, eat, sing, take and buy, so for exactly half."
+  - q: "Why must a system for word structure keep a list of exceptions?"
+    options:
+    - "Rules are slower than lists"
+    - "Lists are required by the Unicode standard"
+    - "Irregular forms never appear in real text"
+    - "A program cannot guess went from go or mice from mouse by a rule"
+    answer: D
+    explain: "Irregular forms follow no suffix rule. A general rule handles the regular words and a lexicon of exceptions is checked first."
+  - q: "How many readings did our tiny analyser find for the word saw?"
+    options:
+    - "3: a noun, a verb, and the past tense of see"
+    - "1"
+    - "2"
+    - "5"
+    answer: A
+    explain: "Saw can be the tool, the verb that means to cut, or the past of see. A word form alone cannot decide, the sentence must."
+  - q: "The word unlockable can be bracketed as (un lock) able or un (lock able). What does this show?"
+    options:
+    - "Prefixes must always be attached last"
+    - "Only one bracketing is ever possible for three pieces"
+    - "The same letters can have two structures with opposite meanings"
+    - "The word has no root"
+    answer: C
+    explain: "The first reading means can be unlocked, the second means cannot be locked. A program must choose between structures, not only between pieces."
+  - q: "In the affix grid, which suffixes worked for all six adjectives?"
+    options:
+    - "un and e n"
+    - "ness and e n"
+    - "un and ly"
+    - "ness and ly"
+    answer: D
+    explain: "The suffixes ness and ly gave a real word for every root, so they are productive. The prefix un and the suffix e n worked for only half of the roots."
+  - q: "On our test sentence with can't, Dr. and e-mail, which tokenizer gave the most tokens?"
+    options:
+    - "The one that cuts at every symbol, with 23 tokens"
+    - "The one that cuts at spaces only, with 23 tokens"
+    - "The rule-based tokenizer, with 23 tokens"
+    - "All three gave the same number"
+    answer: A
+    explain: "Spaces only gave 9 tokens, every symbol gave 23, and the rule-based tokenizer gave 12. The count of words depends on the tokenizer."
+  - q: "Maximum matching cut the string themenareathome as theme, n, are, at, home. Why is this wrong?"
+    options:
+    - "It does not use a word list"
+    - "It took the longest word first, and a shorter first word the would have been better"
+    - "It cuts from the right side"
+    - "It always keeps the spaces"
+    answer: B
+    explain: "Greedy matching cannot see ahead. The writer meant the, men, are, at, home."
+  - q: "Which of these scripts is written without spaces between words?"
+    options:
+    - "English"
+    - "Hindi in Devanagari"
+    - "Chinese"
+    - "Telugu"
+    answer: C
+    explain: "Chinese, Japanese and Thai are written without spaces between words. Hindi and Telugu use spaces, although Telugu words can be very long."
+  - q: "In the simulation with assumed numbers, what happened when each root had 120 forms instead of 4?"
+    options:
+    - "Fewer different words appeared"
+    - "Exactly the same number of types appeared"
+    - "The type count became zero"
+    - "Many more different words appeared, and most were seen only once"
+    answer: D
+    explain: "After 6000 tokens there were 958 types with 4 forms per root and 3787 types with 120 forms. This is the sparse data problem."
+  - q: "Which remedy matches the problem of productivity?"
+    options:
+    - "Use rules, not only lists"
+    - "Keep a list of exceptions only"
+    - "Use context and probabilities only"
+    - "Cut the text at spaces only"
+    answer: A
+    explain: "New words are built from rules all the time, so a list alone is not enough. Irregularity needs a list, and ambiguity needs context."
+- slug: "u1-p3"
+  title: "Part 3: Morphological models"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "Six verbs each have four forms. How many entries do a full-form list and a stems-plus-endings model need?"
+    options:
+    - "10 entries, and 24 entries"
+    - "6 entries, and 4 entries"
+    - "24 entries for both"
+    - "24 entries, and 10 entries (6 stems and 4 endings)"
+    answer: D
+    explain: "The full list needs every form, 6 times 4 equals 24. The stem model keeps 6 stems and 4 endings, which is 10 entries."
+  - q: "How is our finite-state machine for verbs organized?"
+    options:
+    - "A stem lexicon followed by a small network of endings"
+    - "One state for every word"
+    - "A list of endings followed by a list of stems"
+    - "A stack of two-level rules and nothing else"
+    answer: A
+    explain: "The machine reads a stem first and then one ending. Every ending also writes a label, so it is a transducer."
+  - q: "What did the machine output for the word walked?"
+    options:
+    - "walked +V +BASE"
+    - "walk +N +PL"
+    - "walk +V +PAST"
+    - "wal +V +PAST"
+    answer: C
+    explain: "After the stem walk it reached the ending e d, which writes plus V plus past."
+  - q: "In two-level morphology, the lexical form fox+s corresponds to which surface form?"
+    options:
+    - "foxs, because nothing changes"
+    - "foxes, because the plus sign becomes the letter e"
+    - "fox, because s is dropped"
+    - "foxis, because x becomes i"
+    answer: B
+    explain: "In the picture of the two levels the plus sign is paired with e. Rules say when such a pair is allowed."
+  - q: "Our simple doubling rule wrote begining instead of beginning. What does this show?"
+    options:
+    - "Two-level rules can never be written"
+    - "Doubling is only for plurals"
+    - "Rule sets must be tested, because the real doubling rule depends on stress"
+    - "The word beginning is irregular"
+    answer: C
+    explain: "Our rule doubled only one-syllable words. The real rule depends on stress, so a careless rule gives wrong spellings."
+  - q: "Why did unification of dog and the ending e d fail?"
+    options:
+    - "The categories clash: dog is a noun and the ending needs a verb"
+    - "Dog is too short"
+    - "The ending e d has no features"
+    - "Unification always fails for nouns"
+    answer: A
+    explain: "Unification merges feature bundles and fails when an attribute has two different values. Walk plus e d succeeds because both are verbs."
+  - q: "The oblique plural of the Hindi noun ladka is ladkon. In functional morphology this form is:"
+    options:
+    - "An entry stored in a full-form list only"
+    - "The output of a stemmer"
+    - "A prefix added to ladka"
+    - "The value of a function of the lemma and the features"
+    answer: D
+    explain: "A function takes the lemma and the features, here plural and oblique, and returns the form. The same small function also gives beton from beta."
+  - q: "In the Porter-style stemmer, why does relational become relat?"
+    options:
+    - "Step one removes the s"
+    - "Step two makes relate, and a later step removes the final e"
+    - "The word is in a stem lexicon"
+    - "Step three adds ness"
+    answer: B
+    explain: "Step two turns ational into ate, giving relate. Step five removes the final e when the stem is long enough."
+  - q: "The stemmer gave the same stem univers for university and universe. This is called:"
+    options:
+    - "Over-stemming"
+    - "Under-stemming"
+    - "Lemmatization"
+    - "Tokenization"
+    answer: A
+    explain: "Over-stemming joins words with different meanings. Under-stemming leaves related words apart, as our toy stripper did with child and children."
+  - q: "What was the edit distance between unhappy and happier?"
+    options:
+    - "3"
+    - "5"
+    - "7"
+    - "2"
+    answer: B
+    explain: "Two deletions for the u and the n, then one replacement and two insertions to turn y into i e r, which makes 5."
+- slug: "u1-p4"
+  title: "Part 4: Finding the structure of documents: sentences and topics"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "In the paragraph of four sentences, how many of the 10 periods end a sentence?"
+    options:
+    - "4"
+    - "10"
+    - "6"
+    - "2"
+    answer: A
+    explain: "Only the dots after Pune, year, brother and Hyderabad end a sentence. The dots in Dr, Ltd, Rs, 5.5, A and K do not."
+  - q: "Which rule of our detector handles the dot inside 5.5?"
+    options:
+    - "If the next word is capitalized, it is a boundary"
+    - "If no space follows the dot, it is not a boundary"
+    - "If the word before is long, it is a boundary"
+    - "If the dot is the first character, it is a boundary"
+    answer: B
+    explain: "The second check looks at the character after the dot. With no space, as in five point five, the dot is inside a token."
+  - q: "Why did the rules wrongly call the dot after the initial A a sentence end?"
+    options:
+    - "Initials always end a sentence"
+    - "The dot was followed by a space"
+    - "The word before was too long"
+    - "The next word starts with a capital letter and A is not on the abbreviation list"
+    answer: D
+    explain: "A longer list will not fix this, because any letter can be an initial."
+  - q: "On the test text of 67 dots, how did the rule-based detector fail?"
+    options:
+    - "2 false ends and 14 missed ends"
+    - "No false ends and 16 missed ends"
+    - "14 false ends and 2 missed ends"
+    - "16 false ends and no missed ends"
+    answer: C
+    explain: "Most false ends were initials such as A and K. The 2 missed ends came from etc at the end of a sentence, because etc is on the abbreviation list."
+  - q: "How did we find the topic boundaries in the twelve sentences?"
+    options:
+    - "By counting the dots"
+    - "By measuring the overlap of words in windows on both sides of each gap"
+    - "By finding the longest sentence"
+    - "By checking capital letters"
+    answer: B
+    explain: "Overlap was high inside a topic and zero at gaps 4 and 8, where the subject changed."
+  - q: "What does the Viterbi algorithm find in the hidden Markov model?"
+    options:
+    - "The most likely sequence of hidden states"
+    - "The shortest sentence"
+    - "The most frequent word"
+    - "The weights of the features"
+    answer: A
+    explain: "Each cell keeps the best score of a state, the best earlier state is remembered, and the path is read backwards."
+  - q: "How were the probabilities of our hidden Markov model obtained?"
+    options:
+    - "By asking the user"
+    - "By repeated gradient descent on features"
+    - "By counting states and words in a labeled training text"
+    - "By removing the abbreviation list"
+    answer: C
+    explain: "Training a hidden Markov model is only counting how often one state follows another and which words each state writes."
+  - q: "In the discriminative local model, when does the model say a dot ends a sentence?"
+    options:
+    - "When the word before the dot is long"
+    - "When the weights are all zero"
+    - "When the text has a new line"
+    - "When the probability computed from the weighted features is above one half"
+    answer: D
+    explain: "The score is the sum of the weights of the true features. A logistic function turns it into a probability, and above one half means an end."
+  - q: "Which feature had the biggest weight, and in which direction?"
+    options:
+    - "A new line after the dot, strongly against a boundary"
+    - "A very short word before the dot, strongly against a boundary"
+    - "The next capital letter, strongly against a boundary"
+    - "The bias, strongly for a boundary"
+    answer: B
+    explain: "The weight for a short word before the dot was about minus 2.19. Words like Dr, Mr, Rs, A and K are rarely sentence ends."
+  - q: "What is the main difference between generative and discriminative models here?"
+    options:
+    - "The generative model needs no labeled text"
+    - "The discriminative model reads the whole text as one sequence"
+    - "The discriminative model models only the decision given the evidence"
+    - "The generative model uses no probabilities"
+    answer: C
+    explain: "The hidden Markov model describes how the text is produced, while the logistic model learns only the boundary decision from features."
+- slug: "u1-p5"
+  title: "Part 5: Complexity of the approaches and performance measures"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "With 6 states, how many operations does the Viterbi algorithm need per token?"
+    options:
+    - "6, one for each state"
+    - "12"
+    - "36, the number of states squared"
+    - "216"
+    answer: C
+    explain: "For every token it looks at every state and every possible previous state, so 6 times 6 equals 36."
+  - q: "How does the work of the three detectors grow as the text gets longer?"
+    options:
+    - "With the square of the length of the text"
+    - "In proportion to the length of the text"
+    - "It stays the same"
+    - "It stops growing after 343 tokens"
+    answer: B
+    explain: "Twice the text means twice the work for every method, so the cost is linear in the length of the text."
+  - q: "Which dots did the rule layer of the hybrid settle?"
+    options:
+    - "The easy ones: no space after, a known abbreviation, or the end of the text"
+    - "All 67 dots"
+    - "Only the dots after a long word"
+    - "Only dots that end a sentence"
+    answer: A
+    explain: "It settled 12 dots, all correctly, and the learned model decided the other 55."
+  - q: "What is precision?"
+    options:
+    - "Of the real ends, the share that were found"
+    - "The share of all answers that were right"
+    - "The average of false positives and false negatives"
+    - "Of the dots called sentence ends, the share that really are ends"
+    answer: D
+    explain: "Precision is true positives divided by true positives plus false positives."
+  - q: "For the rules, there were 35 true positives, 14 false positives and 2 false negatives. What is the precision?"
+    options:
+    - "35 out of 37, about 0.95"
+    - "35 out of 49, about 0.71"
+    - "35 out of 51, about 0.69"
+    - "14 out of 49, about 0.29"
+    answer: B
+    explain: "Precision is 35 divided by 35 plus 14, which is 35 out of 49. Recall is 35 out of 37."
+  - q: "What does recall answer?"
+    options:
+    - "Of the dots called ends, how many are real"
+    - "How many dots are in the text"
+    - "How fast the detector runs"
+    - "Of the real sentence ends, how many did the detector find"
+    answer: D
+    explain: "Recall is true positives divided by true positives plus false negatives, 35 out of 37 for the rules, about 0.95."
+  - q: "A detector has precision 1.00 and recall 0.10 (made up for illustration). What is its F-measure?"
+    options:
+    - "About 0.18, far below the plain average"
+    - "About 0.55, the plain average"
+    - "1.00"
+    - "About 0.90, close to precision"
+    answer: A
+    explain: "The F-measure is the harmonic mean, two times precision times recall divided by their sum, so it stays near the weaker number."
+  - q: "A detector says end for every dot. What are its precision and recall on the test text?"
+    options:
+    - "Precision 1.00 and recall 0.55"
+    - "Precision 0.55 and recall 0.55"
+    - "Precision 0.55 and recall 1.00"
+    - "Precision 0 and recall 0"
+    answer: C
+    explain: "It finds every real end, so recall is 1.00, but 30 of the 67 dots are not ends, so precision is about 0.55."
+  - q: "What happened when the threshold of the logistic model was raised to 0.9?"
+    options:
+    - "Recall rose to 1.00 and precision fell"
+    - "Both precision and recall rose"
+    - "Both stayed the same"
+    - "Precision rose to 1.00 but recall collapsed to about 0.19"
+    answer: D
+    explain: "A high threshold makes the model very careful. The F-measure fell to about 0.32, while a balanced middle gave about 0.93."
+  - q: "What does a false positive mean for sentence boundary detection?"
+    options:
+    - "A false end, which cuts a good sentence in two"
+    - "A missed end, which glues two sentences together"
+    - "A correct end"
+    - "A correct non-end"
+    answer: A
+    explain: "A false positive is a dot called an end that is not one. A missed end is a false negative."
+- slug: "u1-p6"
+  title: "Part 6: Features, with unit summary"
+  status: approved
+  pass_percent: 70
+  questions:
+  - q: "What is a feature in our boundary detectors?"
+    options:
+    - "The probability of an end"
+    - "A yes or no question about a candidate dot"
+    - "A sentence of the text"
+    - "The weight of the model"
+    answer: B
+    explain: "The answers for one dot form a feature vector, and the model turns the vector into a probability."
+  - q: "Which of these is a typographic feature?"
+    options:
+    - "The word before the dot is Mr"
+    - "The pause before the next word"
+    - "A new line after the dot"
+    - "The next word starts with a capital"
+    answer: C
+    explain: "Typographic features describe layout, such as the space after the dot, a new line, or the end of the text."
+  - q: "Why do prosodic features help for a speech transcript?"
+    options:
+    - "Speech always has dots"
+    - "Prosody gives the spelling of words"
+    - "Pauses are always exactly one second long"
+    - "The transcript has no dots or capitals, but the sound has pauses and pitch resets"
+    answer: D
+    explain: "Three common prosodic clues are the pause, the pitch reset at a new sentence, and the fall of energy at the end of a sentence."
+  - q: "In the simulated pause data (assumed numbers), a cut at 0.30 seconds was right for about what share of the gaps?"
+    options:
+    - "92 percent"
+    - "50 percent"
+    - "100 percent"
+    - "67 percent"
+    answer: A
+    explain: "The numbers were simulated with an assumed spread, for illustration. Adding the pitch reset raised the accuracy to about 95.6 percent."
+  - q: "What does information gain measure?"
+    options:
+    - "How many words the feature contains"
+    - "How fast the feature is computed"
+    - "How much of the uncertainty about the label is removed by knowing the feature"
+    - "How many dots are in the text"
+    answer: C
+    explain: "The labels had about 0.96 bits of uncertainty. A short word before the dot removed 0.352 bits, the most of all."
+  - q: "How does forward selection work?"
+    options:
+    - "Add the feature that helps most, repeat, and stop when nothing improves"
+    - "Start with all features and remove one at a time"
+    - "Pick features at random"
+    - "Rank each feature once and never train a model"
+    answer: A
+    explain: "On our text two features were enough: a short word before the dot, then a new line after it."
+  - q: "When 60 random features were added to a model trained on 30 dots, what happened to the accuracy?"
+    options:
+    - "Both went up to 1.00"
+    - "Training accuracy fell and test accuracy rose"
+    - "Nothing changed"
+    - "Training accuracy reached 1.00 while test accuracy fell to about 0.63"
+    answer: D
+    explain: "The model memorized noise in the training dots. This is overfitting, and test dots must be kept separate."
+  - q: "The test accuracy was 0.70 with only the next-capital feature and 1.00 after adding the word before the dot. What changed between the two?"
+    options:
+    - "The model and the algorithm"
+    - "Only the features"
+    - "The test dots"
+    - "The labels"
+    answer: B
+    explain: "The model, the data and the algorithm stayed the same, which is why feature design is where most of the work goes."
+  - q: "Which selection method trains the model on subsets of features and judges each subset?"
+    options:
+    - "The wrapper method"
+    - "The filter method"
+    - "The embedded method"
+    - "The tokenizer method"
+    answer: A
+    explain: "A filter scores features alone, a wrapper tries subsets as forward selection does, and an embedded method shrinks useless weights during training."
+  - q: "Which line matches Parts 1 to 6 of Unit I in order?"
+    options:
+    - "Features, measures, boundaries, models, issues, words"
+    - "Models, words, features, issues, boundaries, measures"
+    - "Boundaries, words, models, measures, features, issues"
+    - "Words, issues, models, boundaries, measures, features"
+    answer: D
+    explain: "The unit moves from the structure of words, through their problems and models, to document boundaries, how to measure them, and the features they use."

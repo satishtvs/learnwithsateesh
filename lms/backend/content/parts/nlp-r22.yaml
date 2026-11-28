@@ -1,0 +1,62 @@
+# Natural Language Processing (JNTUH R22 CSE-AIML, III-II): the video parts.
+# Ids are written by `python -m lws.package apply` (keys nlp-u1-p1 ...); keep the `youtube_id: null` placeholders.
+# The course is hidden from students until it is published in the instructor admin.
+
+course:
+  slug: natural-language-processing-r22
+  title: "Natural Language Processing: JNTUH R22 B.Tech CSE (AI&ML), III-II"
+  description: "Unit-wise video parts and quizzes for Natural Language Processing (AM603PC), following Bikel and Zitouni, Multilingual Natural Language Processing Applications."
+
+units:
+  - code: U1
+    title: "Finding the Structure of Words and Documents"
+    label: "Unit - I"
+    textbook_ref: "Bikel and Zitouni"
+    parts:
+      - {slug: u1-p1, title: "Part 1: Words and their components", youtube_id: At4UeRZfAFw}
+      - {slug: u1-p2, title: "Part 2: Issues and challenges in finding word structure", youtube_id: KKAnGl2EBf4}
+      - {slug: u1-p3, title: "Part 3: Morphological models", youtube_id: 904Y7v9T7qw}
+      - {slug: u1-p4, title: "Part 4: Finding the structure of documents: sentences and topics", youtube_id: 33jtNLrrYJY}
+      - {slug: u1-p5, title: "Part 5: Complexity of the approaches and performance measures", youtube_id: jMNvgVQ5Rb8}
+      - {slug: u1-p6, title: "Part 6: Features, with unit summary", youtube_id: CpO4h4XOrpI}
+  - code: U2
+    title: "Syntax I"
+    label: "Unit - II"
+    textbook_ref: "Bikel and Zitouni"
+    parts:
+      - {slug: u2-p1, title: "Part 1: Parsing natural language, grammars and ambiguity", youtube_id: null}
+      - {slug: u2-p2, title: "Part 2: Treebanks, a data-driven approach to syntax", youtube_id: null}
+      - {slug: u2-p3, title: "Part 3: Representation of syntactic structure", youtube_id: null}
+      - {slug: u2-p4, title: "Part 4: Parsing algorithms, top-down, bottom-up and CKY", youtube_id: null}
+      - {slug: u2-p5, title: "Part 5: Probabilistic and dependency parsing", youtube_id: null}
+  - code: U3
+    title: "Syntax II and Semantic Parsing I"
+    label: "Unit - III"
+    textbook_ref: "Bikel and Zitouni"
+    parts:
+      - {slug: u3-p1, title: "Part 1: Models for ambiguity resolution in parsing", youtube_id: null}
+      - {slug: u3-p2, title: "Part 2: Discriminative models and parse reranking", youtube_id: null}
+      - {slug: u3-p3, title: "Part 3: Multilingual issues in parsing", youtube_id: null}
+      - {slug: u3-p4, title: "Part 4: Semantic parsing: introduction and interpretation", youtube_id: null}
+      - {slug: u3-p5, title: "Part 5: System paradigms for semantic parsing", youtube_id: null}
+      - {slug: u3-p6, title: "Part 6: Word sense", youtube_id: null}
+  - code: U4
+    title: "Semantic Parsing II"
+    label: "Unit - IV"
+    textbook_ref: "Bikel and Zitouni"
+    parts:
+      - {slug: u4-p1, title: "Part 1: Predicate-argument structure and semantic roles", youtube_id: null}
+      - {slug: u4-p2, title: "Part 2: Semantic role labeling", youtube_id: null}
+      - {slug: u4-p3, title: "Part 3: Meaning representation, logical forms", youtube_id: null}
+      - {slug: u4-p4, title: "Part 4: Semantic networks, frames and graph-based meaning", youtube_id: null}
+  - code: U5
+    title: "Language Modeling"
+    label: "Unit - V"
+    textbook_ref: "Bikel and Zitouni"
+    parts:
+      - {slug: u5-p1, title: "Part 1: Language modeling and n-gram models", youtube_id: null}
+      - {slug: u5-p2, title: "Part 2: Language model evaluation", youtube_id: null}
+      - {slug: u5-p3, title: "Part 3: Smoothing and Bayesian estimation", youtube_id: null}
+      - {slug: u5-p4, title: "Part 4: Language model adaptation", youtube_id: null}
+      - {slug: u5-p5, title: "Part 5: Types of language models", youtube_id: null}
+      - {slug: u5-p6, title: "Part 6: Topic-based and multilingual language models", youtube_id: null}
